@@ -23,8 +23,17 @@ Phase is intended to be used on projects where:
 Installation
 ------------
 
-Check the `deployment` doc to see how to properly install Phase on a local
-machine.
+We provide an Ansible recipe that can be used for both production server and
+local development machine provisioning.
+
+Check the `deployment` doc to see how to properly use the Ansible script.
+
+We also provide a script helper to create a local development machine using
+LXC.
+
+    git clone https://github.com/PhaseDMS/phase.git
+    cd phase/deployment
+    ./local_vm_creation.sh
 
 Contributing
 ------------
