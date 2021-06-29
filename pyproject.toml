@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Django = "^3.2.4"
+Django = "~3.2"
 ansible = "^4.1.0"
 django-braces = "^1.14.0"
 django-model-utils = "^4.1.1"
