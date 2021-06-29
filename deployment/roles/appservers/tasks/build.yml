@@ -9,6 +9,19 @@
         msg: "Starting building tasks"
         verbosity: 3
 
+    - name: Get the virtualenv path
+      shell: "{{ poetry_bin }} env info --path"
+      register: poetry_output
+      args:
+        chdir: "{{ django_root }}"
+
+
+    - name: Stores the virtualenv path for further usage
+      set_fact:
+        venv_dir: "{{ poetry_output.stdout }}"
+        bin_dir: "{{ poetry_output.stdout }}/bin"
+        activate_bin: "{{ poetry_output.stdout }}/bin/activate"
+
     - name: Pull / clone main project repo
       when: project_env == "production"
       git:
@@ -32,19 +45,11 @@
         src: ../../../src/{{ env_file }}
         dest: "{{ django_root }}/{{ env_target }}"
 
-    - name: Install python packages for production
-      when: project_env == "production"
-      pip:
-        requirements: "{{ requirements_root }}/prod.txt"
+    - name: Install python packages
+      shell: |
+        {{ poetry_bin }} install
+      args:
         chdir: "{{ django_root }}"
-        virtualenv: "{{ venv_dir }}"
-
-    - name: Install python packages for dev
-      when: project_env == "local"
-      pip:
-        requirements: "{{ requirements_root }}/local.txt"
-        chdir: "{{ django_root }}"
-        virtualenv: "{{ venv_dir }}"
 
     # - name: Install js packages assets
     #   shell: npm ci

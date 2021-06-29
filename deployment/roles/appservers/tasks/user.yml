@@ -4,6 +4,8 @@
     name: "{{ user_name }}"
     state: present
     password_lock: true
+    skeleton: "/etc/skel"
+    create_home: yes
     shell: /bin/bash
 
 - name: Change owner
