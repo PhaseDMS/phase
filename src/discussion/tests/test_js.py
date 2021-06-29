@@ -1,6 +1,6 @@
 import os.path
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from casper.tests import CasperTestCase
 
 from accounts.factories import UserFactory

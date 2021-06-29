@@ -12,7 +12,7 @@ from collections import OrderedDict
 from django import forms
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.files.base import ContentFile
 from django.utils import timezone
 

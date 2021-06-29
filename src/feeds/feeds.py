@@ -7,7 +7,7 @@ from datetime import datetime, time
 from django.contrib.syndication.views import Feed
 from django.views.generic import View
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse

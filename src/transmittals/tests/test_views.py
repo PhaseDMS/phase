@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.utils.html import escape
 from django.core.files.uploadedfile import SimpleUploadedFile

@@ -6,7 +6,7 @@ from itertools import zip_longest
 from django.apps import apps
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _

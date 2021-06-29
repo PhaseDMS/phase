@@ -3,7 +3,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from categories.models import Category
 from dashboards.fields import DashboardProviderChoiceField

@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 from django.template import Template
 from django.utils.text import slugify
 
-from crispy_forms.compatibility import text_type
 from crispy_forms.layout import Field, LayoutObject, Fieldset, TEMPLATE_PACK
 from crispy_forms.utils import render_field
 
@@ -161,7 +160,7 @@ class PropertyLayout(LayoutObject):
             'name': name,
             'value': value,
         })
-        return Template(text_type(template)).render(context)
+        return Template(template).render(context)
 
 
 class YesNoLayout(PropertyLayout):
@@ -224,7 +223,7 @@ class UneditableFile(LayoutObject):
         if field_name not in form.rendered_fields:
             form.rendered_fields.add(field_name)
 
-        return Template(text_type(html)).render(context)
+        return Template(html).render(context)
 
 
 class DocumentFieldset(Fieldset):

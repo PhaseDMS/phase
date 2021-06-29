@@ -10,7 +10,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import get_object_or_404
 from django.http import (HttpResponse, HttpResponseRedirect, Http404,
                          HttpResponseForbidden)
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.forms.models import modelform_factory

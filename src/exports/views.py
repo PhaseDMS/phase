@@ -5,7 +5,7 @@ import os
 
 from django.views.generic import ListView, UpdateView, View
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, Http404
 from django.views.static import serve
 from django.shortcuts import get_object_or_404

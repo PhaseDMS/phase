@@ -8,7 +8,7 @@ from zipfile import ZipFile
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
 

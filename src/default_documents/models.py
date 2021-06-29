@@ -7,7 +7,7 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django import forms
 
 from elasticsearch_dsl import Q

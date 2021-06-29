@@ -5,7 +5,7 @@ from django import forms
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from crispy_forms.layout import Field
 
