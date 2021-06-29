@@ -7,7 +7,7 @@ from celery import current_task
 
 from audit_trail.models import Activity
 from audit_trail.signals import activity_log
-from core.celery import app
+from core.celeryapp import app
 from accounts.models import Entity, User
 from categories.models import Category
 from documents.models import Document

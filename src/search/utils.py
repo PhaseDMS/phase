@@ -6,7 +6,7 @@ from django.db import models
 from elasticsearch.helpers import bulk
 from elasticsearch.exceptions import ConnectionError
 
-from core.celery import app
+from core.celeryapp import app
 from categories.models import Category
 from search import elastic, INDEX_SETTINGS
 from documents.models import Document

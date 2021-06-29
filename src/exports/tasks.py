@@ -3,7 +3,7 @@
 
 from django.conf import settings
 
-from core.celery import app
+from core.celeryapp import app
 
 from accounts.models import User
 from audit_trail.models import Activity
