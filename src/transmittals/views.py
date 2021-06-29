@@ -2,7 +2,7 @@ import logging
 
 from django.views.generic import ListView, DetailView
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.utils import timezone
 from django.shortcuts import get_object_or_404

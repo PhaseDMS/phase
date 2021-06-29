@@ -4,7 +4,7 @@
 import datetime
 
 from django.utils.timezone import utc
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from accounts.factories import EntityFactory
 from default_documents.tests.test import ContractorDeliverableTestCase

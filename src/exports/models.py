@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.module_loading import import_string
 from django.http import QueryDict
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 
 from model_utils import Choices

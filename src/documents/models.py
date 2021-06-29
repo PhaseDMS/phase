@@ -10,7 +10,7 @@ from django.db.models.base import ModelBase
 from django.utils import timezone, six
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import FieldDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from annoying.functions import get_object_or_None
 

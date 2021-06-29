@@ -2,7 +2,7 @@
 
 
 from django import forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string

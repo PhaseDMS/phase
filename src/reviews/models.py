@@ -10,7 +10,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from model_utils import Choices
 
 from accounts.models import User

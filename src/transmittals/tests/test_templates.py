@@ -2,7 +2,7 @@
 
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from accounts.factories import UserFactory
 from transmittals.factories import create_transmittal
