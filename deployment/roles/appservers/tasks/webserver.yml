@@ -1,14 +1,15 @@
 ---
-- name: Create main site supervisor configuration
+- name: Create main supervisor configuration
   template:
     src: supervisor.j2
     dest: /etc/supervisor/conf.d/{{ project_name }}.conf
 
+- name: Create main nginx configuration
   template:
     src: nginx_main.j2
     dest: /etc/nginx/sites-available/{{ project_name }}
 
-- name: Create main site nginx symlink
+- name: Create nginx configuration symlink
   file:
     src: /etc/nginx/sites-available/{{ project_name }}
     dest: /etc/nginx/sites-enabled/{{ project_name }}

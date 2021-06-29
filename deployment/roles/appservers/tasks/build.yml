@@ -18,13 +18,13 @@
         accept_hostkey: yes
 
     - name: Install additional document apps
-    when: project_env == "production"
-    git:
-      repo: "{{ item.repo }}"
-      dest: "{{ install_root }}/{{ item.name }}"
-      accept_hostkey: yes
-      version: "{{ project_version }}"
-    with_items: "{{ document_apps }}"
+      when: project_env == "production"
+      git:
+        repo: "{{ item.repo }}"
+        dest: "{{ install_root }}/{{ item.name }}"
+        accept_hostkey: yes
+        version: "{{ project_version }}"
+      with_items: "{{ document_apps }}"
 
     - name: Copy private production settings to the remote
       when: project_env == "production"
@@ -34,22 +34,22 @@
 
     - name: Install python packages for production
       when: project_env == "production"
-      shell: |
-        . {{ activate_bin }} && {{ pipenv_bin }} sync
-      args:
+      pip:
+        requirements: "{{ requirements_root }}/prod.txt"
         chdir: "{{ django_root }}"
+        virtualenv: "{{ venv_dir }}"
 
     - name: Install python packages for dev
       when: project_env == "local"
-      shell: |
-        . {{ activate_bin }} && {{ pipenv_bin }} sync --dev
-      args:
+      pip:
+        requirements: "{{ requirements_root }}/local.txt"
         chdir: "{{ django_root }}"
+        virtualenv: "{{ venv_dir }}"
 
-    - name: Install js packages assets
-      shell: npm ci
-      args:
-        chdir: "{{ django_root }}"
+    # - name: Install js packages assets
+    #   shell: npm ci
+    #   args:
+    #     chdir: "{{ django_root }}"
 
     - name: Run Django database migrations
       django_manage:

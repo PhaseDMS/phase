@@ -9,7 +9,7 @@
 - import_tasks: cron.yml
   when: project_env == "production"
 - import_tasks: virtualenv.yml
-- import_tasks: cache.yml
 - import_tasks: build.yml
 - import_tasks: restart.yml
+- import_tasks: cache.yml
   when: project_env == "production"

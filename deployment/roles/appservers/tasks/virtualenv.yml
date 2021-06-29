@@ -13,10 +13,13 @@
   args:
     creates: "{{ venv_dir }}"
 
-- name: Install pipenv
+- name: Fetch poetry install script
+  get_url:
+    url: https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py
+    dest: /tmp/
+    mode: 0755
+
+- name: Install poetry
   become: yes
   become_user: "{{ user_name }}"
-  pip:
-    name: pipenv
-    virtualenv: "{{ venv_dir }}"
-    virtualenv_command  : "{{ venv_dir }}/bin/python3 -m venv"
+  command: python3 /tmp/install-poetry.py -y
