@@ -68,7 +68,7 @@ class CategoryTemplate(models.Model):
     # We use a generic foreign key to reference
     # the type of document metadata this category
     # will host.
-    metadata_model = models.ForeignKey(ContentType)
+    metadata_model = models.ForeignKey(ContentType, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = _('Category template')
@@ -91,10 +91,12 @@ class Category(models.Model):
 
     organisation = models.ForeignKey(
         Organisation,
+        on_delete=models.PROTECT,
         related_name='categories',
         verbose_name=_('Organisation'))
     category_template = models.ForeignKey(
         CategoryTemplate,
+        on_delete=models.PROTECT,
         verbose_name=_('Category template'))
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

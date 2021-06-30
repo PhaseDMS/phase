@@ -76,6 +76,7 @@ class ImportBatch(models.Model):
     uid = UUIDField(primary_key=True)
     category = models.ForeignKey(
         Category,
+        on_delete=models.PROTECT,
         verbose_name=_('Category')
     )
     file = models.FileField(
@@ -178,10 +179,12 @@ class Import(models.Model):
     line = models.IntegerField(_('Line'))
     batch = models.ForeignKey(
         ImportBatch,
+        on_delete=models.PROTECT,
         verbose_name=_('Batch'),
     )
     document = models.ForeignKey(
         Document,
+        on_delete=models.PROTECT,
         null=True, blank=True
     )
     status = models.CharField(

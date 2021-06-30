@@ -9,6 +9,7 @@ from accounts.models import User
 class Notification(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
         verbose_name=_('User'))
     title = models.CharField(
         _('Title'),

@@ -9,8 +9,8 @@ from categories.models import Category
 
 class Bookmark(models.Model):
     """A simple link stored in db."""
-    user = models.ForeignKey(User)
-    category = models.ForeignKey(Category)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(
         _('Name'),
         max_length=50)

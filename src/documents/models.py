@@ -44,6 +44,7 @@ class Document(models.Model):
         verbose_name="Title")
     category = models.ForeignKey(
         Category,
+        on_delete=models.PROTECT,
         verbose_name=_('Category'),
         related_name='documents')
     created_on = models.DateField(

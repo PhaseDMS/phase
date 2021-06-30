@@ -50,7 +50,7 @@ class Activity(models.Model):
 
     # The object that performed the activity.
     actor_content_type = models.ForeignKey(
-        ContentType, related_name='actor', blank=True, null=True)
+        ContentType, on_delete=models.CASCADE, related_name='actor', blank=True, null=True)
     actor_object_id = models.PositiveIntegerField(blank=True, null=True)
     actor = GenericForeignKey('actor_content_type', 'actor_object_id')
     actor_object_str = models.CharField(
@@ -65,6 +65,7 @@ class Activity(models.Model):
     # The object linked to the action itself.
     action_object_content_type = models.ForeignKey(
         ContentType,
+        on_delete=models.CASCADE,
         related_name='action_object',
         blank=True,
         null=True)
@@ -76,7 +77,7 @@ class Activity(models.Model):
 
     # The object to which the activity was performed.
     target_content_type = models.ForeignKey(
-        ContentType, related_name='target', blank=True, null=True)
+        ContentType, on_delete=models.CASCADE, related_name='target', blank=True, null=True)
     target_object_id = models.PositiveIntegerField(blank=True, null=True)
     target = GenericForeignKey(
         'target_content_type', 'target_object_id')

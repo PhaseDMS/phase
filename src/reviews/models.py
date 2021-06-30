@@ -54,6 +54,7 @@ class Review(models.Model):
 
     reviewer = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('User'),
     )
     role = models.CharField(
@@ -64,6 +65,7 @@ class Review(models.Model):
     )
     document = models.ForeignKey(
         Document,
+        on_delete=models.PROTECT,
         verbose_name=_('Document')
     )
     revision = models.PositiveIntegerField(
@@ -223,11 +225,13 @@ class ReviewMixin(models.Model):
         blank=True)
     leader = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('Leader'),
         related_name='%(app_label)s_%(class)s_related_leader',
         null=True, blank=True)
     approver = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('Approver'),
         related_name='%(app_label)s_%(class)s_related_approver',
         null=True, blank=True)

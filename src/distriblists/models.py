@@ -22,11 +22,13 @@ class DistributionList(models.Model):
         blank=True)
     leader = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('Leader'),
         related_name='related_lists_as_leader',
         limit_choices_to={'is_external': False})
     approver = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('Approver'),
         related_name='related_lists_as_approver',
         limit_choices_to={'is_external': False},

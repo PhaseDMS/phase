@@ -26,6 +26,7 @@ from .validators import StringNumberValidator
 class ContractorDeliverable(ScheduleMixin, Metadata):
     latest_revision = models.ForeignKey(
         'ContractorDeliverableRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
 
@@ -42,6 +43,7 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
         max_length=50)
     originator = models.ForeignKey(
         'accounts.Entity',
+        on_delete=models.PROTECT,
         verbose_name=_('Originator'))
     unit = ConfigurableChoiceField(
         verbose_name="Unit",
@@ -416,7 +418,7 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
 
 class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
     # Revision
-    metadata = models.ForeignKey('ContractorDeliverable')
+    metadata = models.ForeignKey('ContractorDeliverable', on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
         verbose_name="Status",
         default="STD",
@@ -436,6 +438,7 @@ class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
 class Correspondence(Metadata):
     latest_revision = models.ForeignKey(
         'CorrespondenceRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
 
@@ -565,7 +568,7 @@ class Correspondence(Metadata):
 
 
 class CorrespondenceRevision(MetadataRevision):
-    metadata = models.ForeignKey('Correspondence')
+    metadata = models.ForeignKey('Correspondence', on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
         _('Status'),
         max_length=20,
@@ -580,6 +583,7 @@ class CorrespondenceRevision(MetadataRevision):
         null=True, blank=True)
     leader = models.ForeignKey(
         User,
+        on_delete=models.PROTECT,
         verbose_name=_('Leader'),
         related_name='leading_correspondance',
         null=True, blank=True)
@@ -591,6 +595,7 @@ class CorrespondenceRevision(MetadataRevision):
 class MinutesOfMeeting(Metadata):
     latest_revision = models.ForeignKey(
         'MinutesOfMeetingRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
 
@@ -697,7 +702,7 @@ class MinutesOfMeeting(Metadata):
 
 
 class MinutesOfMeetingRevision(MetadataRevision):
-    metadata = models.ForeignKey('MinutesOfMeeting')
+    metadata = models.ForeignKey('MinutesOfMeeting', on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
         _('Status'),
         max_length=20,
@@ -711,6 +716,7 @@ class MinutesOfMeetingRevision(MetadataRevision):
 class DemoMetadata(Metadata):
     latest_revision = models.ForeignKey(
         'DemoMetadataRevision',
+        on_delete=models.PROTECT,
         verbose_name=_('Latest revision'),
         null=True)
     title = models.CharField(
@@ -760,7 +766,7 @@ class DemoMetadata(Metadata):
 
 
 class DemoMetadataRevision(ReviewMixin, MetadataRevision):
-    metadata = models.ForeignKey('DemoMetadata')
+    metadata = models.ForeignKey('DemoMetadata', on_delete=models.PROTECT)
     STATUSES = (
         ('STD', 'Started'),
         ('IDC', 'Inter Discipline Check'),
@@ -790,11 +796,13 @@ class DemoMetadataRevision(ReviewMixin, MetadataRevision):
 class GtgMetadata(Metadata):
     latest_revision = models.ForeignKey(
         'GtgMetadataRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
     title = models.TextField(_('title'))
     originator = models.ForeignKey(
         'accounts.Entity',
+        on_delete=models.PROTECT,
         verbose_name=_('Originator'),
         limit_choices_to={'type': 'originator'})
     unit = ConfigurableChoiceField(
@@ -1038,7 +1046,7 @@ class GtgMetadata(Metadata):
 
 
 class GtgMetadataRevision(TransmittableMixin, MetadataRevision):
-    metadata = models.ForeignKey('GtgMetadata')
+    metadata = models.ForeignKey('GtgMetadata', on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
         _('Status'),
         max_length=3,

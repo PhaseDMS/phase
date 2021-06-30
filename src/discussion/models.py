@@ -22,11 +22,13 @@ class Note(models.Model):
     """
     document = models.ForeignKey(
         Document,
+        on_delete=models.PROTECT,
         verbose_name=_('Document'))
     revision = models.PositiveIntegerField(
         _('Revision'))
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
         verbose_name=_('Author'))
     body = models.TextField(
         _('Body'))

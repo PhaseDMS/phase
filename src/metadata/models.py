@@ -34,6 +34,7 @@ class ListEntry(models.Model):
     """Single entry in a values list."""
     values_list = models.ForeignKey(
         ValuesList,
+        on_delete=models.PROTECT,
         verbose_name=_('List'),
         related_name='values')
     order = models.PositiveIntegerField(

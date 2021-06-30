@@ -52,6 +52,7 @@ class Transmittal(Metadata):
 
     latest_revision = models.ForeignKey(
         'TransmittalRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
 
@@ -242,7 +243,7 @@ class Transmittal(Metadata):
 
 
 class TransmittalRevision(MetadataRevision):
-    metadata = models.ForeignKey('Transmittal')
+    metadata = models.ForeignKey('Transmittal', on_delete=models.PROTECT)
     trs_status = ConfigurableChoiceField(
         _('Status'),
         max_length=20,
@@ -257,15 +258,17 @@ class TrsRevision(models.Model):
     """Stores data imported from a single line in the csv."""
     transmittal = models.ForeignKey(
         Transmittal,
+        on_delete=models.PROTECT,
         verbose_name=_('Transmittal'))
     document = models.ForeignKey(
         Document,
+        on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_('Document'))
     document_key = models.SlugField(
         _('Document number'),
         max_length=250)
-    category = models.ForeignKey('categories.Category')
+    category = models.ForeignKey('categories.Category', on_delete=models.PROTECT)
     title = models.TextField(
         verbose_name=_('Title'))
     revision = models.PositiveIntegerField(
@@ -302,6 +305,7 @@ class TrsRevision(models.Model):
         max_length=50)
     originator = models.ForeignKey(
         'accounts.Entity',
+        on_delete=models.PROTECT,
         verbose_name=_('Originator'))
     unit = ConfigurableChoiceField(
         verbose_name=_('Unit'),
@@ -481,6 +485,7 @@ class OutgoingTransmittal(Metadata):
 
     latest_revision = models.ForeignKey(
         'OutgoingTransmittalRevision',
+        on_delete=models.PROTECT,
         null=True,
         verbose_name=_('Latest revision'))
 
@@ -504,6 +509,7 @@ class OutgoingTransmittal(Metadata):
         max_length=3)
     recipient = models.ForeignKey(
         'accounts.Entity',
+        on_delete=models.PROTECT,
         verbose_name=_('Recipient'))
     sequential_number = models.PositiveIntegerField(
         _('sequential number'),
@@ -750,7 +756,7 @@ class OutgoingTransmittal(Metadata):
 
 
 class OutgoingTransmittalRevision(MetadataRevisionBase):
-    metadata = models.ForeignKey('OutgoingTransmittal')
+    metadata = models.ForeignKey('OutgoingTransmittal', on_delete=models.PROTECT)
     error_msg = models.TextField(
         _('Error message'),
         help_text=_('Report an error to the DC'),
@@ -809,8 +815,8 @@ class OutgoingTransmittalRevision(MetadataRevisionBase):
 
 class ExportedRevision(models.Model):
     """Link between an outgoing transmittal and an exported document."""
-    document = models.ForeignKey(Document)
-    transmittal = models.ForeignKey(OutgoingTransmittal)
+    document = models.ForeignKey(Document, on_delete=models.PROTECT)
+    transmittal = models.ForeignKey(OutgoingTransmittal, on_delete=models.PROTECT)
     revision = models.PositiveIntegerField(_('Revision'))
     title = models.TextField(_('Title'))
     status = models.CharField(_('Status'), max_length=5)
@@ -849,6 +855,7 @@ class TransmittableMixin(ReviewMixin):
         upload_to=file_transmitted_file_path)
     under_preparation_by = models.ForeignKey(
         'accounts.User',
+        on_delete=models.PROTECT,
         verbose_name=_('Under preparation by'),
         related_name='+',
         null=True, blank=True)

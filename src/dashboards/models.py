@@ -20,6 +20,7 @@ class Dashboard(models.Model):
         max_length=250)
     category = models.ForeignKey(
         Category,
+        on_delete=models.PROTECT,
         verbose_name=_('Category'))
     data_provider = DashboardProviderChoiceField(
         _('Dashboard data provider'))

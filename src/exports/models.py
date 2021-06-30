@@ -36,9 +36,11 @@ class Export(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
         'accounts.User',
+        on_delete=models.PROTECT,
         verbose_name=_('Owner'))
     category = models.ForeignKey(
         'categories.Category',
+        on_delete=models.PROTECT,
         verbose_name=_('Category'))
     querystring = models.TextField(
         _('Querystring'),
