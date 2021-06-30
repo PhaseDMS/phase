@@ -33,7 +33,7 @@ def isnew_label(trs_revision):
         '<span class="label label-{}">{}</span>', label_class, label_text)
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_outgoing_transmittal_categories(organisation_slug=None):
     """Return categories with an "OutgoingTransmittal" content type"""
     ct = ContentType.objects.get_for_model(OutgoingTransmittal)
