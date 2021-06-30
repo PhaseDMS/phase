@@ -16,6 +16,6 @@ note_detail = DiscussionViewSet.as_view({
 
 
 urlpatterns = [
-    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/$', note_list, name='note-list'),
-    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<pk>\d+)/$', note_detail, name='note-detail'),
+    path('<slug:document_key>/<int:revision>/', note_list, name='note-list'),
+    path('<slug:document_key>/<int:revision>/<int:pk>/', note_detail, name='note-detail'),
 ]

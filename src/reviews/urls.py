@@ -12,61 +12,61 @@ from reviews.feeds import (
 urlpatterns = [
 
     # Review home page
-    path('$',
+    path('',
         ReviewHome.as_view(),
         name='review_home'),
 
     # Cancel review
-    path('(?P<document_key>[\w-]+)/cancel/$',
+    path('<slug:document_key>/cancel/',
         CancelReview.as_view(),
         name="document_cancel_review"),
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/batchcancel/$',
+    path('<slug:organisation>/<slug:category>/batchcancel/',
         BatchCancelReviews.as_view(),
         name="batch_cancel_reviews"),
 
     # Start review
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/batchstart/$',
+    path('<slug:organisation>/<slug:category>/batchstart/',
         BatchStartReviews.as_view(),
         name="batch_start_reviews"),
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/$',
+    path('<slug:organisation>/<slug:category>/<slug:document_key>/',
         StartReview.as_view(),
         name="document_start_review"),
 
     # Review steps
-    path('priorities/$',
+    path('priorities/',
         PrioritiesDocumentList.as_view(),
         name="priorities_review_document_list"),
-    path('reviewers/$',
+    path('reviewers/',
         ReviewersDocumentList.as_view(),
         name="reviewers_review_document_list"),
-    path('leader/$',
+    path('leader/',
         LeaderDocumentList.as_view(),
         name="leader_review_document_list"),
-    path('approver/$',
+    path('approver/',
         ApproverDocumentList.as_view(),
         name="approver_review_document_list"),
 
     # Review steps feeds
-    path('reviewers.rss$',
+    path('reviewers.rss',
         FeedReviewersDocumentList.as_view(),
         name="feed_reviewers_review_document_list"),
-    path('leader.rss$',
+    path('leader.rss',
         FeedLeaderDocumentList.as_view(),
         name="feed_leader_review_document_list"),
-    path('approver.rss$',
+    path('approver.rss',
         FeedApproverDocumentList.as_view(),
         name="feed_approver_review_document_list"),
 
     # Review form
-    path('(?P<document_key>[\w-]+)/$',
+    path('<slug:document_key>/',
         ReviewFormView.as_view(),
         name="review_document"),
 
     # Comments download
-    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/comments/(?P<review_id>\d+)/$',
+    path('<slug:document_key>/<int:revision>/comments/<int:review_id>/',
         CommentsDownload.as_view(),
         name="download_review_comments"),
-    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/comments/all.zip$',
+    path('<slug:document_key>/<int:revision>/comments/all.zip',
         CommentsArchiveDownload.as_view(),
         name="download_review_comments_archive"),
 ]

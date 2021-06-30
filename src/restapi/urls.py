@@ -30,7 +30,7 @@ urlpatterns = [
     path('audit-trail/', include('audit_trail.api.urls')),
 
     # Task progress polling url
-    path('poll/(?P<job_id>[\w-]+)/$',
+    path('poll/<int:job_id>/',
         TaskPollView.as_view(),
         name='task_poll'),
 ]

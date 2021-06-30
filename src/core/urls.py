@@ -22,14 +22,14 @@ urlpatterns = [
     path('search/', include('search.urls')),
     path('exports/', include('exports.urls')),
     path('feeds/', include('feeds.urls')),
-    path('protected/(?P<file_path>[-\w./]+)?$',
+    path('protected/<file_path>',
         ProtectedDownload.as_view(),
         name="protected_download"),
     path('reporting/', include('reporting.urls')),
     path('', include('categories.urls')),
     path('', include('dashboards.urls')),
     path('', include('documents.urls')),
-    path('robots\.txt$', lambda r: HttpResponse(
+    path('robots\.txt', lambda r: HttpResponse(
         "User-agent: *\nDisallow: /",
         content_type="text/plain")),
 ]

@@ -5,16 +5,16 @@ from imports.views import ImportList, FileUpload, ImportStatus, ImportTemplate
 
 urlpatterns = [
 
-    path('$',
+    path('',
         ImportList.as_view(),
         name='import_list'),
-    path('template/$',
+    path('template/',
         ImportTemplate.as_view(),
         name='import_template'),
-    path('import/$',
+    path('import/',
         FileUpload.as_view(),
         name='import_file'),
-    path('(?P<uid>[\w-]+)/$',
+    path('<slug:uid>/',
         ImportStatus.as_view(),
         name='import_status')
 ]

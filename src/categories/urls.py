@@ -4,7 +4,7 @@ from categories.views import CategoryList
 
 
 urlpatterns = [
-    path('$',
+    path('',
         CategoryList.as_view(),
         name="category_list"),
 ]

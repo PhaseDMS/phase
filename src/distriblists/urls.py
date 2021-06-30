@@ -4,7 +4,7 @@ from distriblists.views import DistributionListImport
 
 urlpatterns = [
 
-    path('import/$',
+    path('import/',
         DistributionListImport.as_view(),
         name='distrib_list_import'),
 ]

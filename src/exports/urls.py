@@ -5,13 +5,13 @@ from exports.views import ExportCreate, ExportList, DownloadView
 
 urlpatterns = [
 
-    path('$',
+    path('',
         ExportList.as_view(),
         name="export_list"),
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path('<slug:organisation>/<slug:category>/',
         ExportCreate.as_view(),
         name="export_create"),
-    path('(?P<uid>[-\w]+)/$',
+    path('<slug:uid>/',
         DownloadView.as_view(),
         name='export_download')
 ]

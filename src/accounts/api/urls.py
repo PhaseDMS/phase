@@ -15,7 +15,7 @@ user_detail = UserViewSet.as_view({
 
 
 urlpatterns = [
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$', user_list, name='user-list'),
-    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<pk>\d+)/$',
+    path('<slug:organisation>/<slug:category>/', user_list, name='user-list'),
+    path('<slug:organisation>/<slug:category>/<int:pk>/',
         user_detail, name='user-detail'),
 ]

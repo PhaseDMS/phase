@@ -5,7 +5,7 @@ from .views import FavoriteList
 urlpatterns = [
 
     # Favorites
-    path('$',
+    path('',
         FavoriteList.as_view(),
         name="favorite_list"),
 ]
