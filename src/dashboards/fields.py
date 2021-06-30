@@ -2,7 +2,6 @@ from importlib import import_module
 
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.utils.six import string_types
 from django.utils.module_loading import import_string
 from django.conf import settings
 
@@ -58,7 +57,7 @@ class DashboardProviderChoiceField(models.Field):
         if value == '' or value is None:
             return None
 
-        if isinstance(value, string_types):
+        if isinstance(value, str):
             try:
                 value = import_string(value)
             except:  # noqa
