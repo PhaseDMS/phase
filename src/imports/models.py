@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from django_extensions.db.fields import UUIDField
 from model_utils import Choices
 from annoying.functions import get_object_or_None
 from openpyxl import load_workbook
@@ -71,7 +70,7 @@ class ImportBatch(models.Model):
         ('error', _('Error')),
     )
 
-    uid = UUIDField(primary_key=True)
+    uid = models.UUIDField(primary_key=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
