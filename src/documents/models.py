@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from django.db import models
 from django.db.models.base import ModelBase
-from django.utils import timezone, six
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import FieldDoesNotExist
 from django.urls import reverse
@@ -251,7 +251,7 @@ class MetadataManager(models.Manager):
         return self.get(document_key=document_key)
 
 
-class Metadata(six.with_metaclass(MetadataBase, models.Model)):
+class Metadata(models.Model, metaclass=MetadataBase):
     objects = MetadataManager()
 
     document = models.OneToOneField(Document)
