@@ -7,7 +7,6 @@ from django.apps import apps
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -63,7 +62,6 @@ def xls_to_django(value):
     return value
 
 
-@python_2_unicode_compatible
 class ImportBatch(models.Model):
     STATUSES = Choices(
         ('new', _('New')),
