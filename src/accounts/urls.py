@@ -13,13 +13,13 @@ urlpatterns = [
         auth_views.logout_then_login,
         name='logout'),
     path('password-reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        auth_views.password_reset_confirm,
+        auth_views.PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'),
     path('password-reset-complete/$',
-        auth_views.password_reset_complete,
+        auth_views.PasswordResetCompleteView.as_view(),
         name='password_reset_complete'),
     path('password-change/$',
-        auth_views.password_change,
+        auth_views.PasswordChangeView.as_view(),
         {'post_change_redirect': '/'},
         name='password_change')
 ]
