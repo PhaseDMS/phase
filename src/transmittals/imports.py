@@ -12,8 +12,7 @@ from annoying.functions import get_object_or_None
 
 from documents.models import Document
 from documents.utils import save_document_forms
-from transmittals.validation import (
-    TrsValidator, CSVLineValidator, RevisionsValidator)
+from transmittals.validation import TrsValidator, CSVLineValidator, RevisionsValidator
 from transmittals.reports import ErrorReport
 from accounts.models import Entity
 
@@ -30,9 +29,20 @@ class TrsImport(object):
     Those verifications must be performed upwards, e.g in the management command.
 
     """
-    def __init__(self, trs_dir, tobechecked_dir, accepted_dir, rejected_dir,
-                 email_list, contractor, doc_category, trs_category,
-                 trs_validator=None, csv_line_validator=None):
+
+    def __init__(
+        self,
+        trs_dir,
+        tobechecked_dir,
+        accepted_dir,
+        rejected_dir,
+        email_list,
+        contractor,
+        doc_category,
+        trs_category,
+        trs_validator=None,
+        csv_line_validator=None,
+    ):
         self.trs_dir = trs_dir
         self.tobechecked_dir = tobechecked_dir
         self.accepted_dir = accepted_dir
@@ -57,7 +67,7 @@ class TrsImport(object):
             yield import_line
 
     def do_import(self):
-        logger.info('Starting import of transmittals %s' % self.basename)
+        logger.info("Starting import of transmittals %s" % self.basename)
         if not self.is_valid():
             error_report = ErrorReport(self)
             error_report.send()
@@ -69,10 +79,7 @@ class TrsImport(object):
     def move_to_rejected(self):
         """Move the imported transmittals directory to rejected."""
         new_path = os.path.join(self.rejected_dir, self.basename)
-        logger.info('Moving transmittals from %s to %s' % (
-            self.trs_dir,
-            new_path
-        ))
+        logger.info("Moving transmittals from %s to %s" % (self.trs_dir, new_path))
 
         # If the dir already exists in rejected, it means it was previously
         # submitted and rejected, and the directory was not cleaned.
@@ -83,7 +90,7 @@ class TrsImport(object):
             # To make sure we won't delete system dir by mistake, we check
             # that new_path has a depth of at least 3
             new_path = os.path.abspath(new_path)
-            if new_path.count('/') < 3:
+            if new_path.count("/") < 3:
                 error = "Cannot delete old rejected transmittal %s" % new_path
                 logger.critical(error)
                 raise RuntimeError(error)
@@ -95,10 +102,7 @@ class TrsImport(object):
     def move_to_tobechecked(self):
         """Move the imported transmittals directory to tobechecked."""
         new_path = os.path.join(self.tobechecked_dir, self.basename)
-        logger.info('Moving transmittals from %s to %s' % (
-            self.trs_dir,
-            new_path
-        ))
+        logger.info("Moving transmittals from %s to %s" % (self.trs_dir, new_path))
 
         # If the dir already exists in tobechecked, it means we are accepting
         # the same transmittal twice. It cannot happen.
@@ -118,7 +122,7 @@ class TrsImport(object):
 
     @property
     def csv_fullname(self):
-        return os.path.join(self.trs_dir, '%s.csv' % self.basename)
+        return os.path.join(self.trs_dir, "%s.csv" % self.basename)
 
     @property
     def csv_basename(self):
@@ -151,8 +155,8 @@ class TrsImport(object):
         if not self._csv_lines:
             columns = self.expected_columns()
             try:
-                with open(self.csv_fullname, 'r') as f:
-                    csvfile = csv.DictReader(f, dialect='normal')
+                with open(self.csv_fullname, "r") as f:
+                    csvfile = csv.DictReader(f, dialect="normal")
                     lines = []
                     for row in csvfile:
                         line_row = {}
@@ -172,7 +176,7 @@ class TrsImport(object):
         """Returns the list of pdf files."""
         if not self._pdf_names:
             files = os.listdir(self.trs_dir)
-            self._pdf_names = [f for f in files if f.endswith('pdf')]
+            self._pdf_names = [f for f in files if f.endswith("pdf")]
 
         return self._pdf_names
 
@@ -180,7 +184,9 @@ class TrsImport(object):
         """Returns the list of native files."""
         if not self._native_names:
             files = os.listdir(self.trs_dir)
-            self._native_names = [f for f in files if (not f.endswith('pdf')) and f != self.csv_basename]
+            self._native_names = [
+                f for f in files if (not f.endswith("pdf")) and f != self.csv_basename
+            ]
 
         return self._native_names
 
@@ -192,7 +198,7 @@ class TrsImport(object):
 
     def validate(self):
         """Performs a full automatic validation of the transmittals."""
-        logger.info('Starting validation of transmittal %s' % self.basename)
+        logger.info("Starting validation of transmittal %s" % self.basename)
 
         self._errors = dict()
         self._validate_transmittal()
@@ -203,20 +209,20 @@ class TrsImport(object):
             self._validate_revisions()
 
     def _validate_transmittal(self):
-        logger.info('Validating transmittal')
+        logger.info("Validating transmittal")
 
         errors = self.TrsValidator().validate(self)
         if errors:
             self._errors.update(errors)
 
     def _validate_csv_content(self):
-        logger.info('Validating csv content')
+        logger.info("Validating csv content")
 
         errors = dict()
         line_nb = 1
         for import_line in self:
             if line_nb % 100 == 0:
-                logger.info('Validating line {}'.format(line_nb))
+                logger.info("Validating line {}".format(line_nb))
 
             line_errors = import_line.errors
             if line_errors:
@@ -226,11 +232,11 @@ class TrsImport(object):
             line_nb += 1
 
         if errors:
-            self._errors['csv_content'] = errors
+            self._errors["csv_content"] = errors
 
     def _validate_revisions(self):
         """Check that revision numbers are correct."""
-        logger.info('Validating revisions')
+        logger.info("Validating revisions")
 
         errors = RevisionsValidator().validate(self)
         if errors:
@@ -238,19 +244,19 @@ class TrsImport(object):
 
     @property
     def contract_number(self):
-        return self.basename.split('-')[0]
+        return self.basename.split("-")[0]
 
     @property
     def originator(self):
-        return self.basename.split('-')[1]
+        return self.basename.split("-")[1]
 
     @property
     def recipient(self):
-        return self.basename.split('-')[2]
+        return self.basename.split("-")[2]
 
     @property
     def sequential_number(self):
-        return int(self.basename.split('-')[4])
+        return int(self.basename.split("-")[4])
 
     @transaction.atomic
     def save(self):
@@ -264,41 +270,43 @@ class TrsImport(object):
         # Build the list of related documents
         keys = []
         for line in self:
-            key = line.csv_data['document_key']
+            key = line.csv_data["document_key"]
             if key not in keys:
                 keys.append(key)
-        related_documents = Document.objects \
-            .filter(document_key__in=keys) \
-            .values_list('id', flat=True)
+        related_documents = Document.objects.filter(document_key__in=keys).values_list(
+            "id", flat=True
+        )
 
         data = {
-            'contractor': self.contractor,
-            'tobechecked_dir': self.tobechecked_dir,
-            'accepted_dir': self.accepted_dir,
-            'rejected_dir': self.rejected_dir,
-            'contract_number': self.contract_number,
-            'originator': self.originator,
-            'recipient': self.recipient,
-            'sequential_number': self.sequential_number,
-            'status': 'tobechecked',
-            'related_documents': list(related_documents),
-            'revision_date': datetime.date.today(),
-            'received_date': datetime.date.today(),
-            'created_on': datetime.date.today(),
+            "contractor": self.contractor,
+            "tobechecked_dir": self.tobechecked_dir,
+            "accepted_dir": self.accepted_dir,
+            "rejected_dir": self.rejected_dir,
+            "contract_number": self.contract_number,
+            "originator": self.originator,
+            "recipient": self.recipient,
+            "sequential_number": self.sequential_number,
+            "status": "tobechecked",
+            "related_documents": list(related_documents),
+            "revision_date": datetime.date.today(),
+            "received_date": datetime.date.today(),
+            "created_on": datetime.date.today(),
         }
 
         # The csv file is linked in the "native_file" field
         native_file = File(open(self.csv_fullname))
         files = {
-            'native_file': native_file,
+            "native_file": native_file,
         }
 
         # Use document forms to create the Transmittal
         form = TransmittalForm(data=data, category=self.trs_category)
         revision_form = TransmittalRevisionForm(
-            data=data, files=files, category=self.trs_category)
+            data=data, files=files, category=self.trs_category
+        )
         doc, transmittal, revision = save_document_forms(
-            form, revision_form, self.trs_category, is_indexable=False)
+            form, revision_form, self.trs_category, is_indexable=False
+        )
 
         native_file.close()
 
@@ -306,38 +314,41 @@ class TrsImport(object):
         for line in self:
             data = line.cleaned_data
             metadata = line.get_metadata()
-            document = getattr(metadata, 'document', None)
+            document = getattr(metadata, "document", None)
 
             if nb_line % 100 == 0:
-                logger.info('Importing line {} ({})'.format(
-                    nb_line + 1, data['document_key']))
+                logger.info(
+                    "Importing line {} ({})".format(nb_line + 1, data["document_key"])
+                )
 
             # Is this a revision creation or are we editing an existing one?
             if metadata is None:
                 is_new_revision = True
             else:
                 latest_revision = metadata.latest_revision.revision
-                is_new_revision = bool(int(data['revision']) > latest_revision)
+                is_new_revision = bool(int(data["revision"]) > latest_revision)
 
-            pdf_file = File(open(line.pdf_fullname, 'rb'))
+            pdf_file = File(open(line.pdf_fullname, "rb"))
             native_file = line.native_fullname
             if native_file:
-                native_file = File(open(native_file, 'rb'))
+                native_file = File(open(native_file, "rb"))
 
-            data.update({
-                'transmittal': transmittal,
-                'document': document,
-                'is_new_revision': is_new_revision,
-                'category': self.doc_category,
-                'pdf_file': pdf_file,
-                'native_file': native_file,
-                'sequential_number': line.sequential_number,  # XXX Hack
-            })
+            data.update(
+                {
+                    "transmittal": transmittal,
+                    "document": document,
+                    "is_new_revision": is_new_revision,
+                    "category": self.doc_category,
+                    "pdf_file": pdf_file,
+                    "native_file": native_file,
+                    "sequential_number": line.sequential_number,  # XXX Hack
+                }
+            )
             TrsRevision.objects.create(**data)
             nb_line += 1
 
             pdf_file.close()
-            if hasattr(native_file, 'close'):
+            if hasattr(native_file, "close"):
                 native_file.close()
 
 
@@ -356,10 +367,10 @@ class TrsImportLine(object):
     @property
     def form_data(self):
         """Iterate over every field and prepare them if it's needed."""
-        if not hasattr(self, '_form_data'):
+        if not hasattr(self, "_form_data"):
             _form_data = dict()
             for key, value in list(self.csv_data.items()):
-                clean_method_name = 'clean_{}'.format(key)
+                clean_method_name = "clean_{}".format(key)
                 if hasattr(self, clean_method_name):
                     form_value = getattr(self, clean_method_name)(value)
                 else:
@@ -370,8 +381,7 @@ class TrsImportLine(object):
 
     def clean_originator(self, value):
         try:
-            originator = Entity.objects \
-                .get(trigram=value)
+            originator = Entity.objects.get(trigram=value)
         except:  # noqa
             return None
 
@@ -388,9 +398,9 @@ class TrsImportLine(object):
 
     @property
     def pdf_basename(self):
-        return '%s_%02d.pdf' % (
-            self.csv_data['document_key'],
-            int(self.csv_data['revision'])
+        return "%s_%02d.pdf" % (
+            self.csv_data["document_key"],
+            int(self.csv_data["revision"]),
         )
 
     @property
@@ -404,10 +414,10 @@ class TrsImportLine(object):
         # a search using the `glob` module.
         pdf = self.pdf_fullname
         stripped_name = pdf[0:-4]
-        natives = glob.glob('{}*'.format(stripped_name))
+        natives = glob.glob("{}*".format(stripped_name))
 
         if len(natives) < 1 or len(natives) > 2:
-            raise RuntimeError('Oops. Wrong number of files here.')
+            raise RuntimeError("Oops. Wrong number of files here.")
 
         if len(natives) == 1:
             # We found only the pdf itself, there is no native file
@@ -415,23 +425,22 @@ class TrsImportLine(object):
 
         if len(natives) == 2:
             # We found the pdf and the native
-            first_extension = natives[0].split('.')[-1]
-            if first_extension == 'pdf':
+            first_extension = natives[0].split(".")[-1]
+            if first_extension == "pdf":
                 return natives[1]
             else:
                 return natives[0]
 
     @property
     def sequential_number(self):
-        return self.csv_data['document_key'].split('-')[5]
+        return self.csv_data["document_key"].split("-")[5]
 
     def get_document(self):
         if self._document is None:
-            qs = Document.objects \
-                .select_related('category__category_template')
+            qs = Document.objects.select_related("category__category_template")
             self._document = get_object_or_None(
-                qs,
-                document_key=self.csv_data['document_key'])
+                qs, document_key=self.csv_data["document_key"]
+            )
 
         return self._document
 
@@ -459,18 +468,16 @@ class TrsImportLine(object):
 
         MetadataForm = self.get_metadata_form_class()
         metadata_form = MetadataForm(
-            self.form_data,
-            instance=metadata,
-            category=self.trs_import.doc_category)
+            self.form_data, instance=metadata, category=self.trs_import.doc_category
+        )
 
-        revision_num = self.csv_data['revision']
+        revision_num = self.csv_data["revision"]
         revision = metadata.get_revision(revision_num) if metadata else None
 
         RevisionForm = self.get_revision_form_class()
         revision_form = RevisionForm(
-            self.form_data,
-            instance=revision,
-            category=self.trs_import.doc_category)
+            self.form_data, instance=revision, category=self.trs_import.doc_category
+        )
 
         return metadata_form, revision_form
 

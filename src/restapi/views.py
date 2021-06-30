@@ -35,6 +35,7 @@ class TaskPollView(View):
     ...     return 'done'
 
     """
+
     def get(self, request, job_id):
         """Return json data to describe the task."""
         job = AsyncResult(job_id)
@@ -43,25 +44,20 @@ class TaskPollView(View):
         success = job.successful()
         result = job.result
         if isinstance(result, dict):
-            progress = result.get('progress', 0)
+            progress = result.get("progress", 0)
         else:
             progress = 100.0 if done else 0.0
 
-        data = {
-            'done': done,
-            'success': success,
-            'progress': progress
-        }
+        data = {"done": done, "success": success, "progress": progress}
 
         # in case of error
         if done and not success:
-            data['error_msg'] = 'System error: {}'.format(result)
+            data["error_msg"] = "System error: {}".format(result)
 
-        return HttpResponse(json.dumps(data), content_type='application/json')
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 class CategoryPermission(BasePermission):
-
     def has_permission(self, request, view):
         category = view.get_category()
         if category is None:
@@ -79,6 +75,7 @@ class CategoryAPIViewMixin(object):
     must have access to the given category.
 
     """
+
     _category = None
 
     def get_permissions(self):
@@ -87,12 +84,13 @@ class CategoryAPIViewMixin(object):
 
     def get_category(self):
         if self._category is None:
-            organisation_slug = self.kwargs.get('organisation')
-            category_slug = self.kwargs.get('category')
+            organisation_slug = self.kwargs.get("organisation")
+            category_slug = self.kwargs.get("category")
             try:
                 self._category = Category.objects.get(
                     organisation__slug=organisation_slug,
-                    category_template__slug=category_slug)
+                    category_template__slug=category_slug,
+                )
             except Category.DoesNotExist:
                 self._category = None
 

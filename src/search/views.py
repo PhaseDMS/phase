@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 class SearchDocuments(JSONResponseMixin, BaseDocumentList):
-    http_method_names = ['get']
+    http_method_names = ["get"]
 
     def get_queryset(self):
         """Given DataTables' GET parameters, filter the initial queryset."""
@@ -16,9 +16,9 @@ class SearchDocuments(JSONResponseMixin, BaseDocumentList):
         else:
             entities = None
         try:
-            builder = SearchBuilder(self.category,
-                                    self.request.GET,
-                                    filter_on_entities=entities)
+            builder = SearchBuilder(
+                self.category, self.request.GET, filter_on_entities=entities
+            )
             query = builder.build_query()
             query = builder.add_aggregations(query)
             results = query.execute()
@@ -32,18 +32,18 @@ class SearchDocuments(JSONResponseMixin, BaseDocumentList):
 
     def get_context_data(self, **kwargs):
         response = self.get_queryset()
-        start = int(self.request.GET.get('start', 0))
-        end = start + int(self.request.GET.get('length', settings.PAGINATE_BY))
+        start = int(self.request.GET.get("start", 0))
+        end = start + int(self.request.GET.get("length", settings.PAGINATE_BY))
         total = response.hits.total
         display = min(end, total)
         search_data = [hit._d_ for hit in response.hits]
         aggregations = self.format_aggregations(response.aggregations)
 
         return {
-            'total': total,
-            'display': display,
-            'data': search_data,
-            'aggregations': aggregations,
+            "total": total,
+            "display": display,
+            "data": search_data,
+            "aggregations": aggregations,
         }
 
     def format_aggregations(self, aggregations):
@@ -67,11 +67,13 @@ class SearchDocuments(JSONResponseMixin, BaseDocumentList):
         }
 
         """
+
         def flatten(bucket):
             key = bucket[0]
-            buckets = bucket[1]['buckets']
-            bucket_values = dict([(b['key'], b['doc_count']) for b in buckets])
+            buckets = bucket[1]["buckets"]
+            bucket_values = dict([(b["key"], b["doc_count"]) for b in buckets])
             return (key, bucket_values)
+
         buckets = list(aggregations.to_dict().items())
         response = dict(list(map(flatten, buckets)))
         return response

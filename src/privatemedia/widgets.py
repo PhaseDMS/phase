@@ -13,26 +13,29 @@ class PhaseClearableFileInput(ClearableFileInput):
     change otherwise.
 
     """
-    template_name = 'forms/widgets/phase_clearable_file_input.html'
+
+    template_name = "forms/widgets/phase_clearable_file_input.html"
 
     def get_context(self, name, value, attrs):
         filename = basename(force_text(value))
         try:
             filesize = filesizeformat(value.size)
         except:  # noqa
-            filesize = 'NA'
-        file_name = '{} ({})'.format(filename, filesize)
+            filesize = "NA"
+        file_name = "{} ({})".format(filename, filesize)
 
-        if hasattr(self, 'value_url'):
+        if hasattr(self, "value_url"):
             file_url = self.value_url
-        elif value and hasattr(value, 'url'):
+        elif value and hasattr(value, "url"):
             file_url = value.url
         else:
-            file_url = ''
+            file_url = ""
 
         context = super().get_context(name, value, attrs)
-        context.update({
-            'file_name': file_name,
-            'file_url': conditional_escape(file_url),
-        })
+        context.update(
+            {
+                "file_name": file_name,
+                "file_url": conditional_escape(file_url),
+            }
+        )
         return context

@@ -19,105 +19,109 @@ class BatchReviewTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('batch_start_reviews', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-        ])
-        self.list_url = reverse('category_document_list', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-        ])
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse(
+            "batch_start_reviews",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+            ],
+        )
+        self.list_url = reverse(
+            "category_document_list",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+            ],
+        )
         self.doc1 = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         self.doc2 = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         self.doc3 = DocumentFactory(
             category=self.category,
             revision={
-                'reviewers': [],
-                'leader': None,
-                'approver': None,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [],
+                "leader": None,
+                "approver": None,
+                "received_date": datetime.date.today(),
+            },
         )
-        self.ok = 'The review started for the following documents'
+        self.ok = "The review started for the following documents"
         self.nok = "We failed to start the review for the following documents"
 
     def test_batch_review_returns_poll_url(self):
-        res = self.client.post(
-            self.url,
-            {'document_ids': [self.doc1.id, self.doc2.id]}
-        )
+        res = self.client.post(self.url, {"document_ids": [self.doc1.id, self.doc2.id]})
         json_content = json.loads(res.content.decode())
-        self.assertTrue('poll_url' in json_content)
+        self.assertTrue("poll_url" in json_content)
 
     def test_start_review_with_empty_remark(self):
         self.assertEqual(Note.objects.all().count(), 0)
 
-        res = self.client.post(self.url, {
-            'document_ids': [self.doc1.id, self.doc2.id, self.doc3.id],
-            'remark': ''},
-            follow=True)
+        res = self.client.post(
+            self.url,
+            {"document_ids": [self.doc1.id, self.doc2.id, self.doc3.id], "remark": ""},
+            follow=True,
+        )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Note.objects.all().count(), 0)
 
     def test_start_review_with_remarks(self):
         self.assertEqual(Note.objects.all().count(), 0)
 
-        res = self.client.post(self.url, {
-            'document_ids': [self.doc1.id, self.doc2.id, self.doc3.id],
-            'remark': 'This is a batch remark.'},
-            follow=True)
+        res = self.client.post(
+            self.url,
+            {
+                "document_ids": [self.doc1.id, self.doc2.id, self.doc3.id],
+                "remark": "This is a batch remark.",
+            },
+            follow=True,
+        )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(Note.objects.all().count(), 2)
 
 
 class PrioritiesDocumentListTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.other_user = UserFactory(
-            email='test@phase.fr',
-            category=self.category
-        )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('priorities_review_document_list')
+        self.other_user = UserFactory(email="test@phase.fr", category=self.category)
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse("priorities_review_document_list")
 
     def test_empty_review_list(self):
         res = self.client.get(self.url)
         self.assertNotContains(res, '<td class="columndocument_key"')
-        self.assertNotContains(res, 'Close reviews')
+        self.assertNotContains(res, "Close reviews")
 
     def test_non_prioritary_document(self):
         """User is not approver nor leader."""
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'docclass': 1,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "docclass": 1,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -128,9 +132,9 @@ class PrioritiesDocumentListTests(TestCase):
         """Due date > 5 days."""
         doc = DocumentFactory(
             revision={
-                'leader': self.user,
-                'docclass': 1,
-                'received_date': datetime.date.today(),
+                "leader": self.user,
+                "docclass": 1,
+                "received_date": datetime.date.today(),
             }
         )
         revision = doc.latest_revision
@@ -144,9 +148,9 @@ class PrioritiesDocumentListTests(TestCase):
         """docclass < 2"""
         doc = DocumentFactory(
             revision={
-                'leader': self.user,
-                'docclass': 3,
-                'received_date': datetime.date.today(),
+                "leader": self.user,
+                "docclass": 3,
+                "received_date": datetime.date.today(),
             }
         )
         revision = doc.latest_revision
@@ -159,9 +163,9 @@ class PrioritiesDocumentListTests(TestCase):
     def test_prioritary_document(self):
         doc = DocumentFactory(
             revision={
-                'leader': self.user,
-                'docclass': 1,
-                'received_date': datetime.date.today(),
+                "leader": self.user,
+                "docclass": 1,
+                "received_date": datetime.date.today(),
             }
         )
         revision = doc.latest_revision
@@ -173,34 +177,30 @@ class PrioritiesDocumentListTests(TestCase):
 
 
 class ReviewersDocumentListTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.other_user = UserFactory(
-            email='test@phase.fr',
-            category=self.category
-        )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('reviewers_review_document_list')
+        self.other_user = UserFactory(email="test@phase.fr", category=self.category)
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse("reviewers_review_document_list")
 
     def test_empty_review_list(self):
         res = self.client.get(self.url)
         self.assertNotContains(res, '<td class="columndocument_key"')
-        self.assertContains(res, 'Close reviews')
+        self.assertContains(res, "Close reviews")
 
     def test_review_not_started_yet(self):
         """If the review is not started yet, the doc does not appear in list."""
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
             }
         )
         self.assertFalse(doc.latest_revision.is_under_review())
@@ -210,9 +210,9 @@ class ReviewersDocumentListTests(TestCase):
     def test_review_started(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -223,9 +223,9 @@ class ReviewersDocumentListTests(TestCase):
     def test_step_finished(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -237,9 +237,9 @@ class ReviewersDocumentListTests(TestCase):
     def test_review_finished(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -251,52 +251,46 @@ class ReviewersDocumentListTests(TestCase):
     def test_review_done(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
         self.assertTrue(doc.latest_revision.is_under_review())
-        Review.objects \
-            .filter(document=doc) \
-            .filter(revision=doc.latest_revision.revision) \
-            .filter(reviewer=self.user) \
-            .update(closed_on=timezone.now())
+        Review.objects.filter(document=doc).filter(
+            revision=doc.latest_revision.revision
+        ).filter(reviewer=self.user).update(closed_on=timezone.now())
 
         res = self.client.get(self.url)
         self.assertNotContains(res, '<td class="columndocument_key"')
 
 
 class LeaderDocumentListTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.other_user = UserFactory(
-            email='test@phase.fr',
-            category=self.category
-        )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('leader_review_document_list')
+        self.other_user = UserFactory(email="test@phase.fr", category=self.category)
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse("leader_review_document_list")
 
     def test_empty_review_list(self):
         res = self.client.get(self.url)
         self.assertNotContains(res, '<td class="columndocument_key"')
-        self.assertNotContains(res, 'Close reviews')
+        self.assertNotContains(res, "Close reviews")
 
     def test_review_not_started_yet(self):
         """If the review is not started yet, the doc does not appear in list."""
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         self.assertFalse(doc.latest_revision.is_under_review())
@@ -306,9 +300,9 @@ class LeaderDocumentListTests(TestCase):
     def test_previous_step(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -318,9 +312,9 @@ class LeaderDocumentListTests(TestCase):
     def test_current_step(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -331,9 +325,9 @@ class LeaderDocumentListTests(TestCase):
     def test_step_finished(self):
         doc = DocumentFactory(
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -343,32 +337,28 @@ class LeaderDocumentListTests(TestCase):
 
 
 class ApproverDocumentListTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.other_user = UserFactory(
-            email='test@phase.fr',
-            category=self.category
-        )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('approver_review_document_list')
+        self.other_user = UserFactory(email="test@phase.fr", category=self.category)
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse("approver_review_document_list")
 
     def test_empty_review_list(self):
         res = self.client.get(self.url)
-        self.assertNotContains(res, 'Close reviews')
+        self.assertNotContains(res, "Close reviews")
 
     def test_previous_step(self):
         doc = DocumentFactory(
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -382,9 +372,9 @@ class ApproverDocumentListTests(TestCase):
     def test_current_step(self):
         doc = DocumentFactory(
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -395,9 +385,9 @@ class ApproverDocumentListTests(TestCase):
     def test_step_finished(self):
         doc = DocumentFactory(
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
             }
         )
         doc.latest_revision.start_review()
@@ -407,118 +397,113 @@ class ApproverDocumentListTests(TestCase):
 
 
 class ReviewFormTests(TestCase):
-
     def setUp(self):
         ValuesListFactory(
-            index='REVIEW_RETURN_CODES',
-            name='Review return codes',
+            index="REVIEW_RETURN_CODES",
+            name="Review return codes",
             values={
-                '0': '0',
-                '1': '1',
-            }
+                "0": "0",
+                "1": "1",
+            },
         )
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.other_user = UserFactory(
-            email='test@phase.fr',
-            category=self.category
-        )
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('review_document', args=['test_key'])
+        self.other_user = UserFactory(email="test@phase.fr", category=self.category)
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse("review_document", args=["test_key"])
 
-        self.filename = 'documents/tests/sample_doc_native.docx'
+        self.filename = "documents/tests/sample_doc_native.docx"
 
     def test_reviewers_submit_review_without_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
 
         review = revision.get_review(self.user)
-        self.assertEqual(review.status, 'progress')
+        self.assertEqual(review.status, "progress")
 
-        self.client.post(self.url, {'review': 'something'})
+        self.client.post(self.url, {"review": "something"})
         revision.reload_reviews()
         review = revision.get_review(self.user)
         self.assertIsNotNone(review.closed_on)
-        self.assertEqual(review.status, 'reviewed')
+        self.assertEqual(review.status, "reviewed")
         self.assertFalse(review.comments)
 
     def test_reviewers_submit_review_with_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
 
-        with open(self.filename, 'rb') as fp:
-            self.client.post(self.url, {'review': 'something', 'comments': fp})
+        with open(self.filename, "rb") as fp:
+            self.client.post(self.url, {"review": "something", "comments": fp})
             review = revision.get_review(self.user)
             self.assertTrue(review.comments)
 
     def test_all_reviewers_have_submitted_review(self):
         """When all reviewers have reviewed the doc, proceed to next step."""
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
         self.assertIsNone(revision.reviewers_step_closed)
 
-        self.client.post(self.url, {'review': 'something'})
+        self.client.post(self.url, {"review": "something"})
 
         revision = revision.__class__.objects.get(pk=revision.pk)
         self.assertIsNotNone(revision.reviewers_step_closed)
 
     def test_non_reviewer_submit_review(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
-        res = self.client.post(self.url,
-                               {'review': 'something', 'return_code': '0'})
+        res = self.client.post(self.url, {"review": "something", "return_code": "0"})
         self.assertEqual(res.status_code, 403)
 
     def test_reviewer_still_can_access_review_after_step_is_closed(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -528,34 +513,34 @@ class ReviewFormTests(TestCase):
 
     def test_reviewer_can_amend_its_review(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
 
-        res = self.client.post(self.url, {'review': 'something'}, follow=True)
+        res = self.client.post(self.url, {"review": "something"}, follow=True)
         self.assertEqual(res.status_code, 200)
 
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, 200)
 
-        res = self.client.post(self.url, {'review': 'something'}, follow=True)
+        res = self.client.post(self.url, {"review": "something"}, follow=True)
         self.assertEqual(res.status_code, 200)
 
     def test_leader_submit_review_without_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -563,79 +548,78 @@ class ReviewFormTests(TestCase):
 
         self.assertIsNone(revision.leader_step_closed)
 
-        self.client.post(self.url,
-                         {'review': 'something', 'return_code': '0'})
+        self.client.post(self.url, {"review": "something", "return_code": "0"})
         revision = revision.__class__.objects.get(pk=revision.pk)
         self.assertIsNotNone(revision.leader_step_closed)
 
     def test_leader_submit_review_with_return_code(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
         revision.end_reviewers_step()
 
-        self.client.post(self.url, {'review': 'something', 'return_code': '1'})
+        self.client.post(self.url, {"review": "something", "return_code": "1"})
         review = revision.get_review(self.user)
-        self.assertEqual(review.return_code, '1')
+        self.assertEqual(review.return_code, "1")
 
         revision = doc.latest_revision
-        self.assertEqual(revision.return_code, '1')
+        self.assertEqual(revision.return_code, "1")
 
     def test_leader_submit_review_without_return_code(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
         revision.end_reviewers_step()
 
-        res = self.client.post(self.url, {'review': 'something'})
+        res = self.client.post(self.url, {"review": "something"})
         self.assertEqual(res.status_code, 200)
-        self.assertFormError(
-            res, 'form', 'return_code', 'This field is required.')
+        self.assertFormError(res, "form", "return_code", "This field is required.")
         review = revision.get_review(self.user)
-        self.assertEqual(review.status, 'progress')
+        self.assertEqual(review.status, "progress")
 
     def test_leader_submit_review_with_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
         revision.end_reviewers_step()
 
-        with open(self.filename, 'rb') as fp:
-            self.client.post(self.url, {
-                'review': 'something', 'comments': fp, 'return_code': '0'})
+        with open(self.filename, "rb") as fp:
+            self.client.post(
+                self.url, {"review": "something", "comments": fp, "return_code": "0"}
+            )
             revision = revision.__class__.objects.get(pk=revision.pk)
             self.assertIsNotNone(revision.leader_step_closed)
 
     def test_leader_can_access_review_when_step_is_closed(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.user,
-                'approver': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "approver": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -645,13 +629,13 @@ class ReviewFormTests(TestCase):
 
     def test_approver_submit_review_without_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -659,40 +643,40 @@ class ReviewFormTests(TestCase):
 
         self.assertIsNone(revision.review_end_date)
 
-        self.client.post(self.url, {
-            'review': 'something', 'return_code': '0'})
+        self.client.post(self.url, {"review": "something", "return_code": "0"})
         revision = revision.__class__.objects.get(pk=revision.pk)
         self.assertIsNotNone(revision.review_end_date)
 
     def test_approver_submit_review_with_file(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
         revision.end_leader_step()
 
-        with open(self.filename, 'rb') as fp:
-            self.client.post(self.url, {
-                'review': 'something', 'comments': fp, 'return_code': '0'})
+        with open(self.filename, "rb") as fp:
+            self.client.post(
+                self.url, {"review": "something", "comments": fp, "return_code": "0"}
+            )
             revision = revision.__class__.objects.get(pk=revision.pk)
             self.assertIsNotNone(revision.review_end_date)
 
     def test_approver_cannot_access_a_closed_review(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'leader': self.other_user,
-                'approver': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.other_user,
+                "approver": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -702,13 +686,13 @@ class ReviewFormTests(TestCase):
 
     def test_simple_reviewer_cannot_see_return_code_field(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.other_user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.user],
+                "leader": self.other_user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -718,13 +702,13 @@ class ReviewFormTests(TestCase):
 
     def test_leader_can_see_return_code_field(self):
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [self.other_user],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [self.other_user],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -735,52 +719,46 @@ class ReviewFormTests(TestCase):
 
 
 class StartReviewTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
         self.doc = DocumentFactory(
-            document_key='test_document',
+            document_key="test_document",
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
-        self.client.login(email=self.user.email, password='pass')
-        self.start_review_url = reverse('document_start_review', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            'test_document'])
+        self.client.login(email=self.user.email, password="pass")
+        self.start_review_url = reverse(
+            "document_start_review",
+            args=[self.category.organisation.slug, self.category.slug, "test_document"],
+        )
 
     def test_start_review_with_remarks(self):
         self.assertEqual(self.doc.note_set.all().count(), 0)
 
         res = self.client.post(
-            self.start_review_url,
-            {'body': 'This is a notification!'},
-            follow=True)
+            self.start_review_url, {"body": "This is a notification!"}, follow=True
+        )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(self.doc.note_set.all().count(), 1)
 
         activities = Activity.objects.all()
         self.assertEqual(activities.count(), 1)
         self.assertEqual(activities.get().verb, Activity.VERB_STARTED_REVIEW)
-        self.assertEqual(activities.get().action_object,
-                         self.doc.get_latest_revision())
+        self.assertEqual(activities.get().action_object, self.doc.get_latest_revision())
 
     def test_start_review_with_empty_remark(self):
         self.assertEqual(self.doc.note_set.all().count(), 0)
 
-        res = self.client.post(
-            self.start_review_url,
-            {'body': ''},
-            follow=True)
+        res = self.client.post(self.start_review_url, {"body": ""}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(self.doc.note_set.all().count(), 0)
 
@@ -797,25 +775,25 @@ class ReviewCommentsDownloadTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
         self.other_user = UserFactory(
-            email='test@phase.fr',
-            password='pass',
+            email="test@phase.fr",
+            password="pass",
         )
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
 
         doc = DocumentFactory(
-            document_key='test_key',
+            document_key="test_key",
             category=self.category,
             revision={
-                'reviewers': [],
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "reviewers": [],
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         revision = doc.latest_revision
         revision.start_review()
@@ -823,8 +801,8 @@ class ReviewCommentsDownloadTests(TestCase):
         self.review = revision.get_review(self.user)
         self.url = self.review.get_comments_url()
 
-        pdf_doc = 'sample_doc_pdf.pdf'
-        self.sample_pdf = SimpleUploadedFile(pdf_doc, b'content')
+        pdf_doc = "sample_doc_pdf.pdf"
+        self.sample_pdf = SimpleUploadedFile(pdf_doc, b"content")
 
     def test_download_empty_file(self):
         res = self.client.get(self.url)
@@ -837,6 +815,6 @@ class ReviewCommentsDownloadTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_download_permission(self):
-        self.client.login(email=self.other_user.email, password='pass')
+        self.client.login(email=self.other_user.email, password="pass")
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, 404)

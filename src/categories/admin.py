@@ -9,7 +9,7 @@ from .admin_forms import CategoryTemplateAdminForm
 
 class CategoryInline(admin.StackedInline):
     model = Category
-    fields = ('category_template',)
+    fields = ("category_template",)
     extra = 0
 
 
@@ -19,28 +19,35 @@ class GroupCategoryInline(admin.StackedInline):
 
 
 class OrganisationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'trigram', 'description')
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ("name", "trigram", "description")
+    prepopulated_fields = {"slug": ("name",)}
     inlines = [CategoryInline]
 
 
 class CategoryTemplateAdmin(admin.ModelAdmin):
-    list_display = (
-        'name', 'description', 'use_creation_form', 'display_reporting')
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ("name", "description", "use_creation_form", "display_reporting")
+    prepopulated_fields = {"slug": ("name",)}
     form = CategoryTemplateAdminForm
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('organisation', 'category_template')
-    list_display_links = ('category_template',)
-    search_fields = ('organisation__name', 'category_template__name')
-    ordering = ('organisation', 'category_template')
-    filter_horizontal = ('users', 'groups', 'third_parties')
+    list_display = ("organisation", "category_template")
+    list_display_links = ("category_template",)
+    search_fields = ("organisation__name", "category_template__name")
+    ordering = ("organisation", "category_template")
+    filter_horizontal = ("users", "groups", "third_parties")
     fieldsets = (
-        (None, {'fields': ('organisation', 'category_template')}),
-        ('Members', {'fields': ('groups', 'users',)}),
-        ('Third parties', {'fields': ('third_parties',)}),
+        (None, {"fields": ("organisation", "category_template")}),
+        (
+            "Members",
+            {
+                "fields": (
+                    "groups",
+                    "users",
+                )
+            },
+        ),
+        ("Third parties", {"fields": ("third_parties",)}),
     )
 
 
@@ -48,10 +55,11 @@ class RequiredInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super(RequiredInlineFormSet, self).clean()
 
-        existing_data = [data and not data.get('DELETE', False)
-                         for data in self.cleaned_data]
+        existing_data = [
+            data and not data.get("DELETE", False) for data in self.cleaned_data
+        ]
         if not any(existing_data):
-            raise forms.ValidationError(_('Please select at least one category'))
+            raise forms.ValidationError(_("Please select at least one category"))
 
 
 class UserCategoryInline(admin.StackedInline):
@@ -61,14 +69,14 @@ class UserCategoryInline(admin.StackedInline):
 
 
 class ContractAdmin(admin.ModelAdmin):
-    list_display = ('number', 'name', 'get_associated_categories')
-    filter_horizontal = ('categories',)
+    list_display = ("number", "name", "get_associated_categories")
+    filter_horizontal = ("categories",)
 
     def get_associated_categories(self, obj):
         categories = obj.categories.all()
         return ", ".join([c.name for c in categories])
 
-    get_associated_categories.short_description = _('Categories')
+    get_associated_categories.short_description = _("Categories")
 
 
 admin.site.register(Organisation, OrganisationAdmin)

@@ -4,7 +4,7 @@ from .views import Report
 
 urlpatterns = [
     # Reports page
-    path('<slug:organisation>/<slug:category>/',
-        Report.as_view(),
-        name='category_report'),
+    path(
+        "<slug:organisation>/<slug:category>/", Report.as_view(), name="category_report"
+    ),
 ]

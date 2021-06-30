@@ -9,7 +9,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ('text', 'created_on')
+        fields = ("text", "created_on")
 
     def get_text(self, obj):
         return str(obj)

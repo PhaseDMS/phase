@@ -10,7 +10,7 @@ from documents.models import Document
 from notifications.models import notify
 
 
-mentions_re = re.compile(r'@([\w\-_]+)', re.IGNORECASE)
+mentions_re = re.compile(r"@([\w\-_]+)", re.IGNORECASE)
 
 
 class Note(models.Model):
@@ -20,29 +20,22 @@ class Note(models.Model):
     and limited to the member of the distribution list.
 
     """
+
     document = models.ForeignKey(
-        Document,
-        on_delete=models.PROTECT,
-        verbose_name=_('Document'))
-    revision = models.PositiveIntegerField(
-        _('Revision'))
+        Document, on_delete=models.PROTECT, verbose_name=_("Document")
+    )
+    revision = models.PositiveIntegerField(_("Revision"))
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        verbose_name=_('Author'))
-    body = models.TextField(
-        _('Body'))
-    created_on = models.DateTimeField(
-        _('Created on'),
-        default=timezone.now)
-    deleted_on = models.DateTimeField(
-        _('Deleted on'),
-        null=True, blank=True)
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name=_("Author")
+    )
+    body = models.TextField(_("Body"))
+    created_on = models.DateTimeField(_("Created on"), default=timezone.now)
+    deleted_on = models.DateTimeField(_("Deleted on"), null=True, blank=True)
 
     class Meta:
-        verbose_name = _('Note')
-        verbose_name_plural = _('Notes')
-        app_label = 'discussion'
+        verbose_name = _("Note")
+        verbose_name_plural = _("Notes")
+        app_label = "discussion"
 
     def soft_delete(self):
         """Mark object as deleted, but keep in db.
@@ -53,19 +46,21 @@ class Note(models.Model):
         Instead, we just mark the item as deleted, and show an empty message.
 
         """
-        message = ugettext('Deleted')
+        message = ugettext("Deleted")
         self.body = message
         self.deleted_on = timezone.now()
 
     @transaction.atomic
     def notify_mentionned_users(self):
         """Parse @mentions and create according notifications."""
-        message = _('%(user)s mentionned you on document '
-                    '<a href="%(url)s">%(doc)s</a> (revision %(revision)02d)') % {
-            'user': self.author.name,
-            'url': self.document.get_absolute_url(),
-            'doc': self.document.document_key,
-            'revision': int(self.revision)
+        message = _(
+            "%(user)s mentionned you on document "
+            '<a href="%(url)s">%(doc)s</a> (revision %(revision)02d)'
+        ) % {
+            "user": self.author.name,
+            "url": self.document.get_absolute_url(),
+            "doc": self.document.document_key,
+            "revision": int(self.revision),
         }
         users = self.parse_mentions()
         for user in users:

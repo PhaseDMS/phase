@@ -11,7 +11,7 @@ from celery import Celery
 from django.conf import settings
 
 
-app = Celery('phase')
+app = Celery("phase")
 
 
 # We need a custom serializer to handle date and datetime objects.
@@ -29,14 +29,15 @@ def my_dumps(obj):
 
 
 register(
-    'betterjson',
+    "betterjson",
     my_dumps,
     json.loads,
-    content_type='application/x-myjson',
-    content_encoding='utf-8')
+    content_type="application/x-myjson",
+    content_encoding="utf-8",
+)
 
 
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
+app.config_from_object("django.conf:settings")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

@@ -16,36 +16,36 @@ class PendingReviewsReminderTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
         self.doc1 = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
         self.doc2 = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user,
-                'received_date': datetime.date.today(),
-            }
+                "leader": self.user,
+                "received_date": datetime.date.today(),
+            },
         )
 
     def test_empty_reminder_list(self):
-        call_command('send_review_reminders')
+        call_command("send_review_reminders")
         self.assertEqual(len(mail.outbox), 0)
 
     def test_send_reminders(self):
         self.doc1.get_latest_revision().start_review()
         self.assertEqual(Review.objects.all().count(), 1)
 
-        call_command('send_review_reminders')
+        call_command("send_review_reminders")
         self.assertEqual(len(mail.outbox), 1)
 
     def test_finished_reviews(self):
@@ -54,7 +54,7 @@ class PendingReviewsReminderTests(TestCase):
         rev.end_review()
         self.assertEqual(Review.objects.all().count(), 1)
 
-        call_command('send_review_reminders')
+        call_command("send_review_reminders")
         self.assertEqual(len(mail.outbox), 0)
 
     def test_do_not_send_reminder(self):
@@ -65,7 +65,7 @@ class PendingReviewsReminderTests(TestCase):
         self.user.send_pending_reviews_mails = False
         self.user.save()
 
-        call_command('send_review_reminders')
+        call_command("send_review_reminders")
         self.assertEqual(len(mail.outbox), 0)
 
 
@@ -75,19 +75,19 @@ class ClosedReviewsEmailTests(ContractorDeliverableTestCase):
         self.today = timezone.now()
         self.yesterday = timezone.now() - datetime.timedelta(days=1)
         self.originator = EntityFactory(
-            type='originator',
+            type="originator",
             users=[
                 UserFactory(),
                 UserFactory(),
                 UserFactory(),
                 UserFactory(send_closed_reviews_mails=False),
-            ]
+            ],
         )
 
     def test_end_review_today(self):
         data = {
-            'revision': {
-                'leader': self.user,
+            "revision": {
+                "leader": self.user,
             }
         }
         doc = self.create_doc(**data)
@@ -96,13 +96,13 @@ class ClosedReviewsEmailTests(ContractorDeliverableTestCase):
         rev.end_review(at_date=self.today)
 
         self.assertEqual(len(mail.outbox), 0)
-        call_command('send_closed_reviews_notifications')
+        call_command("send_closed_reviews_notifications")
         self.assertEqual(len(mail.outbox), 0)
 
     def test_send_email_to_empty_originator(self):
         data = {
-            'revision': {
-                'leader': self.user,
+            "revision": {
+                "leader": self.user,
             }
         }
         doc = self.create_doc(**data)
@@ -111,17 +111,17 @@ class ClosedReviewsEmailTests(ContractorDeliverableTestCase):
         rev.end_review(at_date=self.yesterday)
 
         self.assertEqual(len(mail.outbox), 0)
-        call_command('send_closed_reviews_notifications')
+        call_command("send_closed_reviews_notifications")
         self.assertEqual(len(mail.outbox), 0)
 
     def test_send_email_to_originator_with_recipients(self):
         data = {
-            'metadata': {
-                'originator': self.originator,
+            "metadata": {
+                "originator": self.originator,
             },
-            'revision': {
-                'leader': self.user,
-            }
+            "revision": {
+                "leader": self.user,
+            },
         }
         doc = self.create_doc(**data)
         rev = doc.get_latest_revision()
@@ -129,7 +129,7 @@ class ClosedReviewsEmailTests(ContractorDeliverableTestCase):
         rev.end_review(at_date=self.yesterday)
 
         self.assertEqual(len(mail.outbox), 0)
-        call_command('send_closed_reviews_notifications')
+        call_command("send_closed_reviews_notifications")
         self.assertEqual(len(mail.outbox), 1)
         # We have 4 potential recipients but one has `
         # `send_closed_reviews_mails set to False

@@ -11,19 +11,21 @@ class RevisionFileField(PrivateFileField):
     """Custom file field to store revision files."""
 
     def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'upload_to': revision_file_path,
-        })
+        kwargs.update(
+            {
+                "upload_to": revision_file_path,
+            }
+        )
         return super(RevisionFileField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(RevisionFileField, self).deconstruct()
-        kwargs['upload_to'] = revision_file_path
+        kwargs["upload_to"] = revision_file_path
         return name, path, args, kwargs
 
     def formfield(self, **kwargs):
         defaults = {
-            'form_class': PhaseClearableFileField,
+            "form_class": PhaseClearableFileField,
         }
         defaults.update(kwargs)
         return super(RevisionFileField, self).formfield(**defaults)
@@ -31,10 +33,11 @@ class RevisionFileField(PrivateFileField):
 
 class MetadataTypeChoiceField(forms.ModelChoiceField):
     """A custom model choice field limited to document classes."""
+
     def __init__(self, *args, **kwargs):
 
         # We will set our own queryset, so user should not pass one
-        qs = kwargs.pop('queryset', None)
+        qs = kwargs.pop("queryset", None)
         if qs:
             raise ValueError("We don't need a queryset, thank you")
 
@@ -44,6 +47,6 @@ class MetadataTypeChoiceField(forms.ModelChoiceField):
             # This will happen when rebuilding db from schatch, e.g
             # when running tests, and can be ignored safely
             qs = []
-        kwargs.update({'queryset': qs})
+        kwargs.update({"queryset": qs})
 
         super(MetadataTypeChoiceField, self).__init__(*args, **kwargs)

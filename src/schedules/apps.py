@@ -2,8 +2,8 @@ from django.apps import AppConfig
 
 
 class SchedulesConfig(AppConfig):
-    name = 'schedules'
-    verbose_name = 'Schedules'
+    name = "schedules"
+    verbose_name = "Schedules"
 
     def ready(self):
         from documents import signals

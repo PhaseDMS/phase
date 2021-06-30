@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        logger.info('Cleaning old exports')
+        logger.info("Cleaning old exports")
 
         now = timezone.now()
         clean_before = now - timedelta(days=settings.EXPORTS_VALIDITY_DURATION)
@@ -25,11 +25,11 @@ class Command(BaseCommand):
 
             # Remove the actual export file
             filepath = os.path.realpath(export.get_filepath())
-            logger.info('Attempting to remove {}'.format(filepath))
+            logger.info("Attempting to remove {}".format(filepath))
             if os.path.exists(filepath) and filepath.startswith(export_dir):
                 os.remove(filepath)
             else:
-                logger.warning('Cannot delete {}'.format(filepath))
+                logger.warning("Cannot delete {}".format(filepath))
 
         # Remove db objects
         exports_to_clean.delete()

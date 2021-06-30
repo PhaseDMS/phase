@@ -8,6 +8,6 @@ register = template.Library()
 @register.simple_tag
 def get_values_list(list_index):
     """Return a values list from cache."""
-    cache_key = 'values_list_{}'.format(list_index)
+    cache_key = "values_list_{}".format(list_index)
     values = cache.get(cache_key)
     return values

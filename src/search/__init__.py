@@ -3,9 +3,7 @@ from django.conf import settings
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 
-elastic = Elasticsearch(
-    settings.ELASTIC_HOSTS,
-    connection_class=RequestsHttpConnection)
+elastic = Elasticsearch(settings.ELASTIC_HOSTS, connection_class=RequestsHttpConnection)
 
 
 INDEX_SETTINGS = {
@@ -22,24 +20,17 @@ INDEX_SETTINGS = {
                 "nGram_analyzer": {
                     "type": "custom",
                     "tokenizer": "keyword",
-                    "filter": [
-                        "lowercase",
-                        "asciifolding",
-                        "nGram_filter"
-                    ]
+                    "filter": ["lowercase", "asciifolding", "nGram_filter"],
                 },
                 "whitespace_analyzer": {
                     "type": "custom",
                     "tokenizer": "keyword",
-                    "filter": [
-                        "lowercase",
-                        "asciifolding"
-                    ]
-                }
-            }
+                    "filter": ["lowercase", "asciifolding"],
+                },
+            },
         }
     }
 }
 
 
-default_app_config = 'search.apps.SearchConfig'
+default_app_config = "search.apps.SearchConfig"

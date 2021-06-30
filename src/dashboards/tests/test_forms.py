@@ -11,50 +11,46 @@ class IAmNotADashboardProvider(object):
     pass
 
 
-DashboardForm = modelform_factory(Dashboard, fields=('data_provider',))
+DashboardForm = modelform_factory(Dashboard, fields=("data_provider",))
 
 
 class DashboardFieldTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
 
     def test_provider_is_of_wrong_type(self):
         with self.assertRaises(ValidationError):
             dashboard = Dashboard(
-                category=self.category,
-                data_provider=IAmNotADashboardProvider)
+                category=self.category, data_provider=IAmNotADashboardProvider
+            )
             dashboard.full_clean()
 
     def test_provider_class_does_not_exist(self):
         with self.assertRaises(ValidationError):
             dashboard = Dashboard(
-                category=self.category,
-                data_provider='i.do.not.exist')
+                category=self.category, data_provider="i.do.not.exist"
+            )
             dashboard.full_clean()
 
     def test_form_field_values(self):
         form = DashboardForm()
-        choices = list(dict(form.fields['data_provider'].choices).keys())
+        choices = list(dict(form.fields["data_provider"].choices).keys())
         self.assertTrue(EmptyDashboard in choices)
 
     def test_form_widget_values(self):
         form = DashboardForm()
-        choices = list(dict(form.fields['data_provider'].widget.choices).keys())
-        self.assertTrue('dashboards.dashboards.EmptyDashboard' in choices)
+        choices = list(dict(form.fields["data_provider"].widget.choices).keys())
+        self.assertTrue("dashboards.dashboards.EmptyDashboard" in choices)
 
     def test_correct_option_is_selected(self):
-        dashboard = Dashboard(
-            category=self.category,
-            data_provider=EmptyDashboard)
+        dashboard = Dashboard(category=self.category, data_provider=EmptyDashboard)
         form = DashboardForm(instance=dashboard)
-        widget = form['data_provider'].as_widget()
+        widget = form["data_provider"].as_widget()
         selected_option = 'option value="dashboards.dashboards.EmptyDashboard" selected'
         self.assertTrue(selected_option in widget)
 
     def test_settings_field_sets_data_on_instance(self):
-        data = {
-            'data_provider': 'dashboards.dashboards.EmptyDashboard'}
+        data = {"data_provider": "dashboards.dashboards.EmptyDashboard"}
         form = DashboardForm(data)
         dashboard = form.save(commit=False)
         self.assertEqual(dashboard.data_provider, EmptyDashboard)

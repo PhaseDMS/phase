@@ -13,8 +13,13 @@ class NonEditableAdminMixin(object):
 
 
 class DocumentAdmin(NonEditableAdminMixin, admin.ModelAdmin):
-    list_display = ('document_key', 'title', 'category', 'current_revision',
-                    'created_on')
+    list_display = (
+        "document_key",
+        "title",
+        "category",
+        "current_revision",
+        "created_on",
+    )
 
 
 admin.site.register(Document, DocumentAdmin)

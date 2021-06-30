@@ -14,12 +14,12 @@ from transmittals.factories import TransmittalFactory
 from transmittals.models import Transmittal
 
 
-TEST_CTR = 'test'
+TEST_CTR = "test"
 
 
 def touch(path):
     """Simply creates an empty file."""
-    open(path, 'a').close()
+    open(path, "a").close()
 
 
 class TransmittalsValidationTests(TestCase):
@@ -28,32 +28,37 @@ class TransmittalsValidationTests(TestCase):
         cache.clear()
 
         try:
-            document = Document.objects.get(document_key='FAC10005-CTR-000-EXP-LAY-4891')
+            document = Document.objects.get(
+                document_key="FAC10005-CTR-000-EXP-LAY-4891"
+            )
             self.doc_category = document.category
         except Document.DoesNotExist:
             self.doc_category = CategoryFactory()
-        contract = ContractFactory.create(number='FAC10005-CTR-CLT-TRS-00001',
-                                          categories=[self.doc_category])
+        contract = ContractFactory.create(
+            number="FAC10005-CTR-CLT-TRS-00001", categories=[self.doc_category]
+        )
         self.contract_number = contract.number
         trs_content_type = ContentType.objects.get_for_model(Transmittal)
-        self.trs_category = CategoryFactory(category_template__metadata_model=trs_content_type)
+        self.trs_category = CategoryFactory(
+            category_template__metadata_model=trs_content_type
+        )
 
-        self.tmpdir = tempfile.mkdtemp(prefix='phasetest_', suffix='_trs')
-        self.incoming = join(self.tmpdir, 'incoming')
-        self.tobechecked = join(self.tmpdir, 'tobechecked')
-        self.accepted = join(self.tmpdir, 'accepted')
-        self.rejected = join(self.tmpdir, 'rejected')
+        self.tmpdir = tempfile.mkdtemp(prefix="phasetest_", suffix="_trs")
+        self.incoming = join(self.tmpdir, "incoming")
+        self.tobechecked = join(self.tmpdir, "tobechecked")
+        self.accepted = join(self.tmpdir, "accepted")
+        self.rejected = join(self.tmpdir, "rejected")
 
         os.mkdir(self.accepted)
         os.mkdir(self.rejected)
         os.mkdir(self.tobechecked)
 
         self.config = {
-            'INCOMING_DIR': self.incoming,
-            'REJECTED_DIR': self.rejected,
-            'TO_BE_CHECKED_DIR': self.tobechecked,
-            'ACCEPTED_DIR': self.accepted,
-            'EMAIL_LIST': ['test@phase.fr'],
+            "INCOMING_DIR": self.incoming,
+            "REJECTED_DIR": self.rejected,
+            "TO_BE_CHECKED_DIR": self.tobechecked,
+            "ACCEPTED_DIR": self.accepted,
+            "EMAIL_LIST": ["test@phase.fr"],
         }
 
     def tearDown(self):
@@ -62,21 +67,17 @@ class TransmittalsValidationTests(TestCase):
 
     def prepare_fixtures(self, fixtures_dir, trs_dir):
         """Create the fixtures import dir."""
-        src = os.path.join(
-            os.path.dirname(__file__),
-            'fixtures',
-            fixtures_dir
-        )
-        dest = self.config['INCOMING_DIR']
+        src = os.path.join(os.path.dirname(__file__), "fixtures", fixtures_dir)
+        dest = self.config["INCOMING_DIR"]
         copytree(src, dest)
 
-        trs_fullname = join(self.config['INCOMING_DIR'], trs_dir)
+        trs_fullname = join(self.config["INCOMING_DIR"], trs_dir)
         trs_import = TrsImport(
             trs_fullname,
-            tobechecked_dir=self.config['TO_BE_CHECKED_DIR'],
-            accepted_dir=self.config['ACCEPTED_DIR'],
-            rejected_dir=self.config['REJECTED_DIR'],
-            email_list=self.config['EMAIL_LIST'],
+            tobechecked_dir=self.config["TO_BE_CHECKED_DIR"],
+            accepted_dir=self.config["ACCEPTED_DIR"],
+            rejected_dir=self.config["REJECTED_DIR"],
+            email_list=self.config["EMAIL_LIST"],
             contractor=fixtures_dir,
             doc_category=self.doc_category,
             trs_category=self.trs_category,
@@ -85,111 +86,158 @@ class TransmittalsValidationTests(TestCase):
 
 
 class DirectoryContentTests(TransmittalsValidationTests):
-    fixtures = ['initial_categories', 'initial_values_lists',
-                'initial_accounts', 'initial_documents']
+    fixtures = [
+        "initial_categories",
+        "initial_values_lists",
+        "initial_accounts",
+        "initial_documents",
+    ]
 
     def test_invalid_directory_name(self):
-        trs_import = self.prepare_fixtures('invalid_trs_dirname', 'I-Love-Bananas')
-        self.assertTrue('invalid_dirname' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures("invalid_trs_dirname", "I-Love-Bananas")
+        self.assertTrue("invalid_dirname" in trs_import.errors["global_errors"])
 
     def test_already_exists(self):
         TransmittalFactory(
-            document_key='FAC10005-CTR-CLT-TRS-00001',
-            status='tobechecked')
-        trs_import = self.prepare_fixtures('single_correct_trs', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('already_exists' in trs_import.errors['global_errors'])
+            document_key="FAC10005-CTR-CLT-TRS-00001", status="tobechecked"
+        )
+        trs_import = self.prepare_fixtures(
+            "single_correct_trs", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("already_exists" in trs_import.errors["global_errors"])
 
     def test_successive_transmittals_numbers(self):
         TransmittalFactory(
-            document_key='FAC10005-CTR-CLT-TRS-00001',
-            status='accepted',
-            sequential_number=1)
+            document_key="FAC10005-CTR-CLT-TRS-00001",
+            status="accepted",
+            sequential_number=1,
+        )
         TransmittalFactory(
-            document_key='FAC10005-CTR-CLT-TRS-00002',
-            status='accepted',
-            sequential_number=2)
-        trs_import = self.prepare_fixtures('wrong_seq_number', 'FAC10005-CTR-CLT-TRS-00004')
-        self.assertTrue('wrong_sequential_number' in trs_import.errors['global_errors'])
+            document_key="FAC10005-CTR-CLT-TRS-00002",
+            status="accepted",
+            sequential_number=2,
+        )
+        trs_import = self.prepare_fixtures(
+            "wrong_seq_number", "FAC10005-CTR-CLT-TRS-00004"
+        )
+        self.assertTrue("wrong_sequential_number" in trs_import.errors["global_errors"])
 
     def test_missing_csv(self):
-        trs_import = self.prepare_fixtures('missing_csv', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('missing_csv' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures("missing_csv", "FAC10005-CTR-CLT-TRS-00001")
+        self.assertTrue("missing_csv" in trs_import.errors["global_errors"])
 
     def test_wrong_csv_filename(self):
-        trs_import = self.prepare_fixtures('wrong_csv_filename', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('missing_csv' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures(
+            "wrong_csv_filename", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("missing_csv" in trs_import.errors["global_errors"])
 
     def test_csv_columns(self):
-        trs_import = self.prepare_fixtures('wrong_csv_columns', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('csv_columns' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures(
+            "wrong_csv_columns", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("csv_columns" in trs_import.errors["global_errors"])
 
     def test_not_enough_pdfs(self):
-        trs_import = self.prepare_fixtures('not_enough_pdfs', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('wrong_pdf_count' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures(
+            "not_enough_pdfs", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("wrong_pdf_count" in trs_import.errors["global_errors"])
 
     def test_too_many_pdfs(self):
-        trs_import = self.prepare_fixtures('too_many_pdfs', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('wrong_pdf_count' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures(
+            "too_many_pdfs", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("wrong_pdf_count" in trs_import.errors["global_errors"])
 
     def test_too_many_native_files(self):
-        trs_import = self.prepare_fixtures('too_many_native_files', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('native_files' in trs_import.errors['global_errors'])
+        trs_import = self.prepare_fixtures(
+            "too_many_native_files", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("native_files" in trs_import.errors["global_errors"])
 
     def test_valid_transmittal(self):
-        trs_import = self.prepare_fixtures('single_correct_trs', 'FAC10005-CTR-CLT-TRS-00001')
+        trs_import = self.prepare_fixtures(
+            "single_correct_trs", "FAC10005-CTR-CLT-TRS-00001"
+        )
         self.assertEqual(trs_import.errors, {})
 
 
 class CSVContentTests(TransmittalsValidationTests):
-    fixtures = ['initial_categories', 'initial_values_lists',
-                'initial_accounts', 'initial_documents']
+    fixtures = [
+        "initial_categories",
+        "initial_values_lists",
+        "initial_accounts",
+        "initial_documents",
+    ]
 
     def test_missing_csv_data(self):
-        trs_import = self.prepare_fixtures('missing_data', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('missing_data' in trs_import.errors['csv_content'][2])
+        trs_import = self.prepare_fixtures("missing_data", "FAC10005-CTR-CLT-TRS-00001")
+        self.assertTrue("missing_data" in trs_import.errors["csv_content"][2])
 
     def test_missing_pdf_file(self):
-        trs_import = self.prepare_fixtures('missing_pdf', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('missing_pdf' in trs_import.errors['csv_content'][2])
+        trs_import = self.prepare_fixtures("missing_pdf", "FAC10005-CTR-CLT-TRS-00001")
+        self.assertTrue("missing_pdf" in trs_import.errors["csv_content"][2])
 
     def test_wrong_category_error(self):
-        trs_import = self.prepare_fixtures('single_correct_trs', 'FAC10005-CTR-CLT-TRS-00001')
+        trs_import = self.prepare_fixtures(
+            "single_correct_trs", "FAC10005-CTR-CLT-TRS-00001"
+        )
         trs_import.doc_category = CategoryFactory()
 
-        self.assertTrue('wrong_category' in trs_import.errors['csv_content'][2])
+        self.assertTrue("wrong_category" in trs_import.errors["csv_content"][2])
 
     def test_form_validation_error(self):
-        trs_import = self.prepare_fixtures('form_error', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('data_validation' in trs_import.errors['csv_content'][2])
+        trs_import = self.prepare_fixtures("form_error", "FAC10005-CTR-CLT-TRS-00001")
+        self.assertTrue("data_validation" in trs_import.errors["csv_content"][2])
 
     def test_different_title(self):
-        trs_import = self.prepare_fixtures('different_title', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('wrong_title' in trs_import.errors['csv_content'][2])
+        trs_import = self.prepare_fixtures(
+            "different_title", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("wrong_title" in trs_import.errors["csv_content"][2])
 
     def test_incorrect_revision_number(self):
-        trs_import = self.prepare_fixtures('incorrect_revision', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue(5 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
+        trs_import = self.prepare_fixtures(
+            "incorrect_revision", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue(
+            5 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
 
     def test_incorrect_revision_format(self):
-        trs_import = self.prepare_fixtures('revision_format', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertTrue('revision_format' in trs_import.errors['csv_content'][2])
+        trs_import = self.prepare_fixtures(
+            "revision_format", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertTrue("revision_format" in trs_import.errors["csv_content"][2])
 
     def test_non_following_revision_numbers(self):
-        trs_import = self.prepare_fixtures('non_following_revisions', 'FAC10005-CTR-CLT-TRS-00001')
-        self.assertFalse(1 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
-        self.assertFalse(2 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
-        self.assertFalse(3 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
-        self.assertFalse(4 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
-        self.assertTrue(6 in trs_import.errors['revisions']['FAC10005-CTR-000-EXP-LAY-4891'])
+        trs_import = self.prepare_fixtures(
+            "non_following_revisions", "FAC10005-CTR-CLT-TRS-00001"
+        )
+        self.assertFalse(
+            1 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
+        self.assertFalse(
+            2 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
+        self.assertFalse(
+            3 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
+        self.assertFalse(
+            4 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
+        self.assertTrue(
+            6 in trs_import.errors["revisions"]["FAC10005-CTR-000-EXP-LAY-4891"]
+        )
 
 
 class DirRenameTests(TransmittalsValidationTests):
-
     def test_trs_is_moved_to_rejected(self):
         """The trs must be moved to rejected directory"""
-        trs_import = self.prepare_fixtures('missing_csv', 'FAC10005-CTR-CLT-TRS-00001')
+        trs_import = self.prepare_fixtures("missing_csv", "FAC10005-CTR-CLT-TRS-00001")
 
-        dirpath = join(self.rejected, 'FAC10005-CTR-CLT-TRS-00001')
+        dirpath = join(self.rejected, "FAC10005-CTR-CLT-TRS-00001")
 
         trs_import.move_to_rejected()
         self.assertTrue(os.path.exists(dirpath))
@@ -197,12 +245,12 @@ class DirRenameTests(TransmittalsValidationTests):
 
     def test_old_dir_exists_in_rejected(self):
         """When the dir already exists in rejected, it must be overwritten."""
-        trs_import = self.prepare_fixtures('missing_csv', 'FAC10005-CTR-CLT-TRS-00001')
+        trs_import = self.prepare_fixtures("missing_csv", "FAC10005-CTR-CLT-TRS-00001")
 
-        dirpath = join(self.rejected, 'FAC10005-CTR-CLT-TRS-00001')
+        dirpath = join(self.rejected, "FAC10005-CTR-CLT-TRS-00001")
         os.mkdir(dirpath)
 
-        filepath = join(dirpath, 'old_file')
+        filepath = join(dirpath, "old_file")
         touch(filepath)
         self.assertTrue(os.path.exists(filepath))
 

@@ -18,7 +18,7 @@ def get_choices_from_list(list_index):
      - using the `reload_metadata_cache` task
 
     """
-    cache_key = 'values_list_{}'.format(list_index)
+    cache_key = "values_list_{}".format(list_index)
 
     if cache_key not in cache:
 
@@ -58,34 +58,34 @@ class ConfigurableChoiceField(models.CharField):
     has to be called manually after the form __init__ method, though.
 
     """
+
     def __init__(self, *args, **kwargs):
-        self.list_index = kwargs.pop('list_index', None)
+        self.list_index = kwargs.pop("list_index", None)
         if self.list_index is None:
-            raise ImproperlyConfigured('Missing field: list_index')
+            raise ImproperlyConfigured("Missing field: list_index")
         defaults = {
-            'max_length': 50,
+            "max_length": 50,
         }
         defaults.update(kwargs)
         super(ConfigurableChoiceField, self).__init__(*args, **defaults)
 
     def formfield(self, **kwargs):
         defaults = {
-            'required': not self.blank,
-            'label': capfirst(self.verbose_name),
-            'help_text': self.help_text,
+            "required": not self.blank,
+            "label": capfirst(self.verbose_name),
+            "help_text": self.help_text,
         }
         if self.has_default():
-            defaults['initial'] = self.get_default()
+            defaults["initial"] = self.get_default()
 
-        include_blank = (self.blank or
-                         not (self.has_default() or 'initial' in kwargs))
-        defaults['choices'] = self.get_choices(include_blank=include_blank)
-        defaults['coerce'] = self.to_python
+        include_blank = self.blank or not (self.has_default() or "initial" in kwargs)
+        defaults["choices"] = self.get_choices(include_blank=include_blank)
+        defaults["coerce"] = self.to_python
         return forms.TypedChoiceField(**defaults)
 
     def deconstruct(self):
         name, path, args, kwargs = super(ConfigurableChoiceField, self).deconstruct()
-        kwargs['list_index'] = self.list_index
+        kwargs["list_index"] = self.list_index
         return name, path, args, kwargs
 
     def get_choices(self, include_blank=True):

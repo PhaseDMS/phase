@@ -26,36 +26,35 @@ class ExportCreate(LoginRequiredMixin, DocumentListMixin, UpdateView):
     """
 
     model = Export
-    fields = ('querystring',)
-    http_method_names = ['post']
+    fields = ("querystring",)
+    http_method_names = ["post"]
 
     def breadcrumb_section(self):
-        return (_('Export'), '#')
+        return (_("Export"), "#")
 
     def get_form_kwargs(self):
         qd = self.request.POST.copy()
-        qd.pop('csrfmiddlewaretoken', None)
-        qd.pop('start', None)
-        qd.pop('size', None)
-        qd.pop('sort_by', None)
-        qd.pop('format', None)
-        qd.pop('revisions', None)
+        qd.pop("csrfmiddlewaretoken", None)
+        qd.pop("start", None)
+        qd.pop("size", None)
+        qd.pop("sort_by", None)
+        qd.pop("format", None)
+        qd.pop("revisions", None)
         kwargs = super(ExportCreate, self).get_form_kwargs()
-        kwargs.update({'data': {
-            'querystring': qd.urlencode()
-        }})
+        kwargs.update({"data": {"querystring": qd.urlencode()}})
         return kwargs
 
     def get_object(self):
         self.get_queryset()
         # export_format = 'xlsx' if 'xlsx_format' in self.request.POST.keys() else 'csv'
-        export_format = self.request.POST.get('format', 'csv')
-        all_revisions = self.request.POST.get('revisions', 'latest') == 'all'
+        export_format = self.request.POST.get("format", "csv")
+        all_revisions = self.request.POST.get("revisions", "latest") == "all"
         export = Export(
             owner=self.request.user,
             category=self.category,
             format=export_format,
-            export_all_revisions=all_revisions)
+            export_all_revisions=all_revisions,
+        )
         return export
 
     def get_success_url(self):
@@ -65,8 +64,7 @@ class ExportCreate(LoginRequiredMixin, DocumentListMixin, UpdateView):
         return_value = super(ExportCreate, self).form_valid(form)
         self.object.start_export(user_pk=self.request.user.pk)
 
-        message = _("Your export is being processed and will be available "
-                    "soon.")
+        message = _("Your export is being processed and will be available " "soon.")
         notify(self.object.owner, message)
         return return_value
 
@@ -75,18 +73,21 @@ class ExportList(LoginRequiredMixin, ListView):
     model = Export
 
     def breadcrumb_section(self):
-        return (_('Exports'), reverse('export_list'))
+        return (_("Exports"), reverse("export_list"))
 
     def get_queryset(self):
-        return super(ExportList, self).get_queryset() \
-            .filter(owner=self.request.user) \
-            .select_related() \
-            .order_by('-created_on')
+        return (
+            super(ExportList, self)
+            .get_queryset()
+            .filter(owner=self.request.user)
+            .select_related()
+            .order_by("-created_on")
+        )
 
 
 class DownloadView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        uid = kwargs.get('uid')
+        uid = kwargs.get("uid")
         qs = Export.objects.filter(owner=self.request.user).select_related()
         export = get_object_or_404(qs, id=uid)
 
@@ -97,10 +98,10 @@ class DownloadView(LoginRequiredMixin, View):
         url = export.get_url()
         filename = export.get_pretty_filename()
         if settings.USE_X_SENDFILE:
-            url = '{}{}'.format(settings.PRIVATE_X_ACCEL_PREFIX, url)
-            response = HttpResponse(content_type='application/force-download')
-            response['Content-Disposition'] = 'attachment; filename=%s' % filename
-            response['X-Accel-Redirect'] = url
+            url = "{}{}".format(settings.PRIVATE_X_ACCEL_PREFIX, url)
+            response = HttpResponse(content_type="application/force-download")
+            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            response["X-Accel-Redirect"] = url
             return response
         else:
             return serve(request, url, settings.PRIVATE_ROOT)

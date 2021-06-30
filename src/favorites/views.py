@@ -9,17 +9,17 @@ class FavoriteList(LoginRequiredMixin, ListView):
     model = Favorite
 
     def breadcrumb_section(self):
-        return _('Favorites')
+        return _("Favorites")
 
     def get_context_data(self, **kwargs):
         context = super(FavoriteList, self).get_context_data(**kwargs)
-        context.update({
-            'favorites_active': True,
-        })
+        context.update(
+            {
+                "favorites_active": True,
+            }
+        )
         return context
 
     def get_queryset(self):
         """Filters favorites per authenticated user."""
-        return self.model.objects \
-            .filter(user=self.request.user) \
-            .select_related()
+        return self.model.objects.filter(user=self.request.user).select_related()

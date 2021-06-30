@@ -9,22 +9,22 @@ ack_button = '<a id="action-ack-transmittal"'
 
 
 class TransmittalActionTests(TestCase):
-
     def setUp(self):
         self.trs = create_transmittal()
         self.doc = self.trs.document
         self.category = self.doc.category
-        self.url = reverse("document_detail", args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.doc.document_key
-        ])
+        self.url = reverse(
+            "document_detail",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.doc.document_key,
+            ],
+        )
         self.user = UserFactory(
-            name='User',
-            password='pass',
-            is_superuser=True,
-            category=self.category)
-        self.client.login(username=self.user.email, password='pass')
+            name="User", password="pass", is_superuser=True, category=self.category
+        )
+        self.client.login(username=self.user.email, password="pass")
 
     def test_internal_user_cannot_ack_transmittal(self):
         self.assertIsNone(self.trs.ack_of_receipt_date)

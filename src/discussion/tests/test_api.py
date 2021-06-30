@@ -14,27 +14,25 @@ class BaseDiscussionAclTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user1 = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category
+            category=self.category,
         )
         self.user2 = UserFactory(
-            email='otheruser@phase.fr',
-            password='pass',
-            category=self.category
+            email="otheruser@phase.fr", password="pass", category=self.category
         )
-        self.user3 = UserFactory(email='thirduser@phase.fr', password='pass')
+        self.user3 = UserFactory(email="thirduser@phase.fr", password="pass")
         self.doc = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user1,
-            }
+                "leader": self.user1,
+            },
         )
         self.client = APIClient()
-        self.client.login(email=self.user1.email, password='pass')
+        self.client.login(email=self.user1.email, password="pass")
         self.doc.latest_revision.start_review()
-        self.discussion_list_url = reverse('note-list', args=[self.doc.document_key, 1])
+        self.discussion_list_url = reverse("note-list", args=[self.doc.document_key, 1])
 
 
 class DiscussionListGet(BaseDiscussionAclTests):
@@ -47,12 +45,12 @@ class DiscussionListGet(BaseDiscussionAclTests):
 
     def test_category_member(self):
         """All members with access to the document can see the discussion."""
-        self.client.login(email=self.user2.email, password='pass')
+        self.client.login(email=self.user2.email, password="pass")
         res = self.client.get(self.discussion_list_url)
         self.assertEqual(res.status_code, 200)
 
     def test_foreign_user(self):
-        self.client.login(email=self.user3.email, password='pass')
+        self.client.login(email=self.user3.email, password="pass")
         res = self.client.get(self.discussion_list_url)
         self.assertEqual(res.status_code, 403)
 
@@ -61,25 +59,19 @@ class DiscussionListPost(BaseDiscussionAclTests):
     """Test the new discussion item creation permission."""
 
     def test_distribution_list_member(self):
-        data = {
-            'body': 'New message, yeah!'
-        }
+        data = {"body": "New message, yeah!"}
         res = self.client.post(self.discussion_list_url, data)
         self.assertEqual(res.status_code, 201)
 
     def test_category_member(self):
-        data = {
-            'body': 'New message, yeah!'
-        }
-        self.client.login(email=self.user2.email, password='pass')
+        data = {"body": "New message, yeah!"}
+        self.client.login(email=self.user2.email, password="pass")
         res = self.client.post(self.discussion_list_url, data)
         self.assertEqual(res.status_code, 403)
 
     def test_foreign_user(self):
-        data = {
-            'body': 'New message, yeah!'
-        }
-        self.client.login(email=self.user3.email, password='pass')
+        data = {"body": "New message, yeah!"}
+        self.client.login(email=self.user3.email, password="pass")
         res = self.client.post(self.discussion_list_url, data)
         self.assertEqual(res.status_code, 403)
 
@@ -89,40 +81,28 @@ class DiscussionItemPut(BaseDiscussionAclTests):
 
     def test_message_owner(self):
         """The message owner can update it."""
-        note = NoteFactory(
-            document=self.doc,
-            revision=1,
-            author=self.user1
-        )
-        url = reverse('note-detail', args=[self.doc.document_key, 1, note.id])
-        res = self.client.put(url, {'body': 'Update message'})
+        note = NoteFactory(document=self.doc, revision=1, author=self.user1)
+        url = reverse("note-detail", args=[self.doc.document_key, 1, note.id])
+        res = self.client.put(url, {"body": "Update message"})
         self.assertEqual(res.status_code, 200)
 
     def test_other_user(self):
         """An user cannot update someone else's message."""
-        note = NoteFactory(
-            document=self.doc,
-            revision=1,
-            author=self.user2
-        )
-        url = reverse('note-detail', args=[self.doc.document_key, 1, note.id])
+        note = NoteFactory(document=self.doc, revision=1, author=self.user2)
+        url = reverse("note-detail", args=[self.doc.document_key, 1, note.id])
         res = self.client.put(
-            url,
-            {'body': 'Update message'},
-            content_type='application/json')
+            url, {"body": "Update message"}, content_type="application/json"
+        )
         self.assertEqual(res.status_code, 403)
 
     def test_update_deleted_message(self):
         """A soft deleted item cannot be edited."""
-        note = NoteFactory(
-            document=self.doc,
-            revision=1,
-            author=self.user1)
+        note = NoteFactory(document=self.doc, revision=1, author=self.user1)
         note.soft_delete()
         note.save()
 
-        url = reverse('note-detail', args=[self.doc.document_key, 1, note.id])
-        res = self.client.put(url, {'body': 'Update message'})
+        url = reverse("note-detail", args=[self.doc.document_key, 1, note.id])
+        res = self.client.put(url, {"body": "Update message"})
         self.assertEqual(res.status_code, 403)
 
 
@@ -131,13 +111,9 @@ class DiscussionItemDelete(BaseDiscussionAclTests):
 
     def test_message_owner(self):
         """The message owner can delete it"""
-        note = NoteFactory(
-            document=self.doc,
-            revision=1,
-            author=self.user1
-        )
+        note = NoteFactory(document=self.doc, revision=1, author=self.user1)
         self.assertIsNone(note.deleted_on)
-        url = reverse('note-detail', args=[self.doc.document_key, 1, note.id])
+        url = reverse("note-detail", args=[self.doc.document_key, 1, note.id])
         res = self.client.delete(url)
         self.assertEqual(res.status_code, 200)
 
@@ -146,11 +122,7 @@ class DiscussionItemDelete(BaseDiscussionAclTests):
 
     def test_other_user(self):
         """One cannot delete someone else's messages."""
-        note = NoteFactory(
-            document=self.doc,
-            revision=1,
-            author=self.user2
-        )
-        url = reverse('note-detail', args=[self.doc.document_key, 1, note.id])
+        note = NoteFactory(document=self.doc, revision=1, author=self.user2)
+        url = reverse("note-detail", args=[self.doc.document_key, 1, note.id])
         res = self.client.delete(url)
         self.assertEqual(res.status_code, 403)

@@ -22,9 +22,9 @@ class TransmittalNotificationTests(TestCase):
         trs = create_transmittal()
         rev = trs.latest_revision
 
-        trs.recipient.users.add(UserFactory(email='riri@duck.com'))
-        trs.recipient.users.add(UserFactory(email='fifi@duck.com'))
-        trs.recipient.users.add(UserFactory(email='loulou@duck.com'))
+        trs.recipient.users.add(UserFactory(email="riri@duck.com"))
+        trs.recipient.users.add(UserFactory(email="fifi@duck.com"))
+        trs.recipient.users.add(UserFactory(email="loulou@duck.com"))
 
         send_transmittal_creation_notifications(trs, rev)
         self.assertEqual(len(mail.outbox), 3)
@@ -33,15 +33,15 @@ class TransmittalNotificationTests(TestCase):
 class TransmittalReminderTests(TestCase):
     def setUp(self):
         self.trs = create_transmittal()
-        self.trs.recipient.users.add(UserFactory(email='riri@duck.com'))
-        self.trs.recipient.users.add(UserFactory(email='fifi@duck.com'))
-        self.trs.recipient.users.add(UserFactory(email='loulou@duck.com'))
-        self.trs.recipient.users.add(UserFactory(
-            email='scrooge@duck.com',
-            send_trs_reminders_mails=False))
+        self.trs.recipient.users.add(UserFactory(email="riri@duck.com"))
+        self.trs.recipient.users.add(UserFactory(email="fifi@duck.com"))
+        self.trs.recipient.users.add(UserFactory(email="loulou@duck.com"))
+        self.trs.recipient.users.add(
+            UserFactory(email="scrooge@duck.com", send_trs_reminders_mails=False)
+        )
 
     def test_send_reminder_before_timer(self):
-        call_command('send_trs_reminders')
+        call_command("send_trs_reminders")
         self.assertEqual(len(mail.outbox), 0)
 
     def test_send_reminders(self):
@@ -49,7 +49,7 @@ class TransmittalReminderTests(TestCase):
         self.trs.document.created_on = two_days_ago
         self.trs.document.save()
 
-        call_command('send_trs_reminders')
+        call_command("send_trs_reminders")
         self.assertEqual(len(mail.outbox), 3)
 
     def test_send_reminders_when_already_acked(self):
@@ -58,5 +58,5 @@ class TransmittalReminderTests(TestCase):
         self.trs.document.save()
         self.trs.ack_receipt(UserFactory())
 
-        call_command('send_trs_reminders')
+        call_command("send_trs_reminders")
         self.assertEqual(len(mail.outbox), 0)

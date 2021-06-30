@@ -8,8 +8,10 @@ from categories.factories import CategoryFactory
 from documents.factories import DocumentFactory
 from default_documents.models import ContractorDeliverable
 from default_documents.forms import ContractorDeliverableRevisionForm
-from default_documents.factories import (ContractorDeliverableFactory,
-                                         ContractorDeliverableRevisionFactory)
+from default_documents.factories import (
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 from reviews.models import Review
 
 
@@ -19,61 +21,64 @@ class BaseReviewFormMixinTests(TestCase):
         self.category = CategoryFactory(category_template__metadata_model=Model)
 
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
         self.user2 = UserFactory(
-            email='user2@phase.fr',
-            password='pass',
+            email="user2@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
         self.user3 = UserFactory(
-            email='user3@phase.fr',
-            password='pass',
+            email="user3@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
 
         self.data = {
-            'docclass': 3,
-            'purpose_of_issue': 'FR',
-            'created_on': '2015-01-01',
-            'received_date': '2015-01-01'
+            "docclass": 3,
+            "purpose_of_issue": "FR",
+            "created_on": "2015-01-01",
+            "received_date": "2015-01-01",
         }
 
 
 class ReviewFormMixinTest(BaseReviewFormMixinTests):
-
     def test_review_form_is_valid(self):
         form = ContractorDeliverableRevisionForm(self.data, category=self.category)
         self.assertTrue(form.is_valid())
 
     def test_user_is_both_leader_and_reviewer(self):
         """A single user cannot appear twice in the same distribution list."""
-        self.data.update({
-            'leader': self.user.id,
-            'approver': self.user2.id,
-            'reviewers': str(self.user.id),
-        })
+        self.data.update(
+            {
+                "leader": self.user.id,
+                "approver": self.user2.id,
+                "reviewers": str(self.user.id),
+            }
+        )
         form = ContractorDeliverableRevisionForm(self.data, category=self.category)
         self.assertFalse(form.is_valid())
 
     def test_user_is_both_approver_and_reviewer(self):
         """A single user cannot appear twice in the same distribution list."""
-        self.data.update({
-            'leader': self.user2.id,
-            'approver': self.user.id,
-            'reviewers': str(self.user.id),
-        })
+        self.data.update(
+            {
+                "leader": self.user2.id,
+                "approver": self.user.id,
+                "reviewers": str(self.user.id),
+            }
+        )
         form = ContractorDeliverableRevisionForm(self.data, category=self.category)
         self.assertFalse(form.is_valid())
 
     def test_user_is_both_leader_and_approver(self):
         """A single user cannot appear twice in the same distribution list."""
-        self.data.update({
-            'leader': self.user.id,
-            'approver': self.user.id
-        })
+        self.data.update({"leader": self.user.id, "approver": self.user.id})
         form = ContractorDeliverableRevisionForm(self.data, category=self.category)
         self.assertFalse(form.is_valid())
 
@@ -89,78 +94,80 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
     def setUp(self):
         super(UpdateDistribListTests, self).setUp()
         self.user4 = UserFactory(
-            email='user4@phase.fr',
-            password='pass',
+            email="user4@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
         self.doc = DocumentFactory(
             metadata_factory_class=ContractorDeliverableFactory,
             revision_factory_class=ContractorDeliverableRevisionFactory,
             category=self.category,
             revision={
-                'reviewers': [self.user],
-                'leader': self.user2,
-                'approver': self.user3,
-                'received_date': datetime.datetime.today(),
-            })
+                "reviewers": [self.user],
+                "leader": self.user2,
+                "approver": self.user3,
+                "received_date": datetime.datetime.today(),
+            },
+        )
         self.rev = self.doc.get_latest_revision()
-        self.data.update({
-            'reviewers': str(self.user.id),
-            'leader': self.user2.id,
-            'approver': self.user3.id,
-            'review_start_date': datetime.datetime.today(),
-            'review_due_date': datetime.datetime.today() + datetime.timedelta(days=14)
-        })
+        self.data.update(
+            {
+                "reviewers": str(self.user.id),
+                "leader": self.user2.id,
+                "approver": self.user3.id,
+                "review_start_date": datetime.datetime.today(),
+                "review_due_date": datetime.datetime.today()
+                + datetime.timedelta(days=14),
+            }
+        )
 
     def test_form_is_valid(self):
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertTrue(form.is_valid())
 
     def test_reviewers_cannot_be_added_after_reviewers_step(self):
         self.rev.start_review()
         self.rev.end_reviewers_step()
 
-        reviewers = '{},{}'.format(self.user.id, self.user4.id)
-        self.data.update({'reviewers': reviewers})
+        reviewers = "{},{}".format(self.user.id, self.user4.id)
+        self.data.update({"reviewers": reviewers})
 
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertFalse(form.is_valid())
-        self.assertTrue('reviewers' in form.errors)
+        self.assertTrue("reviewers" in form.errors)
 
     def test_reviewers_cannot_be_deleted_after_reviewers_step(self):
         self.rev.start_review()
         self.rev.end_reviewers_step()
-        self.data.update({'reviewers': ''})
+        self.data.update({"reviewers": ""})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertFalse(form.is_valid())
-        self.assertTrue('reviewers' in form.errors)
+        self.assertTrue("reviewers" in form.errors)
 
     def test_reviewer_can_be_added_during_reviewers_step(self):
         self.rev.start_review()
 
         # Count initial Reviews
-        qs = Review.objects \
-            .filter(document=self.rev.document) \
-            .filter(revision=self.rev.revision) \
-            .filter(role='reviewer')
+        qs = (
+            Review.objects.filter(document=self.rev.document)
+            .filter(revision=self.rev.revision)
+            .filter(role="reviewer")
+        )
         self.assertEqual(qs.count(), 1)
 
         # Add a reviewer
-        reviewers = '{},{}'.format(self.user.id, self.user4.id)
-        self.data.update({'reviewers': reviewers})
+        reviewers = "{},{}".format(self.user.id, self.user4.id)
+        self.data.update({"reviewers": reviewers})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -172,19 +179,19 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
         self.rev.start_review()
 
         # Count initial Reviews
-        qs = Review.objects \
-            .filter(document=self.rev.document) \
-            .filter(revision=self.rev.revision) \
-            .filter(role='reviewer')
+        qs = (
+            Review.objects.filter(document=self.rev.document)
+            .filter(revision=self.rev.revision)
+            .filter(role="reviewer")
+        )
         self.assertEqual(qs.count(), 1)
 
         # Remove a reviewer
-        reviewers = ''
-        self.data.update({'reviewers': reviewers})
+        reviewers = ""
+        self.data.update({"reviewers": reviewers})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -206,13 +213,12 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
 
         # Try to remove the initial reviewer
         reviewers = str(self.user4.id)
-        self.data.update({'reviewers': reviewers})
+        self.data.update({"reviewers": reviewers})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertFalse(form.is_valid())
-        self.assertTrue('reviewers' in form.errors)
+        self.assertTrue("reviewers" in form.errors)
 
     def test_removing_reviewers_can_end_reviewers_step(self):
         """Remove all reviewers, and the review goes up to leader step."""
@@ -220,21 +226,21 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
         self.rev.start_review()
 
         leader_review = self.rev.get_review(self.user2)
-        self.assertEqual(leader_review.status, 'pending')
+        self.assertEqual(leader_review.status, "pending")
 
         # Count Review objects
-        qs = Review.objects \
-            .filter(document=self.rev.document) \
-            .filter(revision=self.rev.revision) \
-            .filter(role='reviewer')
+        qs = (
+            Review.objects.filter(document=self.rev.document)
+            .filter(revision=self.rev.revision)
+            .filter(role="reviewer")
+        )
         self.assertEqual(qs.count(), 2)
 
         # Remove one reviewer
-        self.data.update({'reviewers': str(self.user.id)})
+        self.data.update({"reviewers": str(self.user.id)})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -244,11 +250,10 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
         self.assertEqual(qs.count(), 1)
 
         # Remove second reviewer
-        self.data.update({'reviewers': ''})
+        self.data.update({"reviewers": ""})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -258,67 +263,63 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
         self.assertIsNotNone(self.rev.reviewers_step_closed)
 
         leader_review.refresh_from_db()
-        self.assertEqual(leader_review.status, 'progress')
+        self.assertEqual(leader_review.status, "progress")
 
     def test_leader_cannot_be_changed_after_leader_step(self):
         self.rev.start_review()
         self.rev.end_leader_step()
-        self.data.update({'leader': self.user4.id})
+        self.data.update({"leader": self.user4.id})
 
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertFalse(form.is_valid())
-        self.assertTrue('leader' in form.errors)
+        self.assertTrue("leader" in form.errors)
 
     def test_update_leader_updates_distrib_list(self):
         self.rev.start_review()
         review = self.rev.get_review(self.user2)
-        self.assertEqual(review.role, 'leader')
+        self.assertEqual(review.role, "leader")
 
-        self.data.update({'leader': self.user4.id})
+        self.data.update({"leader": self.user4.id})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         rev = form.save()
 
         review = rev.get_review(self.user2)
         self.assertIsNone(review)
 
         review = rev.get_review(self.user4)
-        self.assertEqual(review.role, 'leader')
+        self.assertEqual(review.role, "leader")
 
     def test_approver_cannot_be_changed_after_approver_step(self):
         self.rev.start_review()
         self.rev.end_review()
-        self.data.update({'approver': self.user4.id})
+        self.data.update({"approver": self.user4.id})
 
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         self.assertFalse(form.is_valid())
-        self.assertTrue('approver' in form.errors)
+        self.assertTrue("approver" in form.errors)
 
     def test_update_approver_updates_distrib_list(self):
         self.rev.start_review()
         review = self.rev.get_review(self.user3)
-        self.assertEqual(review.role, 'approver')
+        self.assertEqual(review.role, "approver")
 
-        self.data.update({'approver': self.user4.id})
+        self.data.update({"approver": self.user4.id})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         rev = form.save()
 
         review = rev.get_review(self.user3)
         self.assertIsNone(review)
 
         review = rev.get_review(self.user4)
-        self.assertEqual(review.role, 'approver')
+        self.assertEqual(review.role, "approver")
 
     def test_removing_approver_during_approver_step_ends_review(self):
         self.rev.start_review()
@@ -326,11 +327,10 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
 
         self.assertIsNone(self.rev.review_end_date)
 
-        self.data.update({'approver': ''})
+        self.data.update({"approver": ""})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         rev = form.save()
 
         review = rev.get_review(self.user3)
@@ -343,11 +343,10 @@ class UpdateDistribListTests(BaseReviewFormMixinTests):
 
         self.assertIsNone(self.rev.review_end_date)
 
-        self.data.update({'approver': ''})
+        self.data.update({"approver": ""})
         form = ContractorDeliverableRevisionForm(
-            self.data,
-            instance=self.rev,
-            category=self.category)
+            self.data, instance=self.rev, category=self.category
+        )
         rev = form.save()
 
         review = rev.get_review(self.user3)

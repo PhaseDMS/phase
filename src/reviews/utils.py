@@ -36,14 +36,15 @@ def get_cached_reviews(revision):
 
 def get_all_reviews(document):
     """Return a dictionnary of revision indexed reviews."""
-    cache_key = 'all_reviews_{}'.format(document.id)
+    cache_key = "all_reviews_{}".format(document.id)
     all_reviews = cache.get(cache_key, None)
 
     if all_reviews is None:
-        qs = Review.objects \
-            .filter(document=document) \
-            .order_by('revision', 'id') \
-            .select_related('reviewer')
+        qs = (
+            Review.objects.filter(document=document)
+            .order_by("revision", "id")
+            .select_related("reviewer")
+        )
 
         all_reviews = {}
         for revision_id, reviews in groupby(qs, lambda obj: obj.revision):
@@ -56,41 +57,51 @@ def get_all_reviews(document):
 
 def get_dummy_reviews(revision):
     """Return a dictionary of Review objects for."""
-    cache_key = 'dummy_reviews_{}'.format(revision.metadata.document_id)
+    cache_key = "dummy_reviews_{}".format(revision.metadata.document_id)
     dummy_reviews = cache.get(cache_key, None)
 
     if dummy_reviews is None:
 
-        revisions = revision.__class__.objects \
-            .filter(metadata__document=revision.document) \
-            .filter(review_start_date=None) \
-            .select_related('leader', 'approver') \
-            .prefetch_related('reviewers')
+        revisions = (
+            revision.__class__.objects.filter(metadata__document=revision.document)
+            .filter(review_start_date=None)
+            .select_related("leader", "approver")
+            .prefetch_related("reviewers")
+        )
 
         dummy_reviews = {}
         for revision in revisions:
             revision_reviews = []
 
             for reviewer in revision.reviewers.all():
-                revision_reviews.append(Review(
-                    role='reviewer',
-                    status=Review.STATUSES.void,
-                    reviewer=reviewer,
-                    document_id=revision.metadata.document_id))
+                revision_reviews.append(
+                    Review(
+                        role="reviewer",
+                        status=Review.STATUSES.void,
+                        reviewer=reviewer,
+                        document_id=revision.metadata.document_id,
+                    )
+                )
 
             if revision.leader:
-                revision_reviews.append(Review(
-                    role='leader',
-                    status=Review.STATUSES.void,
-                    reviewer=revision.leader,
-                    document_id=revision.metadata.document_id))
+                revision_reviews.append(
+                    Review(
+                        role="leader",
+                        status=Review.STATUSES.void,
+                        reviewer=revision.leader,
+                        document_id=revision.metadata.document_id,
+                    )
+                )
 
             if revision.approver:
-                revision_reviews.append(Review(
-                    role='approver',
-                    status=Review.STATUSES.void,
-                    reviewer=revision.approver,
-                    document_id=revision.metadata.document_id))
+                revision_reviews.append(
+                    Review(
+                        role="approver",
+                        status=Review.STATUSES.void,
+                        reviewer=revision.approver,
+                        document_id=revision.metadata.document_id,
+                    )
+                )
 
             dummy_reviews[revision.revision] = revision_reviews
 

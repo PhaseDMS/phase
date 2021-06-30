@@ -5,29 +5,25 @@ from factory import fuzzy
 
 from accounts.factories import EntityFactory
 from default_documents.models import (
-    DemoMetadata, DemoMetadataRevision, ContractorDeliverable,
-    ContractorDeliverableRevision)
-
-
-CONTRACT_NB_CHOICES = (
-    'FAC09001',
-    'FAC10005'
+    DemoMetadata,
+    DemoMetadataRevision,
+    ContractorDeliverable,
+    ContractorDeliverableRevision,
 )
 
-DISCIPLINE_CHOICES = (
-    'COM', 'CON', 'COR', 'DRI', 'MAI', 'MUL', 'OPE'
-)
 
-DOC_TYPE_CHOICES = (
-    'PID', 'ANA', 'BAS', 'FAT', 'HAZ', 'ISO'
-)
+CONTRACT_NB_CHOICES = ("FAC09001", "FAC10005")
+
+DISCIPLINE_CHOICES = ("COM", "CON", "COR", "DRI", "MAI", "MUL", "OPE")
+
+DOC_TYPE_CHOICES = ("PID", "ANA", "BAS", "FAT", "HAZ", "ISO")
 
 
 class MetadataFactory(factory.DjangoModelFactory):
     class Meta:
         model = DemoMetadata
 
-    title = factory.SelfAttribute('document.title')
+    title = factory.SelfAttribute("document.title")
 
 
 class MetadataRevisionFactory(factory.DjangoModelFactory):
@@ -66,10 +62,10 @@ class ContractorDeliverableFactory(MetadataFactory):
 
     contract_number = fuzzy.FuzzyChoice(CONTRACT_NB_CHOICES)
     originator = factory.SubFactory(EntityFactory)
-    unit = '000'
+    unit = "000"
     discipline = fuzzy.FuzzyChoice(DISCIPLINE_CHOICES)
     document_type = fuzzy.FuzzyChoice(DOC_TYPE_CHOICES)
-    sequential_number = factory.Sequence(lambda n: '{0:04}'.format(n))
+    sequential_number = factory.Sequence(lambda n: "{0:04}".format(n))
 
 
 class ContractorDeliverableRevisionFactory(MetadataRevisionFactory):

@@ -21,16 +21,16 @@ from documents.utils import save_document_forms
 
 
 class normal_dialect(csv.Dialect):
-    delimiter = ';'
+    delimiter = ";"
     quotechar = '"'
     doublequote = False
     skipinitialspace = True
-    lineterminator = '\r\n'
+    lineterminator = "\r\n"
     quoting = csv.QUOTE_NONE
     strict = True
 
 
-csv.register_dialect('normal', normal_dialect)
+csv.register_dialect("normal", normal_dialect)
 
 
 def xls_to_django(value):
@@ -51,67 +51,56 @@ def xls_to_django(value):
 
     """
     if value is None:
-        value = ''
-    elif hasattr(value, 'is_integer') and value.is_integer():
-        value = '%s' % int(value)
+        value = ""
+    elif hasattr(value, "is_integer") and value.is_integer():
+        value = "%s" % int(value)
     elif type(value) in (dt.datetime, dt.date):
-        value = value.strftime('%Y-%m-%d')
+        value = value.strftime("%Y-%m-%d")
     else:
-        value = '%s' % value
+        value = "%s" % value
     return value
 
 
 class ImportBatch(models.Model):
     STATUSES = Choices(
-        ('new', _('New')),
-        ('started', _('Started')),
-        ('success', _('Success')),
-        ('partial_success', _('Partial success')),
-        ('error', _('Error')),
+        ("new", _("New")),
+        ("started", _("Started")),
+        ("success", _("Success")),
+        ("partial_success", _("Partial success")),
+        ("error", _("Error")),
     )
 
     uid = models.UUIDField(primary_key=True)
     category = models.ForeignKey(
-        Category,
-        on_delete=models.PROTECT,
-        verbose_name=_('Category')
+        Category, on_delete=models.PROTECT, verbose_name=_("Category")
     )
-    file = models.FileField(
-        _('File'),
-        upload_to='import_%Y%m%d'
-    )
+    file = models.FileField(_("File"), upload_to="import_%Y%m%d")
     status = models.CharField(
-        _('Status'),
-        max_length=50,
-        choices=STATUSES,
-        default=STATUSES.new
+        _("Status"), max_length=50, choices=STATUSES, default=STATUSES.new
     )
-    created_on = models.DateField(
-        _('Created on'),
-        default=timezone.now
-    )
+    created_on = models.DateField(_("Created on"), default=timezone.now)
 
     class Meta:
-        verbose_name = _('Import batch')
-        verbose_name_plural = _('Import batches')
-        ordering = ['-created_on']
+        verbose_name = _("Import batch")
+        verbose_name_plural = _("Import batches")
+        ordering = ["-created_on"]
 
     @property
     def imported_type(self):
         return self.category.category_template.metadata_model
 
     def __str__(self):
-        return 'Import {} ({})'.format(self.uid, self.imported_type)
+        return "Import {} ({})".format(self.uid, self.imported_type)
 
     def get_absolute_url(self):
-        return reverse('import_status', args=[self.uid])
+        return reverse("import_status", args=[self.uid])
 
     def get_form_class(self):
         form_class = documentform_factory(self.imported_type.model_class())
         return form_class
 
     def get_form(self, data=None, **kwargs):
-        kwargs.update({'category': self.category})
+        kwargs.update({"category": self.category})
         return self.get_form_class()(data, **kwargs)
 
     def get_revisionform_class(self):
@@ -121,16 +110,16 @@ class ImportBatch(models.Model):
         return form_class
 
     def get_revisionform(self, data=None, **kwargs):
-        kwargs.update({'category': self.category})
+        kwargs.update({"category": self.category})
         # We update `created_on` field with current date.
-        data.update({'created_on': timezone.now()})
+        data.update({"created_on": timezone.now()})
         return self.get_revisionform_class()(data, **kwargs)
 
     def __iter__(self):
         """Loop over csv data."""
-        if self.file.path.endswith('csv'):
-            with open(self.file.path, 'r') as f:
-                csvfile = csv.DictReader(f, dialect='normal')
+        if self.file.path.endswith("csv"):
+            with open(self.file.path, "r") as f:
+                csvfile = csv.DictReader(f, dialect="normal")
                 for row in csvfile:
                     imp = Import(batch=self, data=row)
                     yield imp
@@ -168,40 +157,36 @@ class ImportBatch(models.Model):
 
 class Import(models.Model):
     STATUSES = Choices(
-        ('new', _('New')),
-        ('success', _('Success')),
-        ('error', _('Error')),
+        ("new", _("New")),
+        ("success", _("Success")),
+        ("error", _("Error")),
     )
 
-    line = models.IntegerField(_('Line'))
+    line = models.IntegerField(_("Line"))
     batch = models.ForeignKey(
         ImportBatch,
         on_delete=models.PROTECT,
-        verbose_name=_('Batch'),
+        verbose_name=_("Batch"),
     )
     document = models.ForeignKey(
-        Document,
-        on_delete=models.PROTECT,
-        null=True, blank=True
+        Document, on_delete=models.PROTECT, null=True, blank=True
     )
     status = models.CharField(
-        _('Status'),
-        max_length=50,
-        choices=STATUSES,
-        default=STATUSES.new
+        _("Status"), max_length=50, choices=STATUSES, default=STATUSES.new
     )
     errors = models.TextField(
-        _('Errors'),
-        null=True, blank=True,
+        _("Errors"),
+        null=True,
+        blank=True,
     )
 
     def __init__(self, *args, **kwargs):
-        self.data = kwargs.pop('data', None)
+        self.data = kwargs.pop("data", None)
         self.denormalized = {}
         super(Import, self).__init__(*args, **kwargs)
 
     def get_denormalized_value(self, import_fields, field_name, value):
-        """" Returns the related object pk if the field is a foreign key.
+        """ " Returns the related object pk if the field is a foreign key.
         The PhaseConfig `import_fields` must be configured."""
 
         field_config = import_fields.get(field_name, None)
@@ -209,13 +194,13 @@ class Import(models.Model):
         if not field_config:
             return value
 
-        model_str = field_config.get('model', False)
-        lookup_field = field_config.get('lookup_field', False)
+        model_str = field_config.get("model", False)
+        lookup_field = field_config.get("lookup_field", False)
 
         if not model_str or not lookup_field:
             return value
 
-        app_label, model_name = model_str.split('.')
+        app_label, model_name = model_str.split(".")
         model = apps.get_model(app_label=app_label, model_name=model_name)
         params = {lookup_field: value}
         try:
@@ -223,9 +208,13 @@ class Import(models.Model):
             return obj
 
         except ObjectDoesNotExist:
-            self.errors = json.dumps({
-                'An error occurred': ["Unable to retrieve {} field".format(field_name)]
-            })
+            self.errors = json.dumps(
+                {
+                    "An error occurred": [
+                        "Unable to retrieve {} field".format(field_name)
+                    ]
+                }
+            )
             self.status = self.STATUSES.error
 
     def denormalize_data(self, category):
@@ -233,10 +222,10 @@ class Import(models.Model):
 
         # Check the `PhaseConfig` attribute
         model_class = category.category_template.metadata_model.model_class()
-        config = getattr(model_class, 'PhaseConfig')
+        config = getattr(model_class, "PhaseConfig")
 
         # If `import_fields`is not set, we simply use the initial data
-        if not hasattr(config, 'import_fields'):
+        if not hasattr(config, "import_fields"):
             self.denormalized = self.data
             return
 
@@ -251,16 +240,16 @@ class Import(models.Model):
     def get_forms(self, metadata_instance=None, revision_instance=None):
         return (
             self.batch.get_form(self.denormalized, instance=metadata_instance),
-            self.batch.get_revisionform(self.denormalized, instance=revision_instance)
+            self.batch.get_revisionform(self.denormalized, instance=revision_instance),
         )
 
     def do_import(self, line):
-        assert hasattr(self, 'data')
+        assert hasattr(self, "data")
 
         self.line = line
 
         # Checking if the document already exists
-        key = self.data.get('document_key', None)
+        key = self.data.get("document_key", None)
         doc = get_object_or_None(Document, document_key=key)
         metadata = doc.metadata if doc else None
 
@@ -271,8 +260,10 @@ class Import(models.Model):
             return
 
         # Checking if the revision already exists
-        revision_num = self.data.get('revision', None)
-        revision = metadata.get_revision(revision_num) if metadata and revision_num else None
+        revision_num = self.data.get("revision", None)
+        revision = (
+            metadata.get_revision(revision_num) if metadata and revision_num else None
+        )
 
         form, revision_form = self.get_forms(metadata, revision)
         try:
@@ -282,17 +273,16 @@ class Import(models.Model):
                 # `rewrite_schedule` to False disables rewriting
                 #  (ES indexing is still enabled)
                 doc, metadata, revision = save_document_forms(
-                    form, revision_form,
-                    self.batch.category,
-                    rewrite_schedule=False)
+                    form, revision_form, self.batch.category, rewrite_schedule=False
+                )
                 self.document = doc
                 self.status = self.STATUSES.success
             else:
-                errors = dict(list(form.errors.items()) + list(revision_form.errors.items()))
+                errors = dict(
+                    list(form.errors.items()) + list(revision_form.errors.items())
+                )
                 self.errors = json.dumps(errors)
                 self.status = self.STATUSES.error
         except Exception as e:
-            self.errors = json.dumps({
-                'An error occurred': [str(e)]
-            })
+            self.errors = json.dumps({"An error occurred": [str(e)]})
             self.status = self.STATUSES.error

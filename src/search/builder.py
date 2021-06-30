@@ -26,7 +26,7 @@ class SearchBuilder(object):
         DocumentModel = self.category.document_class()
         Config = DocumentModel.PhaseConfig
         self.filter_fields = Config.filter_fields
-        self.custom_filters = getattr(Config, 'custom_filters', {})
+        self.custom_filters = getattr(Config, "custom_filters", {})
 
         # filter_on_entities parameters is used for OutgoingTransmittals and
         # indicates to restrict items to those whose recipient id is in
@@ -38,7 +38,7 @@ class SearchBuilder(object):
         FilterForm = filterform_factory(DocumentModel)
         form = FilterForm(filters)
         if not form.is_valid():
-            raise RuntimeError('Search filters are invalid')
+            raise RuntimeError("Search filters are invalid")
 
         self.filter_form = form
         self.filters = form.cleaned_data
@@ -54,11 +54,10 @@ class SearchBuilder(object):
             fields = []
         document_type = self.category.document_type()
 
-        s = Search(using=elastic, doc_type=document_type) \
-            .index(settings.ELASTIC_INDEX)
+        s = Search(using=elastic, doc_type=document_type).index(settings.ELASTIC_INDEX)
 
         if only_latest_revisions:
-            s = s.filter('term', is_latest_revision=True)
+            s = s.filter("term", is_latest_revision=True)
 
         s = self._add_filter_fields(s)
         s = self._add_custom_filters(s)
@@ -76,16 +75,16 @@ class SearchBuilder(object):
             if value:
                 if isinstance(value, models.Model):
                     value = value.pk
-                    field = '%s_id' % field
+                    field = "%s_id" % field
                 else:
-                    field = '%s.raw' % field
-                s = s.filter({'term': {field: value}})
+                    field = "%s.raw" % field
+                s = s.filter({"term": {field: value}})
         return s
 
     def _add_custom_filters(self, s):
         for filter_key, filter_data in list(self.custom_filters.items()):
             value = self.filters.get(filter_key, None)
-            f = filter_data['filters'].get(value, None)
+            f = filter_data["filters"].get(value, None)
             if f is not None:
                 s = s.filter(f)
 
@@ -93,7 +92,7 @@ class SearchBuilder(object):
 
     def _add_filter_on_entities(self, s):
         if self.filter_on_entities:
-            s = s.filter({'terms': {'recipient_id': self.filter_on_entities}})
+            s = s.filter({"terms": {"recipient_id": self.filter_on_entities}})
         return s
 
     def add_aggregations(self, s):
@@ -105,43 +104,43 @@ class SearchBuilder(object):
         """
         for field in self.filter_fields:
             if isinstance(self.filter_form.fields[field], ModelChoiceField):
-                s.aggs.bucket(field, 'terms', field='%s_id' % field, size=0)
+                s.aggs.bucket(field, "terms", field="%s_id" % field, size=0)
             else:
-                s.aggs.bucket(field, 'terms', field='%s.raw' % field, size=0)
+                s.aggs.bucket(field, "terms", field="%s.raw" % field, size=0)
 
         return s
 
     def _add_search_query(self, s):
         """Add the full text search to the query."""
-        search_terms = self.filters.get('search_terms', None)
+        search_terms = self.filters.get("search_terms", None)
         if search_terms:
-            s = s.query({
-                'multi_match': {
-                    'query': search_terms,
-                    'fields': ['_all'],
-                    'operator': 'and'
+            s = s.query(
+                {
+                    "multi_match": {
+                        "query": search_terms,
+                        "fields": ["_all"],
+                        "operator": "and",
+                    }
                 }
-            })
+            )
 
         return s
 
     def _add_sort(self, s):
-        sort_field = self.filters.get('sort_by', 'document_key') or 'document_key'
-        sort_field = '%s.raw' % sort_field
-        if sort_field.startswith('-'):
-            sort_field = sort_field.lstrip('-')
-            sort_direction = 'desc'
+        sort_field = self.filters.get("sort_by", "document_key") or "document_key"
+        sort_field = "%s.raw" % sort_field
+        if sort_field.startswith("-"):
+            sort_field = sort_field.lstrip("-")
+            sort_direction = "desc"
         else:
-            sort_direction = 'asc'
-        s = s.sort({sort_field: {
-            'order': sort_direction,
-            'unmapped_type': "String"}})
+            sort_direction = "asc"
+        s = s.sort({sort_field: {"order": sort_direction, "unmapped_type": "String"}})
         return s
 
     def _add_pagination(self, s):
         s = s.extra(
-            from_=self.filters.get('start', 0),
-            size=self.filters.get('size', settings.PAGINATE_BY)
+            from_=self.filters.get("start", 0),
+            size=self.filters.get("size", settings.PAGINATE_BY),
         )
         return s
 

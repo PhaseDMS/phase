@@ -3,14 +3,19 @@ import json
 from django.utils import timezone
 from django.conf import settings
 from django.http import (
-    HttpResponse, Http404, HttpResponseForbidden, HttpResponseRedirect
+    HttpResponse,
+    Http404,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
 )
 from wsgiref.util import FileWrapper
 from django.core.exceptions import PermissionDenied
-from django.views.generic import (
-    ListView, DetailView, RedirectView, DeleteView)
+from django.views.generic import ListView, DetailView, RedirectView, DeleteView
 from django.views.generic.edit import (
-    ModelFormMixin, ProcessFormView, SingleObjectTemplateResponseMixin)
+    ModelFormMixin,
+    ProcessFormView,
+    SingleObjectTemplateResponseMixin,
+)
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -42,8 +47,9 @@ class DocumentListMixin(CategoryMixin):
     of the correct type.
 
     """
-    slug_url_kwarg = 'document_key'
-    slug_field = 'document_key'
+
+    slug_url_kwarg = "document_key"
+    slug_field = "document_key"
 
     def breadcrumb_section(self):
         return None
@@ -59,11 +65,13 @@ class DocumentListMixin(CategoryMixin):
     def get_context_data(self, **kwargs):
         self.get_external_filtering()
         context = super(DocumentListMixin, self).get_context_data(**kwargs)
-        context.update({
-            'document_type': self.category.document_type(),
-            'favorites': self.get_favorites(),
-            'bookmarks': self.get_bookmarks(self.request.user, self.category),
-        })
+        context.update(
+            {
+                "document_type": self.category.document_type(),
+                "favorites": self.get_favorites(),
+                "bookmarks": self.get_bookmarks(self.request.user, self.category),
+            }
+        )
         return context
 
     def get_queryset(self):
@@ -73,12 +81,12 @@ class DocumentListMixin(CategoryMixin):
 
         """
         DocumentClass = self.category.document_class()
-        qs = DocumentClass.objects \
-            .select_related() \
-            .filter(document__category=self.category)
+        qs = DocumentClass.objects.select_related().filter(
+            document__category=self.category
+        )
         entities = self.get_external_filtering()
 
-        if not hasattr(DocumentClass, 'recipient'):
+        if not hasattr(DocumentClass, "recipient"):
             # Recipient only belongs to Transmittals
             return qs
 
@@ -91,9 +99,7 @@ class DocumentListMixin(CategoryMixin):
         return self.category.document_class()
 
     def get_favorites(self):
-        qs = Favorite.objects \
-            .select_related('user') \
-            .filter(user=self.request.user)
+        qs = Favorite.objects.select_related("user").filter(user=self.request.user)
         serializer = FavoriteSerializer(qs, many=True)
         return JSONRenderer().render(serializer.data)
 
@@ -119,42 +125,46 @@ class BaseDocumentBatchActionView(BaseDocumentList):
     is in sync.
 
     """
+
     def get_redirect_url(self, *args, **kwargs):
         """Redirects to document list after that."""
-        return reverse('category_document_list', args=[
-            self.kwargs.get('organisation'),
-            self.kwargs.get('category')])
+        return reverse(
+            "category_document_list",
+            args=[self.kwargs.get("organisation"), self.kwargs.get("category")],
+        )
 
     def post(self, request, *args, **kwargs):
-        document_ids = request.POST.getlist('document_ids')
+        document_ids = request.POST.getlist("document_ids")
         document_class = self.get_document_class()
         contenttype = ContentType.objects.get_for_model(document_class)
 
         job = self.start_job(contenttype, document_ids)
 
-        poll_url = reverse('task_poll', args=[job.id])
-        data = {'poll_url': poll_url}
-        return HttpResponse(json.dumps(data), content_type='application/json')
+        poll_url = reverse("task_poll", args=[job.id])
+        data = {"poll_url": poll_url}
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
     def start_job(self, content_type, document_ids):
         raise NotImplementedError()
 
 
 class DocumentList(BaseDocumentList):
-    template_name = 'documents/document_list.html'
+    template_name = "documents/document_list.html"
 
     def get_context_data(self, **kwargs):
         context = super(DocumentList, self).get_context_data(**kwargs)
-        model = context['object_list'].model
+        model = context["object_list"].model
         FilterForm = filterform_factory(model)
 
-        context.update({
-            'form': FilterForm(),
-            'documents_active': True,
-            'paginate_by': settings.PAGINATE_BY,
-            'sort_by': model._meta.ordering[0],
-            'document_class': self.get_document_class(),
-        })
+        context.update(
+            {
+                "form": FilterForm(),
+                "documents_active": True,
+                "paginate_by": settings.PAGINATE_BY,
+                "sort_by": model._meta.ordering[0],
+                "document_class": self.get_document_class(),
+            }
+        )
         return context
 
 
@@ -165,15 +175,19 @@ class DocumentRedirect(RedirectView):
     permanent = False
 
     def get_redirect_url(self, **kwargs):
-        key = kwargs.get('document_key')
+        key = kwargs.get("document_key")
         qs = Document.objects.select_related(
-            'category__organisation',
-            'category__category_template')
+            "category__organisation", "category__category_template"
+        )
         document = get_object_or_404(qs, document_key=key)
-        return reverse('document_detail', args=[
-            document.category.organisation.slug,
-            document.category.slug,
-            document.document_key])
+        return reverse(
+            "document_detail",
+            args=[
+                document.category.organisation.slug,
+                document.category.slug,
+                document.document_key,
+            ],
+        )
 
 
 class DocumentFormMixin(object):
@@ -203,7 +217,7 @@ class DocumentFormMixin(object):
         document_form_class = self.get_form_class()
         document_form = document_form_class(**kwargs)
 
-        kwargs.update({'instance': self.revision})
+        kwargs.update({"instance": self.revision})
         revision_form_class = self.get_revisionform_class()
         revision_form = revision_form_class(**kwargs)
 
@@ -211,32 +225,35 @@ class DocumentFormMixin(object):
 
     def get_revision(self):
         """Get the edited revision."""
-        revision_number = self.kwargs.get('revision', None)
+        revision_number = self.kwargs.get("revision", None)
         if revision_number:
             revision = self.object.get_revision(revision_number)
             if revision is None:
-                raise Http404(_('This revision does not exist'))
+                raise Http404(_("This revision does not exist"))
         else:
             revision = self.object.latest_revision
 
         return revision
 
 
-class BaseDocumentFormView(LoginRequiredMixin,
-                           PermissionRequiredMixin,
-                           DocumentListMixin,
-                           DocumentFormMixin,
-                           SingleObjectTemplateResponseMixin,
-                           ModelFormMixin,
-                           ProcessFormView):
+class BaseDocumentFormView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    DocumentListMixin,
+    DocumentFormMixin,
+    SingleObjectTemplateResponseMixin,
+    ModelFormMixin,
+    ProcessFormView,
+):
     """Base view class to display a document form."""
 
     def get(self, request, *args, **kwargs):
         document_form, revision_form = self.get_forms()
-        return self.render_to_response(self.get_context_data(
-            document_form=document_form,
-            revision_form=revision_form
-        ))
+        return self.render_to_response(
+            self.get_context_data(
+                document_form=document_form, revision_form=revision_form
+            )
+        )
 
     def post(self, request, *args, **kwargs):
         document_form, revision_form = self.get_forms()
@@ -250,10 +267,10 @@ class BaseDocumentFormView(LoginRequiredMixin,
 
         # If category is not set, the "get_queryset" method was not called
         # TODO clean this
-        if not hasattr(self, 'category'):
+        if not hasattr(self, "category"):
             _qs = self.get_queryset()  # noqa
 
-        kwargs.update({'category': self.category})
+        kwargs.update({"category": self.category})
         return kwargs
 
     def form_valid(self, document_form, revision_form):
@@ -265,18 +282,18 @@ class BaseDocumentFormView(LoginRequiredMixin,
 
     def form_invalid(self, document_form, revision_form):
         """Render the form with errors."""
-        return self.render_to_response(self.get_context_data(
-            document_form=document_form,
-            revision_form=revision_form
-        ))
+        return self.render_to_response(
+            self.get_context_data(
+                document_form=document_form, revision_form=revision_form
+            )
+        )
 
 
-class DocumentDetail(LoginRequiredMixin,
-                     DocumentListMixin,
-                     DocumentFormMixin,
-                     DetailView):
-    context_object_name = 'document'
-    template_name = 'documents/document_detail.html'
+class DocumentDetail(
+    LoginRequiredMixin, DocumentListMixin, DocumentFormMixin, DetailView
+):
+    context_object_name = "document"
+    template_name = "documents/document_detail.html"
 
     def get(self, request, *args, **kwargs):
         """Update the favorite's timestamp for the current user if any."""
@@ -284,10 +301,9 @@ class DocumentDetail(LoginRequiredMixin,
 
         # Upgrade last time the favorite was last seen
         # If not favorited, the query does nothing and it's ok
-        Favorite.objects \
-            .filter(document=self.object.document) \
-            .filter(user=self.request.user) \
-            .update(last_view_date=timezone.now())
+        Favorite.objects.filter(document=self.object.document).filter(
+            user=self.request.user
+        ).update(last_view_date=timezone.now())
 
         return response
 
@@ -296,10 +312,7 @@ class DocumentDetail(LoginRequiredMixin,
         document = self.object
 
         DocumentForm = self.get_form_class()
-        form = DocumentForm(
-            instance=document,
-            category=self.category,
-            read_only=True)
+        form = DocumentForm(instance=document, category=self.category, read_only=True)
 
         revisions = document.get_all_revisions()
         RevisionForm = self.get_revisionform_class()
@@ -309,30 +322,32 @@ class DocumentDetail(LoginRequiredMixin,
                 instance=revision,
                 request=self.request,
                 category=self.category,
-                read_only=True)
+                read_only=True,
+            )
             # Get latest revision without additional query
             if latest_revision is None or latest_revision.revision < revision.revision:
                 latest_revision = revision
 
-        context.update({
-            'is_detail': True,
-            'form': form,
-            'revisions': revisions,
-            'latest_revision': latest_revision,
-        })
+        context.update(
+            {
+                "is_detail": True,
+                "form": form,
+                "revisions": revisions,
+                "latest_revision": latest_revision,
+            }
+        )
         context.update(latest_revision.detail_view_context(self.request))
         return context
 
 
 class DocumentCreate(BaseDocumentFormView):
-    permission_required = 'documents.add_document'
-    context_object_name = 'document'
-    template_name = 'documents/document_form.html'
+    permission_required = "documents.add_document"
+    context_object_name = "document"
+    template_name = "documents/document_form.html"
 
     def check_if_creation_is_available(self):
         if not self.category.use_creation_form:
-            raise PermissionDenied(
-                'Document creation is disabled for this category')
+            raise PermissionDenied("Document creation is disabled for this category")
 
     def get(self, request, *args, **kwargs):
         self.check_if_creation_is_available()
@@ -348,57 +363,59 @@ class DocumentCreate(BaseDocumentFormView):
 
     def get_context_data(self, **kwargs):
         context = super(DocumentCreate, self).get_context_data(**kwargs)
-        context.update({
-            'document_create': True,
-        })
+        context.update(
+            {
+                "document_create": True,
+            }
+        )
         return context
 
     def form_valid(self, document_form, revision_form):
         """Saves both the document and it's revision."""
         doc, metadata, revision = save_document_forms(
-            document_form,
-            revision_form,
-            self.category,
-            created_by=self.request.user)
+            document_form, revision_form, self.category, created_by=self.request.user
+        )
 
-        message_text = '''You created the document
-                       <a href="%(url)s">%(key)s (%(title)s)</a>'''
+        message_text = """You created the document
+                       <a href="%(url)s">%(key)s (%(title)s)</a>"""
         message_data = {
-            'url': doc.get_absolute_url(),
-            'key': doc.document_key,
-            'title': doc.title
+            "url": doc.get_absolute_url(),
+            "key": doc.document_key,
+            "title": doc.title,
         }
         notify(self.request.user, _(message_text) % message_data)
 
         activity_log.send(
-            verb='created',
+            verb="created",
             target=None,
             action_object=doc,
             sender=None,
-            actor=self.request.user)
+            actor=self.request.user,
+        )
 
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         """Redirect to a different URL given the button clicked by the user."""
         if "save-create" in self.request.POST:
-            url = reverse('document_create', args=[
-                self.kwargs['organisation'],
-                self.kwargs['category']
-            ])
+            url = reverse(
+                "document_create",
+                args=[self.kwargs["organisation"], self.kwargs["category"]],
+            )
         else:
-            url = reverse('category_document_list', args=[
-                self.kwargs['organisation'],
-                self.kwargs['category']
-            ])
+            url = reverse(
+                "category_document_list",
+                args=[self.kwargs["organisation"], self.kwargs["category"]],
+            )
         return url
 
 
 class DocumentEdit(BaseDocumentFormView):
     """Edit a document and a selected revision."""
-    permission_required = 'documents.change_document'
-    context_object_name = 'document'
-    template_name = 'documents/document_form.html'
+
+    permission_required = "documents.change_document"
+    context_object_name = "document"
+    template_name = "documents/document_form.html"
 
     # We don't subclass UpdateView because there is too much to rewrite
     # since we manage two forms at a time.
@@ -414,22 +431,25 @@ class DocumentEdit(BaseDocumentFormView):
         return super(DocumentEdit, self).post(request, *args, **kwargs)
 
     def form_valid(self, document_form, revision_form):
-        response = super(DocumentEdit, self).form_valid(document_form,
-                                                        revision_form)
-        activity_log.send(verb=Activity.VERB_EDITED,
-                          action_object=self.revision,
-                          target=self.object.document,
-                          sender=None,
-                          actor=self.request.user)
+        response = super(DocumentEdit, self).form_valid(document_form, revision_form)
+        activity_log.send(
+            verb=Activity.VERB_EDITED,
+            action_object=self.revision,
+            target=self.object.document,
+            sender=None,
+            actor=self.request.user,
+        )
         return response
 
     def get_context_data(self, **kwargs):
         context = super(DocumentEdit, self).get_context_data(**kwargs)
         # Add a context var to make the difference with creation view
-        context.update({
-            'is_edit': True,
-            'revision': self.revision,
-        })
+        context.update(
+            {
+                "is_edit": True,
+                "revision": self.revision,
+            }
+        )
         return context
 
     def get_success_url(self):
@@ -437,21 +457,24 @@ class DocumentEdit(BaseDocumentFormView):
         if "save-view" in self.request.POST:
             url = self.object.get_absolute_url()
         else:
-            url = reverse('category_document_list', args=[
-                self.kwargs['organisation'],
-                self.kwargs['category'],
-            ])
+            url = reverse(
+                "category_document_list",
+                args=[
+                    self.kwargs["organisation"],
+                    self.kwargs["category"],
+                ],
+            )
         return url
 
 
-class DocumentDelete(LoginRequiredMixin,
-                     PermissionRequiredMixin,
-                     DocumentListMixin,
-                     DeleteView):
+class DocumentDelete(
+    LoginRequiredMixin, PermissionRequiredMixin, DocumentListMixin, DeleteView
+):
     """Delete a document and its revisions."""
-    permission_required = 'documents.delete_document'
+
+    permission_required = "documents.delete_document"
     raise_exception = True
-    http_method_names = ['post']
+    http_method_names = ["post"]
 
     def delete(self, request, *args, **kwargs):
         """Delete the document and associated data.
@@ -464,18 +487,20 @@ class DocumentDelete(LoginRequiredMixin,
         document_str = str(document)
         success_url = self.get_success_url()
         document.delete()
-        activity_log.send(verb=Activity.VERB_DELETED,
-                          target=None,
-                          action_object_str=document_str,
-                          sender=None,
-                          actor=self.request.user)
+        activity_log.send(
+            verb=Activity.VERB_DELETED,
+            target=None,
+            action_object_str=document_str,
+            sender=None,
+            actor=self.request.user,
+        )
 
         return HttpResponseRedirect(success_url)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.latest_revision.is_under_review():
-            return HttpResponseForbidden('Documents under review cannot be deleted')
+            return HttpResponseForbidden("Documents under review cannot be deleted")
         return self.delete(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -489,7 +514,7 @@ class DocumentRevisionDelete(DocumentDelete):
         all_revisions = list(self.object.get_all_revisions())
 
         if len(all_revisions) <= 1:
-            return HttpResponseForbidden('Cannot delete a single latest revision')
+            return HttpResponseForbidden("Cannot delete a single latest revision")
 
         latest_revision = all_revisions[0]
         previous_revision = all_revisions[1]
@@ -503,11 +528,13 @@ class DocumentRevisionDelete(DocumentDelete):
         self.object.document.updated_on = timezone.now()
         self.object.document.save()
         latest_revision.delete()
-        activity_log.send(verb=Activity.VERB_DELETED,
-                          action_object_str=latest_revision_str,
-                          target=self.object.document,
-                          sender=self.__class__,
-                          actor=self.request.user)
+        activity_log.send(
+            verb=Activity.VERB_DELETED,
+            action_object_str=latest_revision_str,
+            target=self.object.document,
+            sender=self.__class__,
+            actor=self.request.user,
+        )
 
         success_url = self.get_success_url()
         return HttpResponseRedirect(success_url)
@@ -523,7 +550,7 @@ class DocumentRevise(DocumentEdit):
         doc = self.get_object()
         revision = doc.latest_revision
         if revision.is_under_review():
-            return HttpResponseForbidden('You cannot revise a document during review')
+            return HttpResponseForbidden("You cannot revise a document during review")
 
         return super(DocumentRevise, self).get(*args, **kwargs)
 
@@ -551,22 +578,25 @@ class DocumentRevise(DocumentEdit):
     def form_valid(self, document_form, revision_form):
         """Saves both the document and it's revision."""
         document, self.object, self.revision = save_document_forms(
-            document_form, revision_form, self.category)
+            document_form, revision_form, self.category
+        )
 
-        message_text = '''You created revision %(rev)s for document
-                       <a href="%(url)s">%(key)s (%(title)s)</a>'''
+        message_text = """You created revision %(rev)s for document
+                       <a href="%(url)s">%(key)s (%(title)s)</a>"""
         message_data = {
-            'rev': self.revision.name,
-            'url': self.object.get_absolute_url(),
-            'key': self.object.document_key,
-            'title': self.object.title
+            "rev": self.revision.name,
+            "url": self.object.get_absolute_url(),
+            "key": self.object.document_key,
+            "title": self.object.title,
         }
         notify(self.request.user, _(message_text) % message_data)
 
-        activity_log.send(verb=Activity.VERB_CREATED,
-                          target=self.revision,
-                          sender=None,
-                          actor=self.request.user)
+        activity_log.send(
+            verb=Activity.VERB_CREATED,
+            target=self.revision,
+            sender=None,
+            actor=self.request.user,
+        )
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -574,15 +604,13 @@ class DocumentRevise(DocumentEdit):
         """Add a context var to make the difference with creation view"""
         next_revision = self.object.document.current_revision + 1
         context = super(DocumentRevise, self).get_context_data(**kwargs)
-        context.update({
-            'is_revise': True,
-            'next_revision': '{:02d}'.format(next_revision)
-        })
+        context.update(
+            {"is_revise": True, "next_revision": "{:02d}".format(next_revision)}
+        )
         return context
 
 
 class DocumentDownload(BaseDocumentList):
-
     def post(self, request, *args, **kwargs):
         _class = self.category.document_class()
         form_data = self.request.POST
@@ -591,18 +619,18 @@ class DocumentDownload(BaseDocumentList):
         if form.is_valid():
             data = form.cleaned_data
         else:
-            raise Http404('Invalid parameters to download files.')
+            raise Http404("Invalid parameters to download files.")
 
         # Generates the temporary zip file
-        zip_filename = _class.compress_documents(data['document_ids'], **data)
+        zip_filename = _class.compress_documents(data["document_ids"], **data)
         file_size = zip_filename.tell()
         zip_filename.seek(0)
         wrapper = FileWrapper(zip_filename)
 
         # Returns the zip file for download
-        response = HttpResponse(wrapper, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename=download.zip'
-        response['Content-Length'] = file_size
+        response = HttpResponse(wrapper, content_type="application/zip")
+        response["Content-Disposition"] = "attachment; filename=download.zip"
+        response["Content-Length"] = file_size
         return response
 
 
@@ -610,7 +638,7 @@ class BaseFileDownload(LoginRequiredMixin, CategoryMixin, DetailView):
     """Base class to download files from a Metadata or
     MetadataRevision FileField."""
 
-    http_method_names = ['get']
+    http_method_names = ["get"]
 
     def get_object(self, queryset=None):
         """Get a single MetadataRevision FileField instance."""
@@ -622,7 +650,7 @@ class BaseFileDownload(LoginRequiredMixin, CategoryMixin, DetailView):
         """Get a single MetadataRevision FileField instance."""
 
         doc_or_revision = self.get_object()
-        field_name = self.kwargs.get('field_name')
+        field_name = self.kwargs.get("field_name")
         return serve_model_file_field(doc_or_revision, field_name)
 
 
@@ -630,12 +658,14 @@ class RevisionFileDownload(BaseFileDownload):
     """Download files from a MetadataRevision FileField."""
 
     def get_queryset(self):
-        key = self.kwargs.get('document_key')
-        revision = self.kwargs.get('revision')
+        key = self.kwargs.get("document_key")
+        revision = self.kwargs.get("revision")
 
-        qs_kwargs = {'metadata__document__document_key': key,
-                     'metadata__document__category': self.category,
-                     'revision': revision}
+        qs_kwargs = {
+            "metadata__document__document_key": key,
+            "metadata__document__category": self.category,
+            "revision": revision,
+        }
 
         return self.category.revision_class().objects.filter(**qs_kwargs)
 
@@ -644,9 +674,8 @@ class DocumentFileDownload(BaseFileDownload):
     """Download files from a Metadata FileField."""
 
     def get_queryset(self):
-        key = self.kwargs.get('document_key')
+        key = self.kwargs.get("document_key")
 
-        qs_kwargs = {'document__document_key': key,
-                     'document__category': self.category}
+        qs_kwargs = {"document__document_key": key, "document__category": self.category}
 
         return self.category.document_class().objects.filter(**qs_kwargs)

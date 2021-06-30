@@ -13,12 +13,13 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        categories = Category.objects \
-            .select_related('category_template__metadata_model')
+        categories = Category.objects.select_related(
+            "category_template__metadata_model"
+        )
         for category in categories:
             doc_class = category.document_class()
-            logger.info('Creating mapping for document type %s' % doc_class.__name__)
+            logger.info("Creating mapping for document type %s" % doc_class.__name__)
             try:
                 put_category_mapping(category.id)
             except ConnectionError:
-                raise CommandError('Elasticsearch cannot be found')
+                raise CommandError("Elasticsearch cannot be found")

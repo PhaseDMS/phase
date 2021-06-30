@@ -10,5 +10,5 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        logger.info('Populating values list cache')
+        logger.info("Populating values list cache")
         populate_values_list_cache()

@@ -1,4 +1,3 @@
-
 import datetime as dt
 
 from documents.models import MetadataRevisionBase
@@ -7,8 +6,8 @@ from documents.utils import stringify_value as stringify
 import collections
 
 # Only used in this module, it makes no sense to put it elsewhere for now
-FR_DATE_FORMAT = '%d-%m-%Y'
-FR_DATETIME_FORMAT = '%d-%m-%Y %H:%M'
+FR_DATE_FORMAT = "%d-%m-%Y"
+FR_DATETIME_FORMAT = "%d-%m-%Y %H:%M"
 
 
 class BaseFormatter(object):
@@ -19,6 +18,7 @@ class BaseFormatter(object):
     a file.
 
     """
+
     def __init__(self, fields):
         self.fields = fields
 
@@ -29,14 +29,14 @@ class BaseFormatter(object):
 
         """
         if docs is None:
-            return b''
+            return b""
         formatted = []
         for doc in docs:
             formatted.append(self.format_doc(doc))
         return formatted
 
     def format(self, docs):
-        return b''.join(self._format(docs))
+        return b"".join(self._format(docs))
 
     def format_doc(self, doc):
         raise NotImplementedError()
@@ -49,10 +49,7 @@ class CSVFormatter(BaseFormatter):
         if isinstance(doc, list):
             data = doc
         elif isinstance(doc, MetadataRevisionBase):
-            doc = FieldWrapper((
-                doc,
-                doc.metadata,
-                doc.metadata.document))
+            doc = FieldWrapper((doc, doc.metadata, doc.metadata.document))
             fields = list(self.fields.values())
             data = [self.get_field(doc, field) for field in fields]
         return data
@@ -62,12 +59,12 @@ class CSVFormatter(BaseFormatter):
 
         # Some fields can contain new lines and break csv formatting so we
         # need to remove them (eg: document title TextField)
-        csv_data = ';'.join(data).replace('\r\n', '').replace('\n', '')
-        csv_data = '{}\n'.format(csv_data)
-        return csv_data.encode('utf-8')
+        csv_data = ";".join(data).replace("\r\n", "").replace("\n", "")
+        csv_data = "{}\n".format(csv_data)
+        return csv_data.encode("utf-8")
 
     def get_field(self, doc, field):
-        data = getattr(doc, field, '')
+        data = getattr(doc, field, "")
         # Attributes and method can be passed
         if isinstance(data, collections.Callable):
             data = data()
@@ -79,7 +76,7 @@ class CSVFormatter(BaseFormatter):
         if type(data) == dt.datetime:
             data = data.strftime(FR_DATETIME_FORMAT)
 
-        return stringify(data, none_val='')
+        return stringify(data, none_val="")
 
 
 class XLSXFormatter(CSVFormatter):

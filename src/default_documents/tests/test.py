@@ -6,7 +6,9 @@ from categories.factories import CategoryFactory
 from documents.factories import DocumentFactory
 from default_documents.models import ContractorDeliverable
 from default_documents.factories import (
-    ContractorDeliverableFactory, ContractorDeliverableRevisionFactory)
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 
 
 class ContractorDeliverableTestCase(TestCase):
@@ -16,20 +18,21 @@ class ContractorDeliverableTestCase(TestCase):
         Model = ContentType.objects.get_for_model(ContractorDeliverable)
         self.entity = EntityFactory()
         self.category = CategoryFactory(
-            category_template__metadata_model=Model,
-            third_parties=[self.entity])
+            category_template__metadata_model=Model, third_parties=[self.entity]
+        )
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
 
     def create_doc(self, **kwargs):
         context = {
-            'category': self.category,
-            'metadata_factory_class': ContractorDeliverableFactory,
-            'revision_factory_class': ContractorDeliverableRevisionFactory,
+            "category": self.category,
+            "metadata_factory_class": ContractorDeliverableFactory,
+            "revision_factory_class": ContractorDeliverableRevisionFactory,
         }
         context.update(kwargs)
         doc = DocumentFactory(**context)

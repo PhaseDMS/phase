@@ -22,260 +22,273 @@ from .validators import StringNumberValidator
 
 class ContractorDeliverable(ScheduleMixin, Metadata):
     latest_revision = models.ForeignKey(
-        'ContractorDeliverableRevision',
+        "ContractorDeliverableRevision",
         on_delete=models.PROTECT,
         null=True,
-        verbose_name=_('Latest revision'))
+        verbose_name=_("Latest revision"),
+    )
 
     # General information
-    title = models.TextField(
-        verbose_name="Title")
+    title = models.TextField(verbose_name="Title")
     # Let's keep this field for a while
     contract_number_old = ConfigurableChoiceField(
         verbose_name="Contract Number",
         max_length=15,
-        list_index='CONTRACT_NBS', null=True, blank=True)
-    contract_number = models.CharField(
-        verbose_name='Contract Number',
-        max_length=50)
+        list_index="CONTRACT_NBS",
+        null=True,
+        blank=True,
+    )
+    contract_number = models.CharField(verbose_name="Contract Number", max_length=50)
     originator = models.ForeignKey(
-        'accounts.Entity',
-        on_delete=models.PROTECT,
-        verbose_name=_('Originator'))
+        "accounts.Entity", on_delete=models.PROTECT, verbose_name=_("Originator")
+    )
     unit = ConfigurableChoiceField(
-        verbose_name="Unit",
-        default="000",
-        max_length=3,
-        list_index='UNITS')
+        verbose_name="Unit", default="000", max_length=3, list_index="UNITS"
+    )
     discipline = ConfigurableChoiceField(
-        verbose_name="Discipline",
-        default="PCS",
-        max_length=3,
-        list_index='DISCIPLINES')
+        verbose_name="Discipline", default="PCS", max_length=3, list_index="DISCIPLINES"
+    )
     document_type = ConfigurableChoiceField(
         verbose_name="Document Type",
         default="PID",
         max_length=3,
-        list_index='DOCUMENT_TYPES')
+        list_index="DOCUMENT_TYPES",
+    )
     sequential_number = models.CharField(
         verbose_name="sequential Number",
-        help_text=_('Select a four digit number'),
+        help_text=_("Select a four digit number"),
         default="0001",
         max_length=4,
-        validators=[StringNumberValidator(4)])
+        validators=[StringNumberValidator(4)],
+    )
     system = ConfigurableChoiceField(
-        verbose_name="System",
-        list_index='SYSTEMS',
-        null=True, blank=True)
+        verbose_name="System", list_index="SYSTEMS", null=True, blank=True
+    )
     wbs = ConfigurableChoiceField(
-        verbose_name="WBS",
-        max_length=20,
-        list_index='WBS',
-        null=True, blank=True)
-    weight = models.IntegerField(
-        verbose_name="Weight",
-        null=True, blank=True)
+        verbose_name="WBS", max_length=20, list_index="WBS", null=True, blank=True
+    )
+    weight = models.IntegerField(verbose_name="Weight", null=True, blank=True)
 
     # Related documents
     related_documents = models.ManyToManyField(
-        'documents.Document',
-        related_name='cd_related_documents',
-        blank=True)
+        "documents.Document", related_name="cd_related_documents", blank=True
+    )
 
     # Schedule
     status_std_planned_date = models.DateField(
-        verbose_name="Status STD Planned Date",
-        null=True, blank=True)
+        verbose_name="Status STD Planned Date", null=True, blank=True
+    )
     status_std_forecast_date = models.DateField(
-        verbose_name="Status STD Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status STD Forecast Date", null=True, blank=True
+    )
     status_std_actual_date = models.DateField(
-        verbose_name="Status STD Actual Date",
-        null=True, blank=True)
+        verbose_name="Status STD Actual Date", null=True, blank=True
+    )
     status_idc_planned_date = models.DateField(
-        verbose_name="Status IDC Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IDC Planned Date", null=True, blank=True
+    )
     status_idc_forecast_date = models.DateField(
-        verbose_name="Status IDC Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IDC Forecast Date", null=True, blank=True
+    )
     status_idc_actual_date = models.DateField(
-        verbose_name="Status IDC Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IDC Actual Date", null=True, blank=True
+    )
     status_ifr_planned_date = models.DateField(
-        verbose_name="Status IFR Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IFR Planned Date", null=True, blank=True
+    )
     status_ifr_forecast_date = models.DateField(
-        verbose_name="Status IFR Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IFR Forecast Date", null=True, blank=True
+    )
     status_ifr_actual_date = models.DateField(
-        verbose_name="Status IFR Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IFR Actual Date", null=True, blank=True
+    )
     status_ifa_planned_date = models.DateField(
-        verbose_name="Status IFA Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IFA Planned Date", null=True, blank=True
+    )
     status_ifa_forecast_date = models.DateField(
-        verbose_name="Status IFA Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IFA Forecast Date", null=True, blank=True
+    )
     status_ifa_actual_date = models.DateField(
-        verbose_name="Status IFA Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IFA Actual Date", null=True, blank=True
+    )
     status_ifd_planned_date = models.DateField(
-        verbose_name="Status IFD Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IFD Planned Date", null=True, blank=True
+    )
     status_ifd_forecast_date = models.DateField(
-        verbose_name="Status IFD Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IFD Forecast Date", null=True, blank=True
+    )
     status_ifd_actual_date = models.DateField(
-        verbose_name="Status IFD Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IFD Actual Date", null=True, blank=True
+    )
     status_ifc_planned_date = models.DateField(
-        verbose_name="Status IFC Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IFC Planned Date", null=True, blank=True
+    )
     status_ifc_forecast_date = models.DateField(
-        verbose_name="Status IFC Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IFC Forecast Date", null=True, blank=True
+    )
     status_ifc_actual_date = models.DateField(
-        verbose_name="Status IFC Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IFC Actual Date", null=True, blank=True
+    )
     status_ifi_planned_date = models.DateField(
-        verbose_name="Status IFI Planned Date",
-        null=True, blank=True)
+        verbose_name="Status IFI Planned Date", null=True, blank=True
+    )
     status_ifi_forecast_date = models.DateField(
-        verbose_name="Status IFI Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status IFI Forecast Date", null=True, blank=True
+    )
     status_ifi_actual_date = models.DateField(
-        verbose_name="Status IFI Actual Date",
-        null=True, blank=True)
+        verbose_name="Status IFI Actual Date", null=True, blank=True
+    )
     status_asb_planned_date = models.DateField(
-        verbose_name="Status ASB Planned Date",
-        null=True, blank=True)
+        verbose_name="Status ASB Planned Date", null=True, blank=True
+    )
     status_asb_forecast_date = models.DateField(
-        verbose_name="Status ASB Forecast Date",
-        null=True, blank=True)
+        verbose_name="Status ASB Forecast Date", null=True, blank=True
+    )
     status_asb_actual_date = models.DateField(
-        verbose_name="Status ASB Actual Date",
-        null=True, blank=True)
+        verbose_name="Status ASB Actual Date", null=True, blank=True
+    )
 
     class PhaseConfig:
         filter_fields = (
-            'docclass', 'status', 'unit', 'discipline',
-            'document_type', 'under_review', 'overdue', 'leader', 'approver'
+            "docclass",
+            "status",
+            "unit",
+            "discipline",
+            "document_type",
+            "under_review",
+            "overdue",
+            "leader",
+            "approver",
         )
-        indexable_fields = ['is_existing', 'can_be_transmitted']
+        indexable_fields = ["is_existing", "can_be_transmitted"]
         es_field_types = {
-            'overdue': 'boolean',
+            "overdue": "boolean",
         }
         column_fields = (
-            ('', 'under_preparation_by'),
-            ('Document Number', 'document_number'),
-            ('Title', 'title'),
-            ('Rev.', 'current_revision'),
-            ('Status', 'status'),
-            ('Class', 'docclass'),
-            ('Unit', 'unit'),
-            ('Discipline', 'discipline'),
-            ('Document type', 'document_type'),
-            ('Review start date', 'review_start_date'),
-            ('Review due date', 'review_due_date'),
-            ('Under review', 'under_review'),
-            ('Overdue', 'overdue'),
-            ('Leader', 'leader'),
-            ('Approver', 'approver'),
-            ('Final revision', 'final_revision'),
+            ("", "under_preparation_by"),
+            ("Document Number", "document_number"),
+            ("Title", "title"),
+            ("Rev.", "current_revision"),
+            ("Status", "status"),
+            ("Class", "docclass"),
+            ("Unit", "unit"),
+            ("Discipline", "discipline"),
+            ("Document type", "document_type"),
+            ("Review start date", "review_start_date"),
+            ("Review due date", "review_due_date"),
+            ("Under review", "under_review"),
+            ("Overdue", "overdue"),
+            ("Leader", "leader"),
+            ("Approver", "approver"),
+            ("Final revision", "final_revision"),
         )
         transmittal_columns = {
-            'Document Number': 'document_key',
-            'Title': 'title',
-            'Contract Number': 'contract_number',
-            'Originator': 'originator',
-            'Unit': 'unit',
-            'Discipline': 'discipline',
-            'Document Type': 'document_type',
-            'Sequential Number': 'sequential_number',
-            'Class': 'docclass',
-            'Revision': 'revision',
-            'Status': 'status',
-            'Received Date': 'received_date',
-            'Created': 'created_on',
+            "Document Number": "document_key",
+            "Title": "title",
+            "Contract Number": "contract_number",
+            "Originator": "originator",
+            "Unit": "unit",
+            "Discipline": "discipline",
+            "Document Type": "document_type",
+            "Sequential Number": "sequential_number",
+            "Class": "docclass",
+            "Revision": "revision",
+            "Status": "status",
+            "Received Date": "received_date",
+            "Created": "created_on",
         }
-        export_fields = OrderedDict((
-            ('Document number', 'document_number'),
-            ('Title', 'title'),
-            ('Revision', 'revision_name'),
-            ('Revision date', 'revision_date'),
-            ('Status', 'status'),
-            ('Doc category', 'category'),
-            ('Class', 'docclass'),
-            ('Contract Number', 'contract_number'),
-            ('Originator', 'originator'),
-            ('Unit', 'unit'),
-            ('Discipline', 'discipline'),
-            ('Document type', 'document_type'),
-            ('Sequential number', 'sequential_number'),
-            ('System', 'system'),
-            ('WBS', 'wbs'),
-            ('Weight', 'weight'),
-            ('Is final revision', 'final_revision'),
-            ('Received date', 'received_date'),
-            ('Created on', 'created_on'),
-            ('Review start date', 'review_start_date'),
-            ('Review due date', 'review_due_date'),
-            ('Leader', 'leader'),
-            ('Approver', 'approver'),
-            ('Return code', 'return_code'),
-            ('STD Planned', 'status_std_planned_date'),
-            ('IDC Planned', 'status_idc_planned_date'),
-            ('IFR Planned', 'status_ifr_planned_date'),
-            ('IFA Planned', 'status_ifa_planned_date'),
-            ('IFD Planned', 'status_ifd_planned_date'),
-            ('IFC Planned', 'status_ifc_planned_date'),
-            ('IFI Planned', 'status_ifi_planned_date'),
-            ('ASB Planned', 'status_asb_planned_date'),
-            ('STD Forecast', 'status_std_forecast_date'),
-            ('IDC Forecast', 'status_idc_forecast_date'),
-            ('IFR Forecast', 'status_ifr_forecast_date'),
-            ('IFA Forecast', 'status_ifa_forecast_date'),
-            ('IFD Forecast', 'status_ifd_forecast_date'),
-            ('IFC Forecast', 'status_ifc_forecast_date'),
-            ('IFI Forecast', 'status_ifi_forecast_date'),
-            ('ASB Forecast', 'status_asb_forecast_date'),
-            ('STD Actual', 'status_std_actual_date'),
-            ('IFR Actual', 'status_ifr_actual_date'),
-            ('IDC Actual', 'status_idc_actual_date'),
-            ('IFA Actual', 'status_ifa_actual_date'),
-            ('IFD Actual', 'status_ifd_actual_date'),
-            ('IFC Actual', 'status_ifc_actual_date'),
-            ('IFI Actual', 'status_ifi_actual_date'),
-            ('ASB Actual', 'status_asb_actual_date'),
-        ))
-        custom_filters = OrderedDict((
-            ('show_cld_spd', {
-                'field': forms.BooleanField,
-                'label': _('Show CLD/SPD docs'),
-                'filters': {
-                    True: None,
-                    False: Q('term', is_existing=True),
-                    None: Q('term', is_existing=True)
-                }
-            }),
-            ('outgoing_trs', {
-                'field': forms.BooleanField,
-                'label': _('Ready for outgoing TRS'),
-                'filters': {
-                    True: Q('term', can_be_transmitted=True),
-                    False: None,
-                    None: None,
-                }
-            }))
+        export_fields = OrderedDict(
+            (
+                ("Document number", "document_number"),
+                ("Title", "title"),
+                ("Revision", "revision_name"),
+                ("Revision date", "revision_date"),
+                ("Status", "status"),
+                ("Doc category", "category"),
+                ("Class", "docclass"),
+                ("Contract Number", "contract_number"),
+                ("Originator", "originator"),
+                ("Unit", "unit"),
+                ("Discipline", "discipline"),
+                ("Document type", "document_type"),
+                ("Sequential number", "sequential_number"),
+                ("System", "system"),
+                ("WBS", "wbs"),
+                ("Weight", "weight"),
+                ("Is final revision", "final_revision"),
+                ("Received date", "received_date"),
+                ("Created on", "created_on"),
+                ("Review start date", "review_start_date"),
+                ("Review due date", "review_due_date"),
+                ("Leader", "leader"),
+                ("Approver", "approver"),
+                ("Return code", "return_code"),
+                ("STD Planned", "status_std_planned_date"),
+                ("IDC Planned", "status_idc_planned_date"),
+                ("IFR Planned", "status_ifr_planned_date"),
+                ("IFA Planned", "status_ifa_planned_date"),
+                ("IFD Planned", "status_ifd_planned_date"),
+                ("IFC Planned", "status_ifc_planned_date"),
+                ("IFI Planned", "status_ifi_planned_date"),
+                ("ASB Planned", "status_asb_planned_date"),
+                ("STD Forecast", "status_std_forecast_date"),
+                ("IDC Forecast", "status_idc_forecast_date"),
+                ("IFR Forecast", "status_ifr_forecast_date"),
+                ("IFA Forecast", "status_ifa_forecast_date"),
+                ("IFD Forecast", "status_ifd_forecast_date"),
+                ("IFC Forecast", "status_ifc_forecast_date"),
+                ("IFI Forecast", "status_ifi_forecast_date"),
+                ("ASB Forecast", "status_asb_forecast_date"),
+                ("STD Actual", "status_std_actual_date"),
+                ("IFR Actual", "status_ifr_actual_date"),
+                ("IDC Actual", "status_idc_actual_date"),
+                ("IFA Actual", "status_ifa_actual_date"),
+                ("IFD Actual", "status_ifd_actual_date"),
+                ("IFC Actual", "status_ifc_actual_date"),
+                ("IFI Actual", "status_ifi_actual_date"),
+                ("ASB Actual", "status_asb_actual_date"),
+            )
+        )
+        custom_filters = OrderedDict(
+            (
+                (
+                    "show_cld_spd",
+                    {
+                        "field": forms.BooleanField,
+                        "label": _("Show CLD/SPD docs"),
+                        "filters": {
+                            True: None,
+                            False: Q("term", is_existing=True),
+                            None: Q("term", is_existing=True),
+                        },
+                    },
+                ),
+                (
+                    "outgoing_trs",
+                    {
+                        "field": forms.BooleanField,
+                        "label": _("Ready for outgoing TRS"),
+                        "filters": {
+                            True: Q("term", can_be_transmitted=True),
+                            False: None,
+                            None: None,
+                        },
+                    },
+                ),
+            )
         )
 
     class Meta:
-        ordering = ('document_number',)
-        app_label = 'default_documents'
+        ordering = ("document_number",)
+        app_label = "default_documents"
         unique_together = (
             (
-                "contract_number", "originator", "unit", "discipline",
-                "document_type", "sequential_number",
+                "contract_number",
+                "originator",
+                "unit",
+                "discipline",
+                "document_type",
+                "sequential_number",
             ),
         )
 
@@ -285,28 +298,31 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
     def generate_document_key(self):
         return slugify(
             "{contract_number}-{originator}-{unit}-{discipline}-"
-            "{document_type}-{sequential_number}"
-            .format(
+            "{document_type}-{sequential_number}".format(
                 contract_number=self.contract_number,
                 originator=self.originator.trigram,
                 unit=self.unit,
                 discipline=self.discipline,
                 document_type=self.document_type,
-                sequential_number=self.sequential_number
-            )).upper()
+                sequential_number=self.sequential_number,
+            )
+        ).upper()
 
     def get_all_revisions(self):
         """Return all revisions data of this document."""
-        revisions = super(ContractorDeliverable, self) \
-            .get_all_revisions() \
+        revisions = (
+            super(ContractorDeliverable, self)
+            .get_all_revisions()
             .select_related(
-                'metadata',
-                'metadata__document',
-                'metadata__document__category__organisation',
-                'leader',
-                'approver',
-                'approver') \
-            .prefetch_related('reviewers', 'transmittals__document')
+                "metadata",
+                "metadata__document",
+                "metadata__document__category__organisation",
+                "leader",
+                "approver",
+                "approver",
+            )
+            .prefetch_related("reviewers", "transmittals__document")
+        )
 
         return revisions
 
@@ -316,7 +332,7 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
 
     @property
     def is_existing(self):
-        return self.status not in ('CLD', 'SPD')
+        return self.status not in ("CLD", "SPD")
 
     @property
     def final_revision(self):
@@ -352,54 +368,59 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
 
     @classmethod
     def get_batch_actions(cls, category, user):
-        actions = super(ContractorDeliverable, cls).get_batch_actions(
-            category, user)
+        actions = super(ContractorDeliverable, cls).get_batch_actions(category, user)
 
-        if user.has_perm('documents.can_control_document') and user.has_perm('reviews.can_add_review'):
-            actions['start_review'] = MenuItem(
-                'start-review',
-                _('Start review'),
-                reverse('batch_start_reviews', args=[
-                    category.organisation.slug,
-                    category.slug]),
+        if user.has_perm("documents.can_control_document") and user.has_perm(
+            "reviews.can_add_review"
+        ):
+            actions["start_review"] = MenuItem(
+                "start-review",
+                _("Start review"),
+                reverse(
+                    "batch_start_reviews",
+                    args=[category.organisation.slug, category.slug],
+                ),
                 ajax=True,
-                modal='batch-review-modal',
+                modal="batch-review-modal",
                 progression_modal=True,
-                icon='eye-open',
+                icon="eye-open",
             )
-            actions['cancel_review'] = MenuItem(
-                'cancel-review',
-                _('Cancel review'),
-                reverse('batch_cancel_reviews', args=[
-                    category.organisation.slug,
-                    category.slug]),
+            actions["cancel_review"] = MenuItem(
+                "cancel-review",
+                _("Cancel review"),
+                reverse(
+                    "batch_cancel_reviews",
+                    args=[category.organisation.slug, category.slug],
+                ),
                 ajax=True,
-                modal='cancel-review-modal',
+                modal="cancel-review-modal",
                 progression_modal=True,
-                icon='eye-close',
+                icon="eye-close",
             )
 
-        if user.has_perm('transmittals.add_outgoingtransmittal'):
-            actions['prepare_transmittal'] = MenuItem(
-                'prepare-transmittal',
-                _('Prepare outgoing transmittal'),
-                reverse('transmittal_prepare', args=[
-                    category.organisation.slug,
-                    category.slug]),
+        if user.has_perm("transmittals.add_outgoingtransmittal"):
+            actions["prepare_transmittal"] = MenuItem(
+                "prepare-transmittal",
+                _("Prepare outgoing transmittal"),
+                reverse(
+                    "transmittal_prepare",
+                    args=[category.organisation.slug, category.slug],
+                ),
                 ajax=False,
                 progression_modal=False,
-                icon='hand-up'
+                icon="hand-up",
             )
-            actions['create_transmittal'] = MenuItem(
-                'create-transmittal',
-                'Create transmittal',
-                reverse('transmittal_create', args=[
-                    category.organisation.slug,
-                    category.slug]),
+            actions["create_transmittal"] = MenuItem(
+                "create-transmittal",
+                "Create transmittal",
+                reverse(
+                    "transmittal_create",
+                    args=[category.organisation.slug, category.slug],
+                ),
                 ajax=True,
-                modal='create-transmittal-modal',
+                modal="create-transmittal-modal",
                 progression_modal=True,
-                icon='transfer',
+                icon="transfer",
             )
         return actions
 
@@ -407,138 +428,127 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
     def get_batch_actions_modals(cls):
         templates = super(ContractorDeliverable, cls).get_batch_actions_modals()
         return templates + [
-            'reviews/document_list_cancel_review_modal.html',
-            'reviews/document_list_batch_review_modal.html',
-            'transmittals/document_list_create_transmittal_modal.html'
+            "reviews/document_list_cancel_review_modal.html",
+            "reviews/document_list_batch_review_modal.html",
+            "transmittals/document_list_create_transmittal_modal.html",
         ]
 
 
 class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
     # Revision
-    metadata = models.ForeignKey('ContractorDeliverable', on_delete=models.PROTECT)
+    metadata = models.ForeignKey("ContractorDeliverable", on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
         verbose_name="Status",
         default="STD",
         max_length=3,
-        list_index='STATUSES',
-        null=True, blank=True)
-    final_revision = models.BooleanField(
-        _('Is final revision?'),
-        choices=BOOLEANS,
+        list_index="STATUSES",
         null=True,
-        blank=True)
+        blank=True,
+    )
+    final_revision = models.BooleanField(
+        _("Is final revision?"), choices=BOOLEANS, null=True, blank=True
+    )
 
     class Meta:
-        app_label = 'default_documents'
+        app_label = "default_documents"
 
 
 class Correspondence(Metadata):
     latest_revision = models.ForeignKey(
-        'CorrespondenceRevision',
+        "CorrespondenceRevision",
         on_delete=models.PROTECT,
         null=True,
-        verbose_name=_('Latest revision'))
+        verbose_name=_("Latest revision"),
+    )
 
     # General information
-    subject = models.TextField(_('Subject'))
-    correspondence_date = models.DateField(_('Correspondence date'))
-    received_sent_date = models.DateField(_('Received / sent date'))
+    subject = models.TextField(_("Subject"))
+    correspondence_date = models.DateField(_("Correspondence date"))
+    received_sent_date = models.DateField(_("Received / sent date"))
     contract_number_old = ConfigurableChoiceField(
-        _('Contract Number'),
+        _("Contract Number"),
         max_length=8,
-        list_index='CONTRACT_NBS', null=True, blank=True)
-    contract_number = models.CharField(
-        verbose_name='Contract Number',
-        max_length=50)
+        list_index="CONTRACT_NBS",
+        null=True,
+        blank=True,
+    )
+    contract_number = models.CharField(verbose_name="Contract Number", max_length=50)
     originator = ConfigurableChoiceField(
-        _('Originator'),
-        default='FWF',
-        max_length=3,
-        list_index='ORIGINATORS')
+        _("Originator"), default="FWF", max_length=3, list_index="ORIGINATORS"
+    )
     recipient = ConfigurableChoiceField(
-        _('Recipient'),
-        max_length=50,
-        list_index='RECIPIENTS')
+        _("Recipient"), max_length=50, list_index="RECIPIENTS"
+    )
     document_type = ConfigurableChoiceField(
-        _('Document Type'),
-        default="PID",
-        max_length=3,
-        list_index='DOCUMENT_TYPES')
+        _("Document Type"), default="PID", max_length=3, list_index="DOCUMENT_TYPES"
+    )
     sequential_number = models.CharField(
         verbose_name="sequential Number",
-        help_text=_('Type in a four digit number'),
+        help_text=_("Type in a four digit number"),
         default="0001",
         max_length=4,
-        validators=[StringNumberValidator(4)])
+        validators=[StringNumberValidator(4)],
+    )
     author = ConfigurableChoiceField(
-        _('Author'),
-        null=True,
-        blank=True,
-        max_length=250,
-        list_index='AUTHORS')
+        _("Author"), null=True, blank=True, max_length=250, list_index="AUTHORS"
+    )
     addresses = ConfigurableChoiceField(
-        _('Addresses'),
-        null=True,
-        blank=True,
-        list_index='ADDRESSES')
+        _("Addresses"), null=True, blank=True, list_index="ADDRESSES"
+    )
     response_required = models.BooleanField(
-        _('Response required'),
-        null=True,
-        blank=True)
-    due_date = models.DateField(
-        _('Due date'),
-        null=True,
-        blank=True)
+        _("Response required"), null=True, blank=True
+    )
+    due_date = models.DateField(_("Due date"), null=True, blank=True)
     external_reference = models.TextField(
-        _('External reference'),
-        null=True,
-        blank=True)
+        _("External reference"), null=True, blank=True
+    )
 
     # Related documents
     related_documents = models.ManyToManyField(
-        'documents.Document',
-        related_name='correspondence_related_set',
-        blank=True)
+        "documents.Document", related_name="correspondence_related_set", blank=True
+    )
 
     class Meta:
-        ordering = ('id',)
-        app_label = 'default_documents'
+        ordering = ("id",)
+        app_label = "default_documents"
         unique_together = (
             (
-                "contract_number", "originator", "recipient",
-                "document_type", "sequential_number",
+                "contract_number",
+                "originator",
+                "recipient",
+                "document_type",
+                "sequential_number",
             ),
         )
 
     class PhaseConfig:
-        filter_fields = (
-            'originator', 'recipient', 'status', 'overdue', 'leader')
+        filter_fields = ("originator", "recipient", "status", "overdue", "leader")
         column_fields = (
-            ('Reference', 'document_number'),
-            ('Subject', 'subject'),
-            ('Rec./Sent date', 'received_sent_date'),
-            ('Resp. required', 'response_required'),
-            ('Due date', 'due_date'),
-            ('Status', 'status'),
-            ('Under review', 'status'),
-            ('Overdue', 'overdue'),
-            ('Leader', 'leader'),
-            ('Originator', 'originator'),
-            ('Recipient', 'recipient'),
-            ('Document type', 'document_type'),
+            ("Reference", "document_number"),
+            ("Subject", "subject"),
+            ("Rec./Sent date", "received_sent_date"),
+            ("Resp. required", "response_required"),
+            ("Due date", "due_date"),
+            ("Status", "status"),
+            ("Under review", "status"),
+            ("Overdue", "overdue"),
+            ("Leader", "leader"),
+            ("Originator", "originator"),
+            ("Recipient", "recipient"),
+            ("Document type", "document_type"),
         )
 
     def generate_document_key(self):
         return slugify(
             "{contract_number}-{originator}-{recipient}-"
-            "{document_type}-{sequential_number}"
-            .format(
+            "{document_type}-{sequential_number}".format(
                 contract_number=self.contract_number,
                 originator=self.originator,
                 recipient=self.recipient,
                 document_type=self.document_type,
-                sequential_number=self.sequential_number
-            )).upper()
+                sequential_number=self.sequential_number,
+            )
+        ).upper()
 
     def natural_key(self):
         return (self.document_key,)
@@ -560,131 +570,128 @@ class Correspondence(Metadata):
         return self.subject
 
     def get_initial_empty(self):
-        empty_fields = ('final_revision',)
-        return super(ContractorDeliverableRevision, self).get_initial_empty() + empty_fields
+        empty_fields = ("final_revision",)
+        return (
+            super(ContractorDeliverableRevision, self).get_initial_empty()
+            + empty_fields
+        )
 
 
 class CorrespondenceRevision(MetadataRevision):
-    metadata = models.ForeignKey('Correspondence', on_delete=models.PROTECT)
+    metadata = models.ForeignKey("Correspondence", on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
-        _('Status'),
-        max_length=20,
-        list_index='STATUS_COR_MOM')
+        _("Status"), max_length=20, list_index="STATUS_COR_MOM"
+    )
     under_review = models.BooleanField(
-        _('Under Review'),
-        choices=BOOLEANS,
-        null=True, blank=True)
-    overdue = models.BooleanField(
-        _('Overdue'),
-        choices=BOOLEANS,
-        null=True, blank=True)
+        _("Under Review"), choices=BOOLEANS, null=True, blank=True
+    )
+    overdue = models.BooleanField(_("Overdue"), choices=BOOLEANS, null=True, blank=True)
     leader = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
-        verbose_name=_('Leader'),
-        related_name='leading_correspondance',
-        null=True, blank=True)
+        verbose_name=_("Leader"),
+        related_name="leading_correspondance",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        app_label = 'default_documents'
+        app_label = "default_documents"
 
 
 class MinutesOfMeeting(Metadata):
     latest_revision = models.ForeignKey(
-        'MinutesOfMeetingRevision',
+        "MinutesOfMeetingRevision",
         on_delete=models.PROTECT,
         null=True,
-        verbose_name=_('Latest revision'))
+        verbose_name=_("Latest revision"),
+    )
 
     # General information
-    subject = models.TextField(_('Subject'))
-    meeting_date = models.DateField(_('Meeting date'))
-    received_sent_date = models.DateField(_('Received / sent date'))
+    subject = models.TextField(_("Subject"))
+    meeting_date = models.DateField(_("Meeting date"))
+    received_sent_date = models.DateField(_("Received / sent date"))
     # We keep it for a while
     contract_number_old = ConfigurableChoiceField(
-        _('Contract Number'),
+        _("Contract Number"),
         max_length=8,
-        list_index='CONTRACT_NBS', blank=True, null=True)
-    contract_number = models.CharField(
-        verbose_name='Contract Number',
-        max_length=50
+        list_index="CONTRACT_NBS",
+        blank=True,
+        null=True,
     )
+    contract_number = models.CharField(verbose_name="Contract Number", max_length=50)
     originator = ConfigurableChoiceField(
-        _('Originator'),
-        default='FWF',
-        max_length=3,
-        list_index='ORIGINATORS')
+        _("Originator"), default="FWF", max_length=3, list_index="ORIGINATORS"
+    )
     recipient = ConfigurableChoiceField(
-        _('Recipient'),
-        max_length=50,
-        list_index='RECIPIENTS')
+        _("Recipient"), max_length=50, list_index="RECIPIENTS"
+    )
     document_type = ConfigurableChoiceField(
-        _('Document Type'),
-        default="PID",
-        max_length=3,
-        list_index='DOCUMENT_TYPES')
+        _("Document Type"), default="PID", max_length=3, list_index="DOCUMENT_TYPES"
+    )
     sequential_number = models.CharField(
         verbose_name="sequential Number",
-        help_text=_('Type in a four digit number'),
+        help_text=_("Type in a four digit number"),
         default="0001",
         max_length=4,
-        validators=[StringNumberValidator(4)])
+        validators=[StringNumberValidator(4)],
+    )
     prepared_by = ConfigurableChoiceField(
-        _('Prepared by'),
-        null=True,
-        blank=True,
-        max_length=250,
-        list_index='AUTHORS')
-    signed = models.BooleanField(
-        _('Signed'),
-        null=True, blank=True,
-        choices=BOOLEANS)
+        _("Prepared by"), null=True, blank=True, max_length=250, list_index="AUTHORS"
+    )
+    signed = models.BooleanField(_("Signed"), null=True, blank=True, choices=BOOLEANS)
 
     # Response reference
     # TODO Check the queryset
     response_reference = models.ManyToManyField(
-        'Correspondence',
-        related_name='mom_correspondence_related_set',
-        blank=True)
+        "Correspondence", related_name="mom_correspondence_related_set", blank=True
+    )
 
     class Meta:
-        ordering = ('document_number',)
-        app_label = 'default_documents'
+        ordering = ("document_number",)
+        app_label = "default_documents"
         unique_together = (
             (
-                "contract_number", "originator", "recipient",
-                "document_type", "sequential_number",
+                "contract_number",
+                "originator",
+                "recipient",
+                "document_type",
+                "sequential_number",
             ),
         )
 
     class PhaseConfig:
         filter_fields = (
-            'originator', 'recipient', 'status', 'signed', 'prepared_by',
+            "originator",
+            "recipient",
+            "status",
+            "signed",
+            "prepared_by",
         )
         column_fields = (
-            ('Reference', 'document_number'),
-            ('Subject', 'subject'),
-            ('Meeting date', 'meeting_date'),
-            ('Rec./sent date', 'received_sent_date'),
-            ('Originator', 'originator'),
-            ('Recipient', 'recipient'),
-            ('Document type', 'document_type'),
-            ('Prepared by', 'prepared_by'),
-            ('Signed', 'signed'),
-            ('Status', 'status'),
+            ("Reference", "document_number"),
+            ("Subject", "subject"),
+            ("Meeting date", "meeting_date"),
+            ("Rec./sent date", "received_sent_date"),
+            ("Originator", "originator"),
+            ("Recipient", "recipient"),
+            ("Document type", "document_type"),
+            ("Prepared by", "prepared_by"),
+            ("Signed", "signed"),
+            ("Status", "status"),
         )
 
     def generate_document_key(self):
         return slugify(
             "{contract_number}-{originator}-{recipient}"
-            "{document_type}-{sequential_number}"
-            .format(
+            "{document_type}-{sequential_number}".format(
                 contract_number=self.contract_number,
                 originator=self.originator,
                 recipient=self.recipient,
                 document_type=self.document_type,
-                sequential_number=self.sequential_number
-            )).upper()
+                sequential_number=self.sequential_number,
+            )
+        ).upper()
 
     def natural_key(self):
         return (self.document_key,)
@@ -699,56 +706,53 @@ class MinutesOfMeeting(Metadata):
 
 
 class MinutesOfMeetingRevision(MetadataRevision):
-    metadata = models.ForeignKey('MinutesOfMeeting', on_delete=models.PROTECT)
+    metadata = models.ForeignKey("MinutesOfMeeting", on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
-        _('Status'),
-        max_length=20,
-        list_index='STATUS_COR_MOM')
+        _("Status"), max_length=20, list_index="STATUS_COR_MOM"
+    )
 
     class Meta:
-        app_label = 'default_documents'
+        app_label = "default_documents"
 
 
 # Those two classes are dummy document classes, used for demos and tests
 class DemoMetadata(Metadata):
     latest_revision = models.ForeignKey(
-        'DemoMetadataRevision',
+        "DemoMetadataRevision",
         on_delete=models.PROTECT,
-        verbose_name=_('Latest revision'),
-        null=True)
-    title = models.CharField(
-        _('Title'),
-        max_length=250)
+        verbose_name=_("Latest revision"),
+        null=True,
+    )
+    title = models.CharField(_("Title"), max_length=250)
     related_documents = models.ManyToManyField(
-        'documents.Document',
-        related_name='demometadata_related_set',
-        blank=True)
+        "documents.Document", related_name="demometadata_related_set", blank=True
+    )
 
     class Meta:
-        ordering = ('document_number',)
-        app_label = 'default_documents'
+        ordering = ("document_number",)
+        app_label = "default_documents"
 
     class PhaseConfig:
-        filter_fields = ('status',)
+        filter_fields = ("status",)
         column_fields = (
-            ('Document Number', 'document_number'),
-            ('Title', 'title'),
-            ('Status', 'status'),
+            ("Document Number", "document_number"),
+            ("Title", "title"),
+            ("Status", "status"),
         )
         transmittal_columns = {
-            'Document Number': 'document_key',
-            'Title': 'title',
-            'Contract Number': 'contract_number',
-            'Originator': 'originator',
-            'Unit': 'unit',
-            'Discipline': 'discipline',
-            'Document Type': 'document_type',
-            'Sequential Number': 'sequential_number',
-            'Class': 'docclass',
-            'Revision': 'revision',
-            'Status': 'status',
-            'Received Date': 'revision_date',
-            'Created': 'created_on',
+            "Document Number": "document_key",
+            "Title": "title",
+            "Contract Number": "contract_number",
+            "Originator": "originator",
+            "Unit": "unit",
+            "Discipline": "discipline",
+            "Document Type": "document_type",
+            "Sequential Number": "sequential_number",
+            "Class": "docclass",
+            "Revision": "revision",
+            "Status": "status",
+            "Received Date": "revision_date",
+            "Created": "created_on",
         }
 
     def natural_key(self):
@@ -763,178 +767,181 @@ class DemoMetadata(Metadata):
 
 
 class DemoMetadataRevision(ReviewMixin, MetadataRevision):
-    metadata = models.ForeignKey('DemoMetadata', on_delete=models.PROTECT)
+    metadata = models.ForeignKey("DemoMetadata", on_delete=models.PROTECT)
     STATUSES = (
-        ('STD', 'Started'),
-        ('IDC', 'Inter Discipline Check'),
-        ('IFR', 'Issued For Review'),
-        ('IFA', 'Issued For Approval'),
-        ('IFD', 'Issued For Design'),
-        ('IFC', 'Issued For Construction'),
-        ('FIN', 'Final'),
-        ('IFI', 'Issued For Information'),
-        ('ASB', 'As Built'),
-        ('CLD', 'Cancelled'),
-        ('SPD', 'Superseded'),
-        ('ANA', 'Analysis'),
-        ('BAS', 'Design Basis'),
+        ("STD", "Started"),
+        ("IDC", "Inter Discipline Check"),
+        ("IFR", "Issued For Review"),
+        ("IFA", "Issued For Approval"),
+        ("IFD", "Issued For Design"),
+        ("IFC", "Issued For Construction"),
+        ("FIN", "Final"),
+        ("IFI", "Issued For Information"),
+        ("ASB", "As Built"),
+        ("CLD", "Cancelled"),
+        ("SPD", "Superseded"),
+        ("ANA", "Analysis"),
+        ("BAS", "Design Basis"),
     )
     status = models.CharField(
-        verbose_name=_('Status'),
+        verbose_name=_("Status"),
         default="STD",
         max_length=3,
         choices=STATUSES,
-        null=True, blank=True)
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        app_label = 'default_documents'
+        app_label = "default_documents"
 
 
 class GtgMetadata(Metadata):
     latest_revision = models.ForeignKey(
-        'GtgMetadataRevision',
+        "GtgMetadataRevision",
         on_delete=models.PROTECT,
         null=True,
-        verbose_name=_('Latest revision'))
-    title = models.TextField(_('title'))
+        verbose_name=_("Latest revision"),
+    )
+    title = models.TextField(_("title"))
     originator = models.ForeignKey(
-        'accounts.Entity',
+        "accounts.Entity",
         on_delete=models.PROTECT,
-        verbose_name=_('Originator'),
-        limit_choices_to={'type': 'originator'})
+        verbose_name=_("Originator"),
+        limit_choices_to={"type": "originator"},
+    )
     unit = ConfigurableChoiceField(
-        verbose_name="Unit",
-        default="000",
-        max_length=3,
-        list_index='GTG_UNITS')
+        verbose_name="Unit", default="000", max_length=3, list_index="GTG_UNITS"
+    )
     discipline = ConfigurableChoiceField(
-        _('Discipline'),
+        _("Discipline"),
         max_length=6,
-        list_index='GTG_DISCIPLINES',
+        list_index="GTG_DISCIPLINES",
         blank=True,
-        null=True)
+        null=True,
+    )
     document_type = ConfigurableChoiceField(
-        _('Document Type'),
-        max_length=3,
-        list_index='GTG_DOCUMENT_TYPES')
+        _("Document Type"), max_length=3, list_index="GTG_DOCUMENT_TYPES"
+    )
 
     # Related docs
     related_documents = models.ManyToManyField(
-        'documents.Document',
-        related_name='gtg_related_documents',
-        blank=True)
+        "documents.Document", related_name="gtg_related_documents", blank=True
+    )
 
     # Schedule
     status_ifr_planned_date = models.DateField(
-        _('Status IFR Planned Date'),
-        null=True, blank=True)
+        _("Status IFR Planned Date"), null=True, blank=True
+    )
     status_ifr_forecast_date = models.DateField(
-        _('Status IFR Forecast Date'),
-        null=True, blank=True)
+        _("Status IFR Forecast Date"), null=True, blank=True
+    )
     status_ifr_actual_date = models.DateField(
-        _('Status IFR Actual Date'),
-        null=True, blank=True)
+        _("Status IFR Actual Date"), null=True, blank=True
+    )
 
     status_ifa_planned_date = models.DateField(
-        _('Status IFA Planned Date'),
-        null=True, blank=True)
+        _("Status IFA Planned Date"), null=True, blank=True
+    )
     status_ifa_forecast_date = models.DateField(
-        _('Status IFA Forecast Date'),
-        null=True, blank=True)
+        _("Status IFA Forecast Date"), null=True, blank=True
+    )
     status_ifa_actual_date = models.DateField(
-        _('Status IFA Actual Date'),
-        null=True, blank=True)
+        _("Status IFA Actual Date"), null=True, blank=True
+    )
 
     status_ifi_planned_date = models.DateField(
-        _('Status IFI Planned Date'),
-        null=True, blank=True)
+        _("Status IFI Planned Date"), null=True, blank=True
+    )
     status_ifi_forecast_date = models.DateField(
-        _('Status IFI Forecast Date'),
-        null=True, blank=True)
+        _("Status IFI Forecast Date"), null=True, blank=True
+    )
     status_ifi_actual_date = models.DateField(
-        _('Status IFI Actual Date'),
-        null=True, blank=True)
+        _("Status IFI Actual Date"), null=True, blank=True
+    )
 
     status_ife_planned_date = models.DateField(
-        _('Status IFE Planned Date'),
-        null=True, blank=True)
+        _("Status IFE Planned Date"), null=True, blank=True
+    )
     status_ife_forecast_date = models.DateField(
-        _('Status IFE Forecast Date'),
-        null=True, blank=True)
+        _("Status IFE Forecast Date"), null=True, blank=True
+    )
     status_ife_actual_date = models.DateField(
-        _('Status IFE Actual Date'),
-        null=True, blank=True)
+        _("Status IFE Actual Date"), null=True, blank=True
+    )
 
     status_ifp_planned_date = models.DateField(
-        _('Status IFP Planned Date'),
-        null=True, blank=True)
+        _("Status IFP Planned Date"), null=True, blank=True
+    )
     status_ifp_forecast_date = models.DateField(
-        _('Status IFP Forecast Date'),
-        null=True, blank=True)
+        _("Status IFP Forecast Date"), null=True, blank=True
+    )
     status_ifp_actual_date = models.DateField(
-        _('Status IFP Actual Date'),
-        null=True, blank=True)
+        _("Status IFP Actual Date"), null=True, blank=True
+    )
 
     status_fin_planned_date = models.DateField(
-        _('Status FIN Planned Date'),
-        null=True, blank=True)
+        _("Status FIN Planned Date"), null=True, blank=True
+    )
     status_fin_forecast_date = models.DateField(
-        _('Status FIN Forecast Date'),
-        null=True, blank=True)
+        _("Status FIN Forecast Date"), null=True, blank=True
+    )
     status_fin_actual_date = models.DateField(
-        _('Status FIN Actual Date'),
-        null=True, blank=True)
+        _("Status FIN Actual Date"), null=True, blank=True
+    )
 
     status_asb_planned_date = models.DateField(
-        _('Status ASB Planned Date'),
-        null=True, blank=True)
+        _("Status ASB Planned Date"), null=True, blank=True
+    )
     status_asb_forecast_date = models.DateField(
-        _('Status ASB Forecast Date'),
-        null=True, blank=True)
+        _("Status ASB Forecast Date"), null=True, blank=True
+    )
     status_asb_actual_date = models.DateField(
-        _('Status ASB Actual Date'),
-        null=True, blank=True)
+        _("Status ASB Actual Date"), null=True, blank=True
+    )
 
     class Meta:
-        verbose_name = _('Gtg deliverable')
-        verbose_name_plural = _('Gtg deliverables')
-        ordering = ('document_number',)
+        verbose_name = _("Gtg deliverable")
+        verbose_name_plural = _("Gtg deliverables")
+        ordering = ("document_number",)
 
     class PhaseConfig:
         filter_fields = [
-            'originator',
-            'discipline',
-            'document_type',
-            'status',
-            'unit',
-            'leader',
-            'approver',
-            'under_review',
-            'overdue']
+            "originator",
+            "discipline",
+            "document_type",
+            "status",
+            "unit",
+            "leader",
+            "approver",
+            "under_review",
+            "overdue",
+        ]
         filter_fields_order_ = [
-            'search_terms',
-            'originator',
-            'discipline',
-            'document_type',
-            'status',
-            'unit',
-            'leader',
-            'approver',
-            'under_review',
-            'overdue']
+            "search_terms",
+            "originator",
+            "discipline",
+            "document_type",
+            "status",
+            "unit",
+            "leader",
+            "approver",
+            "under_review",
+            "overdue",
+        ]
 
         column_fields = (
-            ('Document Number', 'document_number'),
-            ('Title', 'title'),
-            ('Status', 'status'),
-            ('Rev.', 'current_revision'),
-            ('Document type', 'document_type'),
-            ('Originator', 'originator'),
-            ('Review start date', 'review_start_date'),
-            ('Review due date', 'review_due_date'),
-            ('Under review', 'under_review'),
-            ('Leader', 'leader'),
-            ('Approver', 'approver'),
+            ("Document Number", "document_number"),
+            ("Title", "title"),
+            ("Status", "status"),
+            ("Rev.", "current_revision"),
+            ("Document type", "document_type"),
+            ("Originator", "originator"),
+            ("Review start date", "review_start_date"),
+            ("Review due date", "review_due_date"),
+            ("Under review", "under_review"),
+            ("Leader", "leader"),
+            ("Approver", "approver"),
         )
 
     def natural_key(self):
@@ -942,7 +949,7 @@ class GtgMetadata(Metadata):
 
     def generate_document_key(self):
         # If document key is not suppplied by user, we generate a uuid
-        return '{}'.format(uuid.uuid4())
+        return "{}".format(uuid.uuid4())
 
     @property
     def status(self):
@@ -994,41 +1001,41 @@ class GtgMetadata(Metadata):
 
     @classmethod
     def get_batch_actions(cls, category, user):
-        actions = super(GtgMetadata, cls).get_batch_actions(
-            category, user)
-        actions['start_review'] = MenuItem(
-            'start-review',
-            _('Start review'),
-            reverse('batch_start_reviews', args=[
-                category.organisation.slug,
-                category.slug]),
+        actions = super(GtgMetadata, cls).get_batch_actions(category, user)
+        actions["start_review"] = MenuItem(
+            "start-review",
+            _("Start review"),
+            reverse(
+                "batch_start_reviews", args=[category.organisation.slug, category.slug]
+            ),
             ajax=True,
-            modal='batch-review-modal',
+            modal="batch-review-modal",
             progression_modal=True,
-            icon='eye-open',
+            icon="eye-open",
         )
-        actions['cancel_review'] = MenuItem(
-            'cancel-review',
-            'Cancel review',
-            reverse('batch_cancel_reviews', args=[
-                category.organisation.slug,
-                category.slug]),
+        actions["cancel_review"] = MenuItem(
+            "cancel-review",
+            "Cancel review",
+            reverse(
+                "batch_cancel_reviews", args=[category.organisation.slug, category.slug]
+            ),
             ajax=True,
-            modal='cancel-review-modal',
+            modal="cancel-review-modal",
             progression_modal=True,
-            icon='eye-close',
+            icon="eye-close",
         )
-        if user.has_perm('transmittals.add_outgoingtransmittal'):
-            actions['create_transmittal'] = MenuItem(
-                'create-transmittal',
-                'Create transmittal',
-                reverse('transmittal_create', args=[
-                    category.organisation.slug,
-                    category.slug]),
+        if user.has_perm("transmittals.add_outgoingtransmittal"):
+            actions["create_transmittal"] = MenuItem(
+                "create-transmittal",
+                "Create transmittal",
+                reverse(
+                    "transmittal_create",
+                    args=[category.organisation.slug, category.slug],
+                ),
                 ajax=True,
-                modal='create-transmittal-modal',
+                modal="create-transmittal-modal",
                 progression_modal=True,
-                icon='transfer',
+                icon="transfer",
             )
         return actions
 
@@ -1036,24 +1043,20 @@ class GtgMetadata(Metadata):
     def get_batch_actions_modals(cls):
         templates = super(GtgMetadata, cls).get_batch_actions_modals()
         return templates + [
-            'reviews/document_list_cancel_review_modal.html',
-            'reviews/document_list_batch_review_modal.html',
-            'transmittals/document_list_create_transmittal_modal.html'
+            "reviews/document_list_cancel_review_modal.html",
+            "reviews/document_list_batch_review_modal.html",
+            "transmittals/document_list_create_transmittal_modal.html",
         ]
 
 
 class GtgMetadataRevision(TransmittableMixin, MetadataRevision):
-    metadata = models.ForeignKey('GtgMetadata', on_delete=models.PROTECT)
+    metadata = models.ForeignKey("GtgMetadata", on_delete=models.PROTECT)
     status = ConfigurableChoiceField(
-        _('Status'),
-        max_length=3,
-        list_index='GTG_STATUSES',
-        null=True, blank=True)
+        _("Status"), max_length=3, list_index="GTG_STATUSES", null=True, blank=True
+    )
     final_revision = models.BooleanField(
-        _('Is final revision?'),
-        choices=BOOLEANS,
-        null=True,
-        blank=True)
+        _("Is final revision?"), choices=BOOLEANS, null=True, blank=True
+    )
 
     def get_first_revision_number(self):
         """See `MetadataRevision.get_first_revision_number`"""

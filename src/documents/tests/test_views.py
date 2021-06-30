@@ -24,14 +24,17 @@ class GenericViewTest(TestCase):
 
         # Login as admin by default so we won't be bothered by missing permissions
         self.category = CategoryFactory()
-        user = UserFactory(email='testadmin@phase.fr', password='pass',
-                           is_superuser=True,
-                           category=self.category)
-        self.client.login(email=user.email, password='pass')
-        self.document_list_url = reverse('category_document_list', args=[
-            self.category.organisation.slug,
-            self.category.slug
-        ])
+        user = UserFactory(
+            email="testadmin@phase.fr",
+            password="pass",
+            is_superuser=True,
+            category=self.category,
+        )
+        self.client.login(email=user.email, password="pass")
+        self.document_list_url = reverse(
+            "category_document_list",
+            args=[self.category.organisation.slug, self.category.slug],
+        )
 
     def assertGet(self, parameters=None, auth=None, status_code=200):
         if not parameters:
@@ -75,42 +78,41 @@ class DocumentDetailTest(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            name='User',
-            password='pass',
-            is_superuser=True,
-            category=self.category)
-        self.client.login(username=self.user.email, password='pass')
+            name="User", password="pass", is_superuser=True, category=self.category
+        )
+        self.client.login(username=self.user.email, password="pass")
 
     def test_document_number(self):
-        """Tests that a document detail returns a document and his form. """
+        """Tests that a document detail returns a document and his form."""
         document = DocumentFactory(
-            document_key='hazop-report',
+            document_key="hazop-report",
             category=self.category,
         )
 
-        url = reverse("document_detail", args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        url = reverse(
+            "document_detail",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
         res = self.client.get(url)
         self.assertContains(res, "hazop-report")
 
     def test_document_related_documents(self):
         documents = [
-            DocumentFactory(document_key='HAZOP-related-1'),
-            DocumentFactory(document_key='HAZOP-related-2'),
+            DocumentFactory(document_key="HAZOP-related-1"),
+            DocumentFactory(document_key="HAZOP-related-2"),
         ]
-        document = DocumentFactory(
-            document_key='HAZOP-report',
-            category=self.category)
+        document = DocumentFactory(document_key="HAZOP-report", category=self.category)
         document.metadata.related_documents = documents
         document.metadata.save()
 
         url = document.get_absolute_url()
         res = self.client.get(url, follow=True)
-        self.assertContains(res, 'HAZOP-related-1')
-        self.assertContains(res, 'HAZOP-related-2')
+        self.assertContains(res, "HAZOP-related-1")
+        self.assertContains(res, "HAZOP-related-2")
 
 
 class DocumentDownloadTest(TestCase):
@@ -118,10 +120,13 @@ class DocumentDownloadTest(TestCase):
         # Login as admin so we won't be bothered by missing permissions
         self.category = CategoryFactory()
         self.download_url = self.category.get_download_url()
-        user = UserFactory(email='testadmin@phase.fr', password='pass',
-                           is_superuser=True,
-                           category=self.category)
-        self.client.login(email=user.email, password='pass')
+        user = UserFactory(
+            email="testadmin@phase.fr",
+            password="pass",
+            is_superuser=True,
+            category=self.category,
+        )
+        self.client.login(email=user.email, password="pass")
         self.maxDiff = None
 
     def tearDown(self):
@@ -130,61 +135,73 @@ class DocumentDownloadTest(TestCase):
         if os.path.exists(media_root):
             for f in os.listdir(media_root):
                 file_path = os.path.join(media_root, f)
-                if os.path.isfile(file_path) and file_path.startswith('/tmp/'):
+                if os.path.isfile(file_path) and file_path.startswith("/tmp/"):
                     os.unlink(file_path)
 
     def test_unique_document_download(self):
         """
         Tests that a document download returns a zip file of the latest revision.
         """
-        native_doc = 'sample_doc_native.docx'
-        pdf_doc = 'sample_doc_pdf.pdf'
+        native_doc = "sample_doc_native.docx"
+        pdf_doc = "sample_doc_pdf.pdf"
 
         document = DocumentFactory(
-            document_key='HAZOP-related',
+            document_key="HAZOP-related",
             category=self.category,
             revision={
-                'native_file': SimpleUploadedFile(native_doc, b'content'),
-                'pdf_file': SimpleUploadedFile(pdf_doc, b'content'),
-            }
+                "native_file": SimpleUploadedFile(native_doc, b"content"),
+                "pdf_file": SimpleUploadedFile(pdf_doc, b"content"),
+            },
         )
         c = self.client
-        r = c.post(self.download_url, {
-            'document_ids': document.id,
-            'revisions': 'latest',
-            'format': 'both',
-        })
+        r = c.post(
+            self.download_url,
+            {
+                "document_ids": document.id,
+                "revisions": "latest",
+                "format": "both",
+            },
+        )
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r._headers['vary'], ('Vary', 'Cookie'))
-        self.assertEqual(r._headers['content-type'], ('Content-Type', 'application/zip'))
-        self.assertEqual(r._headers['content-disposition'], (
-            'Content-Disposition',
-            'attachment; filename=download.zip'))
+        self.assertEqual(r._headers["vary"], ("Vary", "Cookie"))
+        self.assertEqual(
+            r._headers["content-type"], ("Content-Type", "application/zip")
+        )
+        self.assertEqual(
+            r._headers["content-disposition"],
+            ("Content-Disposition", "attachment; filename=download.zip"),
+        )
 
     def test_empty_document_download(self):
         """
         Tests that a document download returns an empty zip file.
         """
         document = DocumentFactory(
-            document_key='HAZOP-related',
+            document_key="HAZOP-related",
             category=self.category,
         )
-        r = self.client.post(self.download_url, {
-            'document_ids': [document.id],
-            'revisions': 'latest',
-            'format': 'both',
-        })
+        r = self.client.post(
+            self.download_url,
+            {
+                "document_ids": [document.id],
+                "revisions": "latest",
+                "format": "both",
+            },
+        )
         self.assertEqual(r.status_code, 200)
-        self.assertDictEqual(r._headers, {
-            'content-length': ('Content-Length', '22'),
-            'content-type': ('Content-Type', 'application/zip'),
-            'vary': ('Vary', 'Cookie'),
-            'x-frame-options': ('X-Frame-Options', 'SAMEORIGIN'),
-            'content-disposition': (
-                'Content-Disposition',
-                'attachment; filename=download.zip'
-            )
-        })
+        self.assertDictEqual(
+            r._headers,
+            {
+                "content-length": ("Content-Length", "22"),
+                "content-type": ("Content-Type", "application/zip"),
+                "vary": ("Vary", "Cookie"),
+                "x-frame-options": ("X-Frame-Options", "SAMEORIGIN"),
+                "content-disposition": (
+                    "Content-Disposition",
+                    "attachment; filename=download.zip",
+                ),
+            },
+        )
 
     def test_all_revisions_document_download(self):
         """
@@ -194,26 +211,29 @@ class DocumentDownloadTest(TestCase):
         document = DocumentFactory(
             category=self.category,
         )
-        native_doc = 'sample_doc_native.docx'
-        pdf_doc = 'sample_doc_pdf.pdf'
+        native_doc = "sample_doc_native.docx"
+        pdf_doc = "sample_doc_pdf.pdf"
 
         MetadataRevisionFactory(
             metadata=document.get_metadata(),
             revision=2,
-            native_file=SimpleUploadedFile(native_doc, b'content'),
-            pdf_file=SimpleUploadedFile(pdf_doc, b'content'),
+            native_file=SimpleUploadedFile(native_doc, b"content"),
+            pdf_file=SimpleUploadedFile(pdf_doc, b"content"),
         )
         MetadataRevisionFactory(
             metadata=document.get_metadata(),
             revision=3,
-            native_file=SimpleUploadedFile(native_doc, b'content'),
-            pdf_file=SimpleUploadedFile(pdf_doc, b'content'),
+            native_file=SimpleUploadedFile(native_doc, b"content"),
+            pdf_file=SimpleUploadedFile(pdf_doc, b"content"),
         )
-        r = self.client.post(document.category.get_download_url(), {
-            'document_ids': document.id,
-            'revisions': 'all',
-            'format': 'both',
-        })
+        r = self.client.post(
+            document.category.get_download_url(),
+            {
+                "document_ids": document.id,
+                "revisions": "all",
+                "format": "both",
+            },
+        )
         self.assertEqual(r.status_code, 200)
 
         zipfile = BytesIO(r.content)
@@ -225,30 +245,30 @@ class DocumentReviseTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
             category=self.category,
         )
-        self.client.login(email=user.email, password='pass')
+        self.client.login(email=user.email, password="pass")
 
     def test_cannot_revise_document_in_review(self):
         document = DocumentFactory(
             category=self.category,
-            document_key='FAC09001-FWF-000-HSE-REP-0004',
-            revision={
-                'status': 'STD',
-                'review_start_date': '2014-04-04'
-            }
+            document_key="FAC09001-FWF-000-HSE-REP-0004",
+            revision={"status": "STD", "review_start_date": "2014-04-04"},
         )
         revision = document.latest_revision
         self.assertTrue(revision.is_under_review)
 
-        url = reverse('document_revise', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        url = reverse(
+            "document_revise",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, 403)
@@ -258,37 +278,43 @@ class DocumentDeleteTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
             category=self.category,
         )
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
         self.doc_list_url = self.category.get_absolute_url()
 
     def test_delete_page_only_post(self):
         document = DocumentFactory(category=self.category)
-        delete_url = reverse('document_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        delete_url = reverse(
+            "document_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
         res = self.client.get(delete_url)
         self.assertEqual(res.status_code, 405)
 
     def test_delete_document(self):
         document = DocumentFactory(category=self.category)
         document_str = str(document)
-        delete_url = reverse('document_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        delete_url = reverse(
+            "document_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
         res = self.client.post(delete_url)
         self.assertRedirects(res, self.category.get_absolute_url())
 
         # Check that deletion was logged in audit trail
-        activity = Activity.objects.latest('created_on')
+        activity = Activity.objects.latest("created_on")
         self.assertEqual(activity.verb, Activity.VERB_DELETED)
         self.assertEqual(activity.action_object_str, document_str)
         self.assertEqual(activity.actor, self.user)
@@ -305,17 +331,17 @@ class DocumentDeleteTests(TestCase):
     def test_cannot_revise_document_in_review(self):
         document = DocumentFactory(
             category=self.category,
-            document_key='FAC09001-FWF-000-HSE-REP-0004',
-            revision={
-                'status': 'STD',
-                'review_start_date': '2014-04-04'
-            }
+            document_key="FAC09001-FWF-000-HSE-REP-0004",
+            revision={"status": "STD", "review_start_date": "2014-04-04"},
         )
-        delete_url = reverse('document_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        delete_url = reverse(
+            "document_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
 
         revision = document.latest_revision
         self.assertTrue(revision.is_under_review)
@@ -326,23 +352,26 @@ class DocumentDeleteTests(TestCase):
         try:
             document = Document.objects.get(document_key=document.document_key)
         except:  # noqa
-            self.fail('Document was deleted')
+            self.fail("Document was deleted")
 
     def test_simple_user_cannot_delete_document(self):
         user = UserFactory(
-            email='testuser@phase.fr',
-            password='pass',
+            email="testuser@phase.fr",
+            password="pass",
             is_superuser=False,
             category=self.category,
         )
 
-        self.client.login(email=user.email, password='pass')
+        self.client.login(email=user.email, password="pass")
         document = DocumentFactory(category=self.category)
-        delete_url = reverse('document_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        delete_url = reverse(
+            "document_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
 
         res = self.client.post(delete_url)
 
@@ -350,22 +379,24 @@ class DocumentDeleteTests(TestCase):
 
     def test_user_with_delete_perms_can_delete_document(self):
         user = UserFactory(
-            email='testuser@phase.fr',
-            password='pass',
+            email="testuser@phase.fr",
+            password="pass",
             is_superuser=False,
             category=self.category,
         )
-        delete_doc_perm = Permission.objects.get(
-            codename='delete_document')
+        delete_doc_perm = Permission.objects.get(codename="delete_document")
         user.user_permissions.add(delete_doc_perm)
 
-        self.client.login(email=user.email, password='pass')
+        self.client.login(email=user.email, password="pass")
         document = DocumentFactory(category=self.category)
-        delete_url = reverse('document_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            document.document_key
-        ])
+        delete_url = reverse(
+            "document_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                document.document_key,
+            ],
+        )
 
         res = self.client.post(delete_url)
 
@@ -378,26 +409,26 @@ class DocumentRevisionDeleteTests(TestCase):
         doc = DocumentFactory(category=self.category)
         meta = doc.get_metadata()
         for rev in range(2, nb_revisions + 1):
-            MetadataRevisionFactory(
-                metadata=meta,
-                revision=rev
-            )
-        url = reverse('document_revision_delete', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            doc.document_key
-        ])
+            MetadataRevisionFactory(metadata=meta, revision=rev)
+        url = reverse(
+            "document_revision_delete",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                doc.document_key,
+            ],
+        )
         return doc, url
 
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
             category=self.category,
         )
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
         self.doc_list_url = self.category.get_absolute_url()
 
     def test_delete_page_only_accepts_post_requests(self):
@@ -443,13 +474,13 @@ class DocumentRevisionDeleteTests(TestCase):
         self.assertEqual(doc.get_all_revisions().count(), 2)
         # User has not delete perms
         user = UserFactory(
-            email='testuser@phase.fr',
-            password='pass',
+            email="testuser@phase.fr",
+            password="pass",
             is_superuser=False,
             category=self.category,
         )
         self.client.logout()
-        self.client.login(email=user.email, password='pass')
+        self.client.login(email=user.email, password="pass")
 
         res = self.client.post(delete_url)
 
@@ -462,16 +493,15 @@ class DocumentRevisionDeleteTests(TestCase):
         doc, delete_url = self.create_doc(nb_revisions=2)
         self.assertEqual(doc.get_all_revisions().count(), 2)
         user = UserFactory(
-            email='testuser@phase.fr',
-            password='pass',
+            email="testuser@phase.fr",
+            password="pass",
             is_superuser=False,
             category=self.category,
         )
-        delete_doc_perm = Permission.objects.get(
-            codename='delete_document')
+        delete_doc_perm = Permission.objects.get(codename="delete_document")
         user.user_permissions.add(delete_doc_perm)
         self.client.logout()
-        self.client.login(email=user.email, password='pass')
+        self.client.login(email=user.email, password="pass")
 
         self.client.post(delete_url)
 
@@ -484,23 +514,27 @@ class PrivateDownloadTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='test@phase.fr',
-            password='pass',
+            email="test@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
         self.doc = DocumentFactory(category=self.category)
         self.rev = self.doc.get_latest_revision()
 
-        pdf_doc = 'sample_doc_pdf.pdf'
-        self.sample_pdf = SimpleUploadedFile(pdf_doc, b'content')
-        self.url = reverse('revision_file_download', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.doc.document_key,
-            self.rev.revision,
-            'pdf_file',
-        ])
+        pdf_doc = "sample_doc_pdf.pdf"
+        self.sample_pdf = SimpleUploadedFile(pdf_doc, b"content")
+        self.url = reverse(
+            "revision_file_download",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.doc.document_key,
+                self.rev.revision,
+                "pdf_file",
+            ],
+        )
 
     def test_download_empty_file(self):
         res = self.client.get(self.url)

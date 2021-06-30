@@ -7,8 +7,8 @@ from categories.models import Category
 
 
 class Command(BaseCommand):
-    args = '<number_of_documents> <category_id>'
-    help = 'Creates a given number of random documents'
+    args = "<number_of_documents> <category_id>"
+    help = "Creates a given number of random documents"
 
     def handle(self, *args, **options):
         nb_of_docs = int(args[0])
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         generate_random_documents(nb_of_docs, category)
 
         self.stdout.write(
-            'Successfully generated {nb_of_docs} documents'.format(
+            "Successfully generated {nb_of_docs} documents".format(
                 nb_of_docs=nb_of_docs,
             ).encode()
         )

@@ -7,7 +7,7 @@ from django.utils.encoding import force_text
 
 class DashboardTypeChoiceField(forms.TypedChoiceField):
     def __init__(self, *args, **kwargs):
-        kwargs['widget'] = DashboardSelect
+        kwargs["widget"] = DashboardSelect
         super(DashboardTypeChoiceField, self).__init__(*args, **kwargs)
 
     def _get_choices(self):
@@ -17,10 +17,10 @@ class DashboardTypeChoiceField(forms.TypedChoiceField):
         choices = list(value)
         self._choices = choices
 
-        text_choices = [(
-            classpath(subclass) if subclass else subclass,
-            name
-        ) for subclass, name in choices]
+        text_choices = [
+            (classpath(subclass) if subclass else subclass, name)
+            for subclass, name in choices
+        ]
 
         self.widget.choices = text_choices
 

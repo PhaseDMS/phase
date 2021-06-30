@@ -4,4 +4,5 @@ class ScheduleMixin(object):
     This is use to filter document classes in signal handling.
 
     """
+
     pass

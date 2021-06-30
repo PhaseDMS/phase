@@ -14,23 +14,15 @@ from documents.forms.models import documentform_factory
 class Organisation(models.Model):
     objects = SlugManager()
 
-    name = models.CharField(
-        _('Name'),
-        max_length=50)
-    slug = models.SlugField(
-        _('Slug'),
-        max_length=50)
-    trigram = models.CharField(
-        _('Trigram'),
-        max_length=3,
-        unique=True)
+    name = models.CharField(_("Name"), max_length=50)
+    slug = models.SlugField(_("Slug"), max_length=50)
+    trigram = models.CharField(_("Trigram"), max_length=3, unique=True)
     description = models.CharField(
-        _('Description'),
-        max_length=200,
-        null=True, blank=True)
+        _("Description"), max_length=200, null=True, blank=True
+    )
 
     class Meta:
-        app_label = 'categories'
+        app_label = "categories"
 
     def __str__(self):
         return self.name
@@ -42,28 +34,23 @@ class Organisation(models.Model):
 
     def random_trigram(self):
         """Returns a word of three random letters."""
-        return ''.join(random.choice(string.ascii_lowercase) for _ in range(3))
+        return "".join(random.choice(string.ascii_lowercase) for _ in range(3))
 
 
 class CategoryTemplate(models.Model):
     objects = SlugManager()
 
-    name = models.CharField(
-        _('Name'),
-        max_length=50)
-    slug = models.SlugField(
-        _('Slug'),
-        max_length=50)
+    name = models.CharField(_("Name"), max_length=50)
+    slug = models.SlugField(_("Slug"), max_length=50)
     description = models.CharField(
-        _('Description'),
-        max_length=200,
-        null=True, blank=True)
+        _("Description"), max_length=200, null=True, blank=True
+    )
     use_creation_form = models.BooleanField(
-        _('Use document creation form'),
-        default=True)
+        _("Use document creation form"), default=True
+    )
     display_reporting = models.BooleanField(
-        _('Display reporting section'),
-        default=False)
+        _("Display reporting section"), default=False
+    )
 
     # We use a generic foreign key to reference
     # the type of document metadata this category
@@ -71,9 +58,9 @@ class CategoryTemplate(models.Model):
     metadata_model = models.ForeignKey(ContentType, on_delete=models.PROTECT)
 
     class Meta:
-        verbose_name = _('Category template')
-        verbose_name_plural = _('Category templates')
-        app_label = 'categories'
+        verbose_name = _("Category template")
+        verbose_name_plural = _("Category templates")
+        app_label = "categories"
 
     def __str__(self):
         return self.name
@@ -81,44 +68,42 @@ class CategoryTemplate(models.Model):
 
 class CategoryManager(models.Manager):
     def get_by_natural_key(self, organisation_slug, category_slug):
-        return self.get(organisation__slug=organisation_slug,
-                        category_template__slug=category_slug)
+        return self.get(
+            organisation__slug=organisation_slug, category_template__slug=category_slug
+        )
 
 
 class Category(models.Model):
     """Link between organisation / category and users and groups."""
+
     objects = CategoryManager()
 
     organisation = models.ForeignKey(
         Organisation,
         on_delete=models.PROTECT,
-        related_name='categories',
-        verbose_name=_('Organisation'))
+        related_name="categories",
+        verbose_name=_("Organisation"),
+    )
     category_template = models.ForeignKey(
-        CategoryTemplate,
-        on_delete=models.PROTECT,
-        verbose_name=_('Category template'))
+        CategoryTemplate, on_delete=models.PROTECT, verbose_name=_("Category template")
+    )
     users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='categories',
-        blank=True)
+        settings.AUTH_USER_MODEL, related_name="categories", blank=True
+    )
     groups = models.ManyToManyField(
-        'auth.Group',
-        blank=True,
-        related_name='owner_groups')
+        "auth.Group", blank=True, related_name="owner_groups"
+    )
     third_parties = models.ManyToManyField(
-        'accounts.Entity',
-        blank=True,
-        related_name='linked_categories')
+        "accounts.Entity", blank=True, related_name="linked_categories"
+    )
 
     class Meta:
-        unique_together = ('category_template', 'organisation')
-        verbose_name = _('Category')
-        verbose_name_plural = _('Categories')
+        unique_together = ("category_template", "organisation")
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
 
     def __str__(self):
-        return '%s > %s' % (self.organisation.name,
-                            self.category_template.name)
+        return "%s > %s" % (self.organisation.name, self.category_template.name)
 
     @property
     def name(self):
@@ -146,13 +131,13 @@ class Category(models.Model):
         return documentform_factory(self.revision_class())
 
     def document_type(self):
-        return '{}.{}'.format(
-            self.organisation.slug, self.category_template.slug)
+        return "{}.{}".format(self.organisation.slug, self.category_template.slug)
 
     def get_absolute_url(self):
-        url = reverse('category_document_list', args=(
-            self.organisation.slug,
-            self.category_template.slug))
+        url = reverse(
+            "category_document_list",
+            args=(self.organisation.slug, self.category_template.slug),
+        )
         return url
 
     def get_transmittal_columns(self):
@@ -161,18 +146,19 @@ class Category(models.Model):
 
     def get_download_url(self):
         """Gets the url used to download a list of documents."""
-        url = reverse('document_download', args=(
-            self.organisation.slug,
-            self.category_template.slug))
+        url = reverse(
+            "document_download",
+            args=(self.organisation.slug, self.category_template.slug),
+        )
         return url
 
 
 class Contract(models.Model):
-    number = models.CharField(_('Number'), max_length=50)
-    name = models.CharField(_('Name'), max_length=255)
-    categories = models.ManyToManyField(Category,
-                                        related_name='contracts',
-                                        verbose_name=_('Categories'))
+    number = models.CharField(_("Number"), max_length=50)
+    name = models.CharField(_("Name"), max_length=255)
+    categories = models.ManyToManyField(
+        Category, related_name="contracts", verbose_name=_("Categories")
+    )
 
     def __str__(self):
         return self.number

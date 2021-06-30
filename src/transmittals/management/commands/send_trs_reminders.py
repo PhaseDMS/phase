@@ -15,23 +15,24 @@ logger = logging.getLogger(__name__)
 
 
 class Command(EmailCommand):
-    help = 'Send reminders for trs with missing ack of receipt.'
-    text_template = 'transmittals/pending_ack_email.txt'
-    html_template = 'transmittals/pending_ack_email.html'
+    help = "Send reminders for trs with missing ack of receipt."
+    text_template = "transmittals/pending_ack_email.txt"
+    html_template = "transmittals/pending_ack_email.html"
 
     def handle(self, *args, **options):
 
-        logger.info('Sending transmittal reminders')
+        logger.info("Sending transmittal reminders")
 
         delta = timezone.now().date() - timedelta(days=1)
-        transmittals = OutgoingTransmittal.objects \
-            .filter(ack_of_receipt_date__isnull=True) \
-            .filter(document__created_on__lt=delta) \
-            .select_related() \
-            .prefetch_related('recipient__users')
+        transmittals = (
+            OutgoingTransmittal.objects.filter(ack_of_receipt_date__isnull=True)
+            .filter(document__created_on__lt=delta)
+            .select_related()
+            .prefetch_related("recipient__users")
+        )
         recipients = groupby(transmittals, lambda trs: trs.recipient)
         for recipient, transmittals in recipients:
-            logger.info('Sending reminders for recipient {}'.format(recipient.name))
+            logger.info("Sending reminders for recipient {}".format(recipient.name))
 
             # We prevent iterator exhaustion in case we have to send the
             # `transmittals` content to several recipients.
@@ -44,7 +45,7 @@ class Command(EmailCommand):
                 self.send_notification(user=user, transmittals=trs)
 
     def get_subject(self, **kwargs):
-        return 'Phase - Transmittals pending acknowledgment of receipt'
+        return "Phase - Transmittals pending acknowledgment of receipt"
 
     def get_recipient_list(self, **kwargs):
-        return [kwargs['user'].email]
+        return [kwargs["user"].email]

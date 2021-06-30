@@ -7,4 +7,4 @@ class ExportFactory(factory.DjangoModelFactory):
     class Meta:
         model = Export
 
-    querystring = ''
+    querystring = ""

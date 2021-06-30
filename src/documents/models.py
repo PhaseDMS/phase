@@ -29,58 +29,50 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
     """A single document base model."""
+
     objects = DocumentManager()
 
     document_key = models.SlugField(
-        _('Document key'),
-        unique=True,
-        db_index=True,
-        max_length=250)
-    document_number = models.CharField(
-        _('Document number'),
-        max_length=250)
-    title = models.TextField(
-        verbose_name="Title")
+        _("Document key"), unique=True, db_index=True, max_length=250
+    )
+    document_number = models.CharField(_("Document number"), max_length=250)
+    title = models.TextField(verbose_name="Title")
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        verbose_name=_('Category'),
-        related_name='documents')
-    created_on = models.DateField(
-        _('Created on'),
-        default=timezone.now)
+        verbose_name=_("Category"),
+        related_name="documents",
+    )
+    created_on = models.DateField(_("Created on"), default=timezone.now)
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        verbose_name=_('Created by'),
-        related_name='documents_created',
+        verbose_name=_("Created by"),
+        related_name="documents_created",
         blank=True,
-        null=True)
-    updated_on = models.DateTimeField(
-        _('Updated on'),
-        default=timezone.now)
+        null=True,
+    )
+    updated_on = models.DateTimeField(_("Updated on"), default=timezone.now)
     favorited_by = models.ManyToManyField(
-        User,
-        through='favorites.Favorite',
-        blank=True)
-    is_indexable = models.BooleanField(
-        _('Indexable'),
-        default=True)
-    current_revision = models.PositiveIntegerField(
-        verbose_name="Revision")
+        User, through="favorites.Favorite", blank=True
+    )
+    is_indexable = models.BooleanField(_("Indexable"), default=True)
+    current_revision = models.PositiveIntegerField(verbose_name="Revision")
     current_revision_date = models.DateField(
-        null=True, blank=True,
-        verbose_name="Revision Date")
+        null=True, blank=True, verbose_name="Revision Date"
+    )
 
     class Meta:
-        verbose_name = _('Document')
-        verbose_name_plural = _('Documents')
+        verbose_name = _("Document")
+        verbose_name_plural = _("Documents")
 
         # Custom permission for document controllers
         # Permission used in sidebar template to check if user belongs to
         # doc controller group
-        permissions = (('can_control_document', 'Can control document'),
-                       ('can_start_stop_review', 'Can start stop review'),)
+        permissions = (
+            ("can_control_document", "Can control document"),
+            ("can_start_stop_review", "Can start stop review"),
+        )
 
     def __str__(self):
         return self.document_number
@@ -93,35 +85,41 @@ class Document(models.Model):
         Otherwise, we return the short url to prevent a useless query.
 
         """
-        if hasattr(self, '_category_cache'):
-            url = reverse('document_detail', args=[
-                self.category.organisation.slug,
-                self.category.slug,
-                self.document_key
-            ])
+        if hasattr(self, "_category_cache"):
+            url = reverse(
+                "document_detail",
+                args=[
+                    self.category.organisation.slug,
+                    self.category.slug,
+                    self.document_key,
+                ],
+            )
         else:
-            url = reverse('document_short_url', args=[self.document_key])
+            url = reverse("document_short_url", args=[self.document_key])
 
         return url
 
     def get_edit_url(self, revision=None):
         kwargs = {
-            'organisation': self.category.organisation.slug,
-            'category': self.category.category_template.slug,
-            'document_key': self.document_key
+            "organisation": self.category.organisation.slug,
+            "category": self.category.category_template.slug,
+            "document_key": self.document_key,
         }
         if revision is not None:
-            kwargs.update({'revision': revision})
+            kwargs.update({"revision": revision})
 
-        url = reverse('document_edit', kwargs=kwargs)
+        url = reverse("document_edit", kwargs=kwargs)
         return url
 
     def get_revise_url(self):
-        url = reverse('document_revise', args=(
-            self.category.organisation.slug,
-            self.category.category_template.slug,
-            self.document_key,
-        ))
+        url = reverse(
+            "document_revise",
+            args=(
+                self.category.organisation.slug,
+                self.category.category_template.slug,
+                self.document_key,
+            ),
+        )
         return url
 
     def natural_key(self):
@@ -145,14 +143,15 @@ class Document(models.Model):
 
         """
         Model = self.category.document_class()
-        metadata = Model.objects \
-            .select_related() \
+        metadata = (
+            Model.objects.select_related()
             .select_related(
-                'latest_revision__metadata__document__category',
-                'latest_revision__metadata__document__category__category_template',
-                'latest_revision__metadata__document__category__organisation',
-            ) \
+                "latest_revision__metadata__document__category",
+                "latest_revision__metadata__document__category__category_template",
+                "latest_revision__metadata__document__category__organisation",
+            )
             .get(document=self)
+        )
         return metadata
 
     @property
@@ -176,16 +175,17 @@ class Document(models.Model):
     def get_all_revisions(self):
         """Return all revisions data of this document."""
         RevisionClass = self.get_revision_class()
-        revisions = RevisionClass.objects \
-            .filter(metadata__document=self) \
-            .select_related() \
-            .order_by('-id')
+        revisions = (
+            RevisionClass.objects.filter(metadata__document=self)
+            .select_related()
+            .order_by("-id")
+        )
         return revisions
 
     @property
     def current_revision_name(self):
         """A revision identifier should be displayed with two digits"""
-        return '%02d' % self.current_revision
+        return "%02d" % self.current_revision
 
     def to_json(self):
         return self.get_latest_revision().to_json()
@@ -204,27 +204,31 @@ class MetadataBase(ModelBase):
     An optional `filter_fields_order` defines the order in which right sidebar
     filter fields are displayed.
     """
+
     def __new__(cls, name, bases, attrs):
-        if name != 'NewBase' and name != 'Metadata':
+        if name != "NewBase" and name != "Metadata":
             base_attrs = []
             for base in bases:
-                if hasattr(base, '_meta'):
+                if hasattr(base, "_meta"):
                     base_attrs += base._meta.fields
 
-            phase_config = attrs.get('PhaseConfig', None)
+            phase_config = attrs.get("PhaseConfig", None)
             if not phase_config:
-                raise TypeError('You are missing the "PhaseConfig" configuration '
-                                'class on %s' % name)
+                raise TypeError(
+                    'You are missing the "PhaseConfig" configuration '
+                    "class on %s" % name
+                )
 
-            filter_fields = getattr(phase_config, 'filter_fields', None)
-            column_fields = getattr(phase_config, 'column_fields', None)
-            filter_fields_order = getattr(
-                phase_config, 'filter_fields_order', None)
-            import_fields = getattr(phase_config, 'import_fields', None)
+            filter_fields = getattr(phase_config, "filter_fields", None)
+            column_fields = getattr(phase_config, "column_fields", None)
+            filter_fields_order = getattr(phase_config, "filter_fields_order", None)
+            import_fields = getattr(phase_config, "import_fields", None)
 
             if not all((filter_fields, column_fields)):
-                raise TypeError('Your "PhaseConfig" definition is incorrect '
-                                'on %s. Please check the doc' % name)
+                raise TypeError(
+                    'Your "PhaseConfig" definition is incorrect '
+                    "on %s. Please check the doc" % name
+                )
 
             if filter_fields_order:
                 if not set(filter_fields) <= set(filter_fields_order):
@@ -232,15 +236,17 @@ class MetadataBase(ModelBase):
                         'Your "PhaseConfig" definition is incorrect '
                         '"filter_fields_order" should contain the same '
                         'elements as "filter_fields" and the base'
-                        ' visible fields from'
-                        ' "documents.forms.BaseDocumentFilterForm"')
+                        " visible fields from"
+                        ' "documents.forms.BaseDocumentFilterForm"'
+                    )
 
             if import_fields:
-                if 'created_on' in import_fields:
+                if "created_on" in import_fields:
                     raise TypeError(
                         'Your "PhaseConfig" definition is incorrect: '
-                        'created_on field must not be in import_field '
-                        'parameter')
+                        "created_on field must not be in import_field "
+                        "parameter"
+                    )
 
         return super(MetadataBase, cls).__new__(cls, name, bases, attrs)
 
@@ -255,15 +261,9 @@ class Metadata(models.Model, metaclass=MetadataBase):
 
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
     document_key = models.SlugField(
-        _('Document key'),
-        blank=True,
-        unique=True,
-        db_index=True,
-        max_length=250)
-    document_number = models.CharField(
-        _('Document number'),
-        blank=True,
-        max_length=250)
+        _("Document key"), blank=True, unique=True, db_index=True, max_length=250
+    )
+    document_number = models.CharField(_("Document number"), blank=True, max_length=250)
 
     class Meta:
         abstract = True
@@ -281,22 +281,20 @@ class Metadata(models.Model, metaclass=MetadataBase):
     @classmethod
     def get_revision_class(self):
         """Return the class of the associated revision model."""
-        return self._meta.get_field('latest_revision').rel.to
+        return self._meta.get_field("latest_revision").rel.to
 
     def get_all_revisions(self):
         """Return all revisions data of this document."""
         Revision = self.get_revision_class()
-        revisions = Revision.objects \
-            .filter(metadata=self) \
-            .select_related() \
-            .order_by('-id')
+        revisions = (
+            Revision.objects.filter(metadata=self).select_related().order_by("-id")
+        )
         return revisions
 
     def get_revision(self, revision):
         """Returns the rivision with the specified number."""
         Revision = self.get_revision_class()
-        qs = Revision.objects \
-            .filter(metadata=self)
+        qs = Revision.objects.filter(metadata=self)
         revision = get_object_or_None(qs, revision=revision)
         return revision
 
@@ -323,26 +321,30 @@ class Metadata(models.Model, metaclass=MetadataBase):
 
         """
         actions = OrderedDict()
-        actions['download'] = MenuItem(
-            'download',
-            _('Download'),
-            reverse('document_download', args=[
-                category.organisation.slug,
-                category.slug]),
+        actions["download"] = MenuItem(
+            "download",
+            _("Download"),
+            reverse(
+                "document_download", args=[category.organisation.slug, category.slug]
+            ),
             ajax=False,
-            modal='documents-download-modal',
-            icon='download')
+            modal="documents-download-modal",
+            icon="download",
+        )
         return actions
 
     @classmethod
     def get_batch_actions_modals(cls):
         """Returns a list of templates used in batch actions."""
-        return ['documents/document_list_download_modal.html',
-                'documents/document_list_export_modal.html']
+        return [
+            "documents/document_list_download_modal.html",
+            "documents/document_list_export_modal.html",
+        ]
 
     @classmethod
     def get_document_download_form(cls, data, queryset):
         from documents.forms.utils import DocumentDownloadForm
+
         return DocumentDownloadForm(data, queryset=queryset)
 
     @classmethod
@@ -354,32 +356,31 @@ class Metadata(models.Model, metaclass=MetadataBase):
 
         Returns the name of the ziped file.
         """
-        format = kwargs.pop('format', 'both')
-        revisions = kwargs.pop('revisions', 'latest')
+        format = kwargs.pop("format", "both")
+        revisions = kwargs.pop("revisions", "latest")
         temp_file = tempfile.TemporaryFile()
 
-        with zipfile.ZipFile(temp_file, mode='w') as zip_file:
+        with zipfile.ZipFile(temp_file, mode="w") as zip_file:
             files = []
             for document in documents:
-                if revisions == 'latest':
+                if revisions == "latest":
                     revs = [document.latest_revision]
-                elif revisions == 'all':
+                elif revisions == "all":
                     revs = document.get_all_revisions()
 
                 for rev in revs:
                     if rev is not None:
-                        if format in ('native', 'both'):
+                        if format in ("native", "both"):
                             files.append(rev.native_file)
-                        if format in ('pdf', 'both'):
+                        if format in ("pdf", "both"):
                             files.append(rev.pdf_file)
 
             for file_ in files:
                 if file_.name:
                     if os.path.isfile(file_.path):
                         zip_file.write(
-                            file_.path,
-                            file_.name,
-                            compress_type=zipfile.ZIP_DEFLATED)
+                            file_.path, file_.name, compress_type=zipfile.ZIP_DEFLATED
+                        )
                     else:
                         msg = "Can't serve %s, the file is missing"
                         logger.error(msg % file_.name)
@@ -392,53 +393,46 @@ class RevisionBase(ModelBase):
     Checks that required fields are present.
 
     """
+
     def __new__(cls, name, bases, attrs):
         new_class = super(RevisionBase, cls).__new__(cls, name, bases, attrs)
 
-        if name not in ('NewBase', 'MetadataRevision', 'MetadataRevisionBase'):
+        if name not in ("NewBase", "MetadataRevision", "MetadataRevisionBase"):
             try:
-                new_class._meta.get_field('metadata')
+                new_class._meta.get_field("metadata")
             except FieldDoesNotExist:
-                raise TypeError('The {} class definition is incorrect. '
-                                'The "metadata" field is missing'.format(name))
+                raise TypeError(
+                    "The {} class definition is incorrect. "
+                    'The "metadata" field is missing'.format(name)
+                )
 
         return new_class
 
 
 class MetadataRevisionBase(models.Model):
-    revision = models.PositiveIntegerField(_('Revision'))
+    revision = models.PositiveIntegerField(_("Revision"))
     revision_date = models.DateField(
-        null=True, blank=True,
-        verbose_name="Revision Date")
+        null=True, blank=True, verbose_name="Revision Date"
+    )
     native_file = RevisionFileField(
-        verbose_name="Native File",
-        null=True, blank=True, max_length=255)
-    pdf_file = RevisionFileField(
-        verbose_name="PDF File",
-        null=True, blank=True)
+        verbose_name="Native File", null=True, blank=True, max_length=255
+    )
+    pdf_file = RevisionFileField(verbose_name="PDF File", null=True, blank=True)
 
-    created_on = models.DateField(
-        _('Created on'),
-        default=timezone.now)
-    updated_on = models.DateTimeField(
-        _('Updated on'),
-        auto_now=True)
+    created_on = models.DateField(_("Created on"), default=timezone.now)
+    updated_on = models.DateTimeField(_("Updated on"), auto_now=True)
 
     class Meta:
         abstract = True
-        ordering = ('-revision',)
-        get_latest_by = 'revision'
-        unique_together = ('document', 'revision')
+        ordering = ("-revision",)
+        get_latest_by = "revision"
+        unique_together = ("document", "revision")
 
     def __str__(self):
-        return '{} ({})'.format(
-            self.document.document_key,
-            self.revision)
+        return "{} ({})".format(self.document.document_key, self.revision)
 
     def audit_trail_repr(self):
-        return '{} rev {}'.format(
-            self.document.document_key,
-            self.revision)
+        return "{} rev {}".format(self.document.document_key, self.revision)
 
     def save(self, update_document=False, *args, **kwargs):
         super(MetadataRevisionBase, self).save(*args, **kwargs)
@@ -476,7 +470,7 @@ class MetadataRevisionBase(models.Model):
     @property
     def name(self):
         """A revision identifier should be displayed with two digits"""
-        return '%02d' % self.revision
+        return "%02d" % self.revision
 
     @property
     def revision_name(self):
@@ -514,18 +508,16 @@ class MetadataRevisionBase(models.Model):
                     try:
                         value = getattr(document, key)
                     except AttributeError:
-                        error = 'Cannot find field {} in doc {} ({})'.format(
-                            key, document.document_key, document.document_type())
+                        error = "Cannot find field {} in doc {} ({})".format(
+                            key, document.document_key, document.document_type()
+                        )
                         raise RuntimeError(error)
 
             if isinstance(value, collections.Callable):
                 value = value()
 
             if isinstance(value, models.Model):
-                field = (
-                    (str(key), value.__str__()),
-                    ('%s_id' % key, value.pk)
-                )
+                field = ((str(key), value.__str__()), ("%s_id" % key, value.pk))
             else:
                 field = ((str(key), value),)
 
@@ -534,35 +526,41 @@ class MetadataRevisionBase(models.Model):
         config = document.category.document_class().PhaseConfig
         filter_fields = list(config.filter_fields)
         column_fields = list(dict(config.column_fields).values())
-        indexable_fields = getattr(config, 'indexable_fields', [])
+        indexable_fields = getattr(config, "indexable_fields", [])
         fields_to_index = set(filter_fields + column_fields + indexable_fields)
 
         for field in fields_to_index:
             fields += add_to_fields(field)
 
         fields_infos = dict(fields)
-        fields_infos.update({
-            'url': document.get_absolute_url(),
-            'document_key': document.document_key,
-            'document_number': document.document_number,
-            'document_pk': document.pk,
-            'metadata_pk': metadata.pk,
-            'pk': self.pk,
-            'revision': self.revision,
-            'is_latest_revision': document.current_revision == self.revision,
-        })
+        fields_infos.update(
+            {
+                "url": document.get_absolute_url(),
+                "document_key": document.document_key,
+                "document_number": document.document_number,
+                "document_pk": document.pk,
+                "metadata_pk": metadata.pk,
+                "pk": self.pk,
+                "revision": self.revision,
+                "is_latest_revision": document.current_revision == self.revision,
+            }
+        )
         return fields_infos
 
     def get_initial_ignored_fields(self):
         """New revision initial data that must stay default."""
         fields_to_ignore = (
-            'created_on', 'status', 'native_file', 'pdf_file', 'received_date'
+            "created_on",
+            "status",
+            "native_file",
+            "pdf_file",
+            "received_date",
         )
         return fields_to_ignore
 
     def get_initial_empty(self):
         """New revision initial data that must be empty."""
-        empty_fields = ('revision_date', 'status', 'final_revision')
+        empty_fields = ("revision_date", "status", "final_revision")
         return empty_fields
 
     def get_new_revision_initial(self, form):
@@ -617,67 +615,90 @@ class MetadataRevisionBase(models.Model):
         """
         actions = []
         category = self.document.category
-        if user.has_perm('documents.change_document'):
-            actions.append(MenuItem(
-                'create-revision',
-                _('Create revision'),
-                reverse('document_revise', args=[
-                    category.organisation.slug,
-                    category.slug,
-                    self.document.document_key]),
-                disabled=self.is_under_review(),
-                method='GET',
-            ))
+        if user.has_perm("documents.change_document"):
+            actions.append(
+                MenuItem(
+                    "create-revision",
+                    _("Create revision"),
+                    reverse(
+                        "document_revise",
+                        args=[
+                            category.organisation.slug,
+                            category.slug,
+                            self.document.document_key,
+                        ],
+                    ),
+                    disabled=self.is_under_review(),
+                    method="GET",
+                )
+            )
 
-        if user.has_perm('documents.delete_document'):
+        if user.has_perm("documents.delete_document"):
             actions.append(DividerMenuItem())
 
-            actions.append(MenuItem(
-                'delete-revision',
-                _('Delete last revision'),
-                reverse('document_revision_delete', args=[
-                    category.organisation.slug,
-                    category.slug,
-                    self.document.document_key]),
-                modal='delete-revision-modal',
-                disabled=self.revision <= 1
-            ))
+            actions.append(
+                MenuItem(
+                    "delete-revision",
+                    _("Delete last revision"),
+                    reverse(
+                        "document_revision_delete",
+                        args=[
+                            category.organisation.slug,
+                            category.slug,
+                            self.document.document_key,
+                        ],
+                    ),
+                    modal="delete-revision-modal",
+                    disabled=self.revision <= 1,
+                )
+            )
             actions.append(DividerMenuItem())
-            actions.append(MenuItem(
-                'delete-document',
-                _('Delete document'),
-                reverse('document_delete', args=[
-                    category.organisation.slug,
-                    category.slug,
-                    self.document.document_key]),
-                modal='delete-document-modal'
-            ))
+            actions.append(
+                MenuItem(
+                    "delete-document",
+                    _("Delete document"),
+                    reverse(
+                        "document_delete",
+                        args=[
+                            category.organisation.slug,
+                            category.slug,
+                            self.document.document_key,
+                        ],
+                    ),
+                    modal="delete-document-modal",
+                )
+            )
 
-        if user.has_perm('documents.can_control_document'):
-            actions.append(MenuItem(
-                'audit-trail',
-                _('Audit Trail'),
-                reverse('document_audit_trail', args=[
-                    category.organisation.slug,
-                    category.slug,
-                    self.document.document_key]),
-                modal='audit-trail-modal',
-                disabled=False,
-                method='GET',
-            ))
+        if user.has_perm("documents.can_control_document"):
+            actions.append(
+                MenuItem(
+                    "audit-trail",
+                    _("Audit Trail"),
+                    reverse(
+                        "document_audit_trail",
+                        args=[
+                            category.organisation.slug,
+                            category.slug,
+                            self.document.document_key,
+                        ],
+                    ),
+                    modal="audit-trail-modal",
+                    disabled=False,
+                    method="GET",
+                )
+            )
         return actions
 
     def get_action_modals(self):
         return [
-            'documents/document_detail_delete_revision_modal.html',
-            'reviews/document_detail_cancel_review_modal.html',
-            'reviews/document_detail_start_review_with_comments.html',
+            "documents/document_detail_delete_revision_modal.html",
+            "reviews/document_detail_cancel_review_modal.html",
+            "reviews/document_detail_start_review_with_comments.html",
         ]
 
 
 class MetadataRevision(MetadataRevisionBase):
-    received_date = models.DateField(
-        _('Received date'))
+    received_date = models.DateField(_("Received date"))
 
     class Meta(MetadataRevisionBase.Meta):
         abstract = True

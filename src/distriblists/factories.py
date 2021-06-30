@@ -15,12 +15,18 @@ class DistributionListFactory(factory.DjangoModelFactory):
     class Meta:
         model = DistributionList
 
-    name = factory.Sequence(lambda n: 'Distrib list {}'.format(n))
+    name = factory.Sequence(lambda n: "Distrib list {}".format(n))
     leader = factory.SubFactory(UserFactory)
     approver = factory.SubFactory(UserFactory)
-    reviewer1 = factory.RelatedFactory(DistributionListReviewerFactory, 'distributionlist')
-    reviewer2 = factory.RelatedFactory(DistributionListReviewerFactory, 'distributionlist')
-    reviewer3 = factory.RelatedFactory(DistributionListReviewerFactory, 'distributionlist')
+    reviewer1 = factory.RelatedFactory(
+        DistributionListReviewerFactory, "distributionlist"
+    )
+    reviewer2 = factory.RelatedFactory(
+        DistributionListReviewerFactory, "distributionlist"
+    )
+    reviewer3 = factory.RelatedFactory(
+        DistributionListReviewerFactory, "distributionlist"
+    )
 
     @factory.post_generation
     def categories(self, create, extracted, **kwargs):

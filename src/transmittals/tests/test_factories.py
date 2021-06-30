@@ -8,5 +8,5 @@ class TransmittalFactoryTests(TestCase):
 
     def test_transmittal_factory(self):
         """Default generation."""
-        trs = TransmittalFactory(status='accepted')
+        trs = TransmittalFactory(status="accepted")
         assert trs.pk

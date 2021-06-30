@@ -14,15 +14,13 @@ def file_link(file, name=None):
     if file:
         name = name if name else os.path.basename(file.name)
         link = format_html(
-            '<a href="{}">{}</a> ({})',
-            file.url,
-            name,
-            filesizeformat(file.size))
+            '<a href="{}">{}</a> ({})', file.url, name, filesizeformat(file.size)
+        )
     else:
-        link = ''
+        link = ""
     return link
 
 
 @register.filter
 def na_if_none(data):
-    return data if data else _('N/A')
+    return data if data else _("N/A")

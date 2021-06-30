@@ -1,1 +1,1 @@
-default_app_config = 'schedules.apps.SchedulesConfig'
+default_app_config = "schedules.apps.SchedulesConfig"

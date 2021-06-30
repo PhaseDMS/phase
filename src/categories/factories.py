@@ -11,8 +11,8 @@ class OrganisationFactory(factory.DjangoModelFactory):
     class Meta:
         model = Organisation
 
-    name = factory.Sequence(lambda n: 'Organisation {0}'.format(n))
-    slug = factory.Sequence(lambda n: 'organisation_{0}'.format(n))
+    name = factory.Sequence(lambda n: "Organisation {0}".format(n))
+    slug = factory.Sequence(lambda n: "organisation_{0}".format(n))
     trigram = fuzzy.FuzzyText(length=3)
 
 
@@ -20,9 +20,9 @@ class CategoryTemplateFactory(factory.DjangoModelFactory):
     class Meta:
         model = CategoryTemplate
 
-    name = factory.Sequence(lambda n: 'Category {0}'.format(n))
-    slug = factory.Sequence(lambda n: 'category_{0}'.format(n))
-    description = 'Test category'
+    name = factory.Sequence(lambda n: "Category {0}".format(n))
+    slug = factory.Sequence(lambda n: "category_{0}".format(n))
+    description = "Test category"
 
     @factory.lazy_attribute
     def metadata_model(self):
@@ -52,8 +52,8 @@ class ContractFactory(factory.DjangoModelFactory):
     class Meta:
         model = Contract
 
-    number = factory.Sequence(lambda n: 'CONTRACTNB-{0}'.format(n))
-    name = factory.Sequence(lambda n: 'CONTRACTNAME-{0}'.format(n))
+    number = factory.Sequence(lambda n: "CONTRACTNB-{0}".format(n))
+    name = factory.Sequence(lambda n: "CONTRACTNAME-{0}".format(n))
 
     @factory.post_generation
     def categories(self, create, extracted, **kwargs):

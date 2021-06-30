@@ -1,1 +1,1 @@
-default_app_config = 'metadata.apps.MetadataConfig'
+default_app_config = "metadata.apps.MetadataConfig"

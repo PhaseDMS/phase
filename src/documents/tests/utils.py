@@ -15,9 +15,11 @@ def generate_random_documents(nb_of_docs, category):
 
     """
     if category.category_template.metadata_model.model_class() != DemoMetadata:
-        error_message = ('This function is only useful for testing purpose. '
-                         'The category you pass as an argument can only host '
-                         'documents of the DemoMetadata type.')
+        error_message = (
+            "This function is only useful for testing purpose. "
+            "The category you pass as an argument can only host "
+            "documents of the DemoMetadata type."
+        )
         raise Exception(error_message)
 
     for i in range(nb_of_docs):
@@ -29,10 +31,10 @@ def generate_random_documents(nb_of_docs, category):
         for revision_number in range(2, max_revision):
             MetadataRevisionFactory(
                 revision=revision_number,
-                revision_date='{year}-{month:0>2}-{day:0>2}'.format(
+                revision_date="{year}-{month:0>2}-{day:0>2}".format(
                     year=2008 + revision_number,
                     month=choice(list(range(1, 13))),
                     day=choice(list(range(1, 29))),
                 ),
-                metadata=metadata
+                metadata=metadata,
             )

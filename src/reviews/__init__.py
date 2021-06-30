@@ -1,1 +1,1 @@
-default_app_config = 'reviews.apps.ReviewsConfig'
+default_app_config = "reviews.apps.ReviewsConfig"

@@ -11,10 +11,10 @@ class UserFactory(factory.DjangoModelFactory):
     class Meta:
         model = User
 
-    email = factory.Sequence(lambda n: 'test{0:03d}@phase.fr'.format(n))
-    username = factory.Sequence(lambda n: 'test{0:03d}'.format(n))
-    name = factory.Sequence(lambda n: 'User {0:03d}'.format(n))
-    password = factory.PostGenerationMethodCall('set_password', '1234')
+    email = factory.Sequence(lambda n: "test{0:03d}@phase.fr".format(n))
+    username = factory.Sequence(lambda n: "test{0:03d}".format(n))
+    name = factory.Sequence(lambda n: "User {0:03d}".format(n))
+    password = factory.PostGenerationMethodCall("set_password", "1234")
 
     @factory.post_generation
     def category(self, create, extracted, **kwargs):

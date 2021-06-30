@@ -5,7 +5,9 @@ from search.views import SearchDocuments
 
 
 urlpatterns = [
-    path('<slug:organisation>/<slug:category>/',
+    path(
+        "<slug:organisation>/<slug:category>/",
         SearchDocuments.as_view(),
-        name='search_documents'),
+        name="search_documents",
+    ),
 ]

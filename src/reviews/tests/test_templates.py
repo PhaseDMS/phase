@@ -11,47 +11,47 @@ review_button = '<a id="action-start-review"'
 
 
 class ReviewableDocumentDetail(ContractorDeliverableTestCase):
-
     def setUp(self):
         super(ReviewableDocumentDetail, self).setUp()
-        revision_kwargs = {
-            'leader': self.user
-        }
+        revision_kwargs = {"leader": self.user}
         self.doc = self.create_doc(revision=revision_kwargs)
-        self.url = reverse("document_detail", args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.doc.document_key
-        ])
+        self.url = reverse(
+            "document_detail",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.doc.document_key,
+            ],
+        )
 
     def test_review_not_started(self):
         res = self.client.get(self.url)
         self.assertContains(res, review_button)
-        self.assertNotContains(res, 'Cancel review')
+        self.assertNotContains(res, "Cancel review")
 
     def test_review_started(self):
         self.doc.latest_revision.start_review()
         res = self.client.get(self.url)
         self.assertNotContains(res, review_button)
-        self.assertContains(res, 'Cancel review')
+        self.assertContains(res, "Cancel review")
 
     def test_review_canceled(self):
         self.doc.latest_revision.start_review()
         self.doc.latest_revision.cancel_review()
         res = self.client.get(self.url)
         self.assertContains(res, review_button)
-        self.assertNotContains(res, 'Cancel review')
+        self.assertNotContains(res, "Cancel review")
 
     def test_user_can_update_review(self):
         self.doc.latest_revision.start_review()
         res = self.client.get(self.url)
-        self.assertNotContains(res, 'Modify your comment')
+        self.assertNotContains(res, "Modify your comment")
 
         review = self.doc.latest_revision.get_review(self.user)
         review.post_review(comments=None)
 
         res = self.client.get(self.url)
-        self.assertContains(res, 'Modify your comment')
+        self.assertContains(res, "Modify your comment")
 
 
 class SimpleUserDocumentDetailTests(TestCase):
@@ -60,22 +60,23 @@ class SimpleUserDocumentDetailTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            name='User',
-            password='pass',
-            is_superuser=False,
-            category=self.category)
-        self.client.login(username=self.user.email, password='pass')
+            name="User", password="pass", is_superuser=False, category=self.category
+        )
+        self.client.login(username=self.user.email, password="pass")
         self.doc = DocumentFactory(
             category=self.category,
             revision={
-                'leader': self.user,
-            }
+                "leader": self.user,
+            },
         )
-        self.url = reverse("document_detail", args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.doc.document_key
-        ])
+        self.url = reverse(
+            "document_detail",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.doc.document_key,
+            ],
+        )
 
     def test_start_review_button_is_present(self):
         res = self.client.get(self.url)
@@ -83,8 +84,8 @@ class SimpleUserDocumentDetailTests(TestCase):
 
     def test_cancel_review_button(self):
         res = self.client.get(self.url)
-        self.assertNotContains(res, 'Cancel review')
+        self.assertNotContains(res, "Cancel review")
 
         self.doc.latest_revision.start_review()
         res = self.client.get(self.url)
-        self.assertNotContains(res, 'Cancel review')
+        self.assertNotContains(res, "Cancel review")

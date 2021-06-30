@@ -8,10 +8,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 from accounts.factories import UserFactory
 from documents.factories import DocumentFactory
-from categories.factories import CategoryFactory, ContractFactory, \
-    CategoryTemplateFactory
+from categories.factories import (
+    CategoryFactory,
+    ContractFactory,
+    CategoryTemplateFactory,
+)
 from default_documents.factories import (
-    ContractorDeliverableFactory, ContractorDeliverableRevisionFactory)
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 from default_documents.models import ContractorDeliverable
 from accounts.factories import EntityFactory
 from notifications.models import Notification
@@ -22,19 +27,19 @@ from transmittals.tasks import process_transmittal, do_create_transmittal
 
 def touch(path):
     """Simply creates an empty file."""
-    open(path, 'a').close()
+    open(path, "a").close()
 
 
 class ProcessTransmittalTests(TestCase):
-    fixtures = ['initial_values_lists']
+    fixtures = ["initial_values_lists"]
 
     def setUp(self):
         # Filesystem setup
-        self.tmpdir = tempfile.mkdtemp(prefix='phasetest_', suffix='_trs')
-        self.incoming = join(self.tmpdir, 'incoming')
-        self.tobechecked = join(self.tmpdir, 'tobechecked')
-        self.accepted = join(self.tmpdir, 'accepted')
-        self.rejected = join(self.tmpdir, 'rejected')
+        self.tmpdir = tempfile.mkdtemp(prefix="phasetest_", suffix="_trs")
+        self.incoming = join(self.tmpdir, "incoming")
+        self.tobechecked = join(self.tmpdir, "tobechecked")
+        self.accepted = join(self.tmpdir, "accepted")
+        self.rejected = join(self.tmpdir, "rejected")
 
         os.mkdir(self.accepted)
         os.mkdir(self.rejected)
@@ -43,84 +48,86 @@ class ProcessTransmittalTests(TestCase):
         Model = ContentType.objects.get_for_model(ContractorDeliverable)
         self.category = CategoryFactory(category_template__metadata_model=Model)
         self.document = DocumentFactory(
-            document_key='FAC10005-CTR-000-EXP-LAY-4891',
+            document_key="FAC10005-CTR-000-EXP-LAY-4891",
             metadata={
-                'title': 'Cause & Effect Chart',
-                'contract_number': 'FAC10005',
-                'originator': EntityFactory(),
-                'unit': '000',
-                'discipline': 'EXP',
-                'document_type': 'LAY',
-                'sequential_number': '4891',
+                "title": "Cause & Effect Chart",
+                "contract_number": "FAC10005",
+                "originator": EntityFactory(),
+                "unit": "000",
+                "discipline": "EXP",
+                "document_type": "LAY",
+                "sequential_number": "4891",
             },
             revision={
-                'revision': 1,
-                'docclass': 1,
-                'status': 'SPD',
+                "revision": 1,
+                "docclass": 1,
+                "status": "SPD",
             },
             metadata_factory_class=ContractorDeliverableFactory,
             revision_factory_class=ContractorDeliverableRevisionFactory,
-            category=self.category)
+            category=self.category,
+        )
         self.metadata = self.document.metadata
 
         ContractorDeliverableRevisionFactory(
-            metadata=self.metadata,
-            revision=2,
-            docclass=1,
-            status='SPD')
+            metadata=self.metadata, revision=2, docclass=1, status="SPD"
+        )
 
-        sample_path = b'documents/tests/'
-        native_doc = b'sample_doc_native.docx'
-        pdf_doc = b'sample_doc_pdf.pdf'
+        sample_path = b"documents/tests/"
+        native_doc = b"sample_doc_native.docx"
+        pdf_doc = b"sample_doc_pdf.pdf"
 
         self.transmittal = TransmittalFactory(
-            document_key='FAC10005-CTR-CLT-TRS-00001',
-            status='tobechecked',
+            document_key="FAC10005-CTR-CLT-TRS-00001",
+            status="tobechecked",
             tobechecked_dir=self.tobechecked,
             accepted_dir=self.accepted,
             rejected_dir=self.rejected,
-            contractor='test')
+            contractor="test",
+        )
         os.mkdir(self.transmittal.full_tobechecked_name)
 
         data = {
-            'transmittal': self.transmittal,
-            'document': self.document,
-            'category': self.category,
-            'title': 'Cause & Effect Chart',
-            'contract_number': 'FAC10005',
-            'originator': EntityFactory(trigram='CTR'),
-            'unit': '000',
-            'discipline': 'EXP',
-            'document_type': 'LAY',
-            'sequential_number': '4891',
-            'docclass': 1,
-            'revision': 1,
-            'status': 'SPD',
-            'pdf_file': SimpleUploadedFile(pdf_doc, sample_path + pdf_doc),
-            'created_on': '2015-10-10',
+            "transmittal": self.transmittal,
+            "document": self.document,
+            "category": self.category,
+            "title": "Cause & Effect Chart",
+            "contract_number": "FAC10005",
+            "originator": EntityFactory(trigram="CTR"),
+            "unit": "000",
+            "discipline": "EXP",
+            "document_type": "LAY",
+            "sequential_number": "4891",
+            "docclass": 1,
+            "revision": 1,
+            "status": "SPD",
+            "pdf_file": SimpleUploadedFile(pdf_doc, sample_path + pdf_doc),
+            "created_on": "2015-10-10",
         }
         TrsRevisionFactory(**data)
 
-        data.update({'revision': 2, 'status': 'IFA'})
+        data.update({"revision": 2, "status": "IFA"})
         TrsRevisionFactory(**data)
 
-        data.update({'revision': 3, 'docclass': 2})
+        data.update({"revision": 3, "docclass": 2})
         TrsRevisionFactory(**data)
 
-        data.update({
-            'revision': 4,
-            'status': 'FIN',
-            'native_file': SimpleUploadedFile(native_doc, sample_path + native_doc),
-        })
+        data.update(
+            {
+                "revision": 4,
+                "status": "FIN",
+                "native_file": SimpleUploadedFile(native_doc, sample_path + native_doc),
+            }
+        )
         TrsRevisionFactory(**data)
 
     def test_process_update_revisions(self):
         rev = self.document.metadata.get_revision(2)
-        self.assertEqual(rev.status, 'SPD')
+        self.assertEqual(rev.status, "SPD")
         process_transmittal(self.transmittal.pk)
 
         rev = self.document.metadata.get_revision(2)
-        self.assertEqual(rev.status, 'IFA')
+        self.assertEqual(rev.status, "IFA")
 
     def test_process_create_revisions(self):
         rev = self.document.metadata.get_revision(3)
@@ -130,11 +137,11 @@ class ProcessTransmittalTests(TestCase):
 
         rev = self.document.metadata.get_revision(3)
         self.assertIsNotNone(rev)
-        self.assertEqual(rev.status, 'IFA')
+        self.assertEqual(rev.status, "IFA")
 
         rev = self.document.metadata.get_revision(4)
         self.assertIsNotNone(rev)
-        self.assertEqual(rev.status, 'FIN')
+        self.assertEqual(rev.status, "FIN")
 
     def test_process_updates_files(self):
         rev = self.document.metadata.get_revision(1)
@@ -154,8 +161,8 @@ class ProcessTransmittalTests(TestCase):
         self.assertTrue(rev.native_file)
 
     def test_successfull_process_moves_files_to_accepted_dir(self):
-        tobechecked_file = join(self.transmittal.full_tobechecked_name, 'toto.csv')
-        accepted_file = join(self.transmittal.full_accepted_name, 'toto.csv')
+        tobechecked_file = join(self.transmittal.full_tobechecked_name, "toto.csv")
+        accepted_file = join(self.transmittal.full_accepted_name, "toto.csv")
 
         touch(tobechecked_file)
 
@@ -169,34 +176,34 @@ class ProcessTransmittalTests(TestCase):
 
 
 class OutgoingTransmittalTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
         Model = ContentType.objects.get_for_model(ContractorDeliverable)
         self.category = CategoryFactory(category_template__metadata_model=Model)
         self.docs = [
             DocumentFactory(
                 metadata_factory_class=ContractorDeliverableFactory,
                 revision_factory_class=ContractorDeliverableRevisionFactory,
-                category=self.category)
-            for _ in range(1, 3)]
+                category=self.category,
+            )
+            for _ in range(1, 3)
+        ]
         self.revisions = [doc.get_latest_revision() for doc in self.docs]
-        self.contract = ContractFactory.create(
-            categories=[self.category])
+        self.contract = ContractFactory.create(categories=[self.category])
 
     def test_otg_creation(self):
         ct = ContentType.objects.get_for_model(OutgoingTransmittal)
-        cat_template = CategoryTemplateFactory(
-            metadata_model=ct)
+        cat_template = CategoryTemplateFactory(metadata_model=ct)
         dest_cat = CategoryFactory(category_template=cat_template)
-        ctr1 = EntityFactory(type='contractor')
-        ctr2 = EntityFactory(type='contractor')
+        ctr1 = EntityFactory(type="contractor")
+        ctr2 = EntityFactory(type="contractor")
         # We have to link third parties to categories
         self.category.third_parties.add(ctr1, ctr2)
         dest_cat.third_parties.add(ctr1, ctr2)
@@ -209,8 +216,8 @@ class OutgoingTransmittalTests(TestCase):
             dest_cat.id,
             document_ids,
             self.contract.number,
-            'FR',
-            recipients_ids
+            "FR",
+            recipients_ids,
         )
         # We have 2 docs and 2 recipients, so we expect 2 outgoing trs
         # and 2 notifications

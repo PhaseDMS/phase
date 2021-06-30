@@ -21,12 +21,12 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = (NoCSRFAuthentication,)
 
     def get_queryset(self):
-        return Notification.objects \
-            .filter(user=self.request.user) \
-            .order_by('-created_on')
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_on"
+        )
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def mark_as_read(self, request):
         qs = self.get_queryset()
         qs.update(seen=True)
-        return Response({'status': 'done'})
+        return Response({"status": "done"})

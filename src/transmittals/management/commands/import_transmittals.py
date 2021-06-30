@@ -21,70 +21,75 @@ class Command(BaseCommand):
     This is the entry point to the transmittals import feature.
 
     """
-    args = '<contractor_id> <doc_category> <trs_category>'
-    help = 'Import existing transmittals for a given contractor.'
+
+    args = "<contractor_id> <doc_category> <trs_category>"
+    help = "Import existing transmittals for a given contractor."
 
     def add_arguments(self, parser):
-        parser.add_argument('contractor_id')
-        parser.add_argument('doc_category')
-        parser.add_argument('trs_category')
+        parser.add_argument("contractor_id")
+        parser.add_argument("doc_category")
+        parser.add_argument("trs_category")
         parser.add_argument(
-            '--trs-validator',
-            dest='trs_validator',
+            "--trs-validator",
+            dest="trs_validator",
             default=False,
-            help='Choose a custom global validator class')
+            help="Choose a custom global validator class",
+        )
         parser.add_argument(
-            '--csv-line-validator',
-            dest='csv_line_validator',
+            "--csv-line-validator",
+            dest="csv_line_validator",
             default=False,
-            help='Choose a custom single csv line validator class')
+            help="Choose a custom single csv line validator class",
+        )
 
     def handle(self, *args, **options):
         from transmittals.models import Transmittal
 
         # Import validators
         TrsValidator = None
-        trs_validator = options['trs_validator']
+        trs_validator = options["trs_validator"]
         if trs_validator:
             TrsValidator = self.import_validator(trs_validator)
 
         CsvLineValidator = None
-        csv_line_validator = options['csv_line_validator']
+        csv_line_validator = options["csv_line_validator"]
         if csv_line_validator:
             CsvLineValidator = self.import_validator(csv_line_validator)
 
         # Get configuration for the given contractor
-        contractor_id = options['contractor_id']
+        contractor_id = options["contractor_id"]
         config = settings.TRS_IMPORTS_CONFIG
         ctr_config = config.get(contractor_id, None)
         if ctr_config is None:
-            raise ImproperlyConfigured('The "%s" contractor is unknown. '
-                                       'Check your configuration.' % contractor_id)
+            raise ImproperlyConfigured(
+                'The "%s" contractor is unknown. '
+                "Check your configuration." % contractor_id
+            )
 
         # Get categories
-        doc_category = self.get_category(options['doc_category'])
+        doc_category = self.get_category(options["doc_category"])
         if doc_category is None:
-            error = 'The document category is unknown. Check your configuration.'
+            error = "The document category is unknown. Check your configuration."
             raise CommandError(error)
 
-        trs_category = self.get_category(options['trs_category'])
+        trs_category = self.get_category(options["trs_category"])
         if trs_category is None:
-            error = 'The transmittal category is unknown. Check your configuration.'
+            error = "The transmittal category is unknown. Check your configuration."
             raise CommandError(error)
 
         model_class = trs_category.category_template.metadata_model.model_class()
         if model_class != Transmittal:
-            error = 'The transmittal category should host Transmittal documents.'
+            error = "The transmittal category should host Transmittal documents."
             raise CommandError(error)
 
         # Check directories permissions
-        self.assert_permissions(ctr_config['INCOMING_DIR'])
-        self.assert_permissions(ctr_config['REJECTED_DIR'])
-        self.assert_permissions(ctr_config['TO_BE_CHECKED_DIR'])
-        self.assert_permissions(ctr_config['ACCEPTED_DIR'])
+        self.assert_permissions(ctr_config["INCOMING_DIR"])
+        self.assert_permissions(ctr_config["REJECTED_DIR"])
+        self.assert_permissions(ctr_config["TO_BE_CHECKED_DIR"])
+        self.assert_permissions(ctr_config["ACCEPTED_DIR"])
 
         # Start import
-        incoming_dir = ctr_config['INCOMING_DIR']
+        incoming_dir = ctr_config["INCOMING_DIR"]
         dir_content = sorted(os.listdir(incoming_dir))
         for incoming in dir_content:
             fullname = os.path.join(incoming_dir, incoming)
@@ -92,19 +97,22 @@ class Command(BaseCommand):
                 fullname,
                 ctr_config,
                 contractor_id,
-                doc_category, trs_category,
-                TrsValidator, CsvLineValidator)
+                doc_category,
+                trs_category,
+                TrsValidator,
+                CsvLineValidator,
+            )
 
     def get_category(self, path):
         """Takes a string "organisation_slug/category_slug" and returns a category."""
-        slugs = path.split('/')
+        slugs = path.split("/")
 
         if len(slugs) != 2:
             return None
 
-        qs = Category.objects \
-            .filter(organisation__slug=slugs[0]) \
-            .filter(category_template__slug=slugs[1])
+        qs = Category.objects.filter(organisation__slug=slugs[0]).filter(
+            category_template__slug=slugs[1]
+        )
         return get_object_or_None(qs)
 
     def assert_permissions(self, path):
@@ -118,17 +126,25 @@ class Command(BaseCommand):
             error = 'The directory "%s" is not writeable.' % path
             raise CommandError(error)
 
-    def import_dir(self, directory, config, contractor, doc_category,
-                   trs_category, TrsValidator, CsvLineValidator):
+    def import_dir(
+        self,
+        directory,
+        config,
+        contractor,
+        doc_category,
+        trs_category,
+        TrsValidator,
+        CsvLineValidator,
+    ):
         """Start the import task for a single directory."""
-        logger.info('Starting import of trs in %s' % directory)
+        logger.info("Starting import of trs in %s" % directory)
 
         trsImport = TrsImport(
             directory,
-            tobechecked_dir=config['TO_BE_CHECKED_DIR'],
-            accepted_dir=config['ACCEPTED_DIR'],
-            rejected_dir=config['REJECTED_DIR'],
-            email_list=config['EMAIL_LIST'],
+            tobechecked_dir=config["TO_BE_CHECKED_DIR"],
+            accepted_dir=config["ACCEPTED_DIR"],
+            rejected_dir=config["REJECTED_DIR"],
+            email_list=config["EMAIL_LIST"],
             contractor=contractor,
             doc_category=doc_category,
             trs_category=trs_category,
@@ -140,18 +156,19 @@ class Command(BaseCommand):
     def import_validator(self, validator_path):
         """Import a validator class from it's path."""
         try:
-            path = validator_path.split('.')
-            module_path = '.'.join(path[0:-1])
+            path = validator_path.split(".")
+            module_path = ".".join(path[0:-1])
             module = importlib.import_module(module_path)
             class_name = path[-1]
             TrsValidator = getattr(module, class_name)
         except:  # noqa
-            error = 'The validator {} does not exist.'.format(validator_path)
+            error = "The validator {} does not exist.".format(validator_path)
             raise CommandError(error)
 
         if not issubclass(TrsValidator, Validator):
-            error = 'The validator {} is invalid. Must be a Validator subclass.'.format(
-                validator_path)
+            error = "The validator {} is invalid. Must be a Validator subclass.".format(
+                validator_path
+            )
             raise CommandError(error)
 
         return TrsValidator

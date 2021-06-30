@@ -15,13 +15,15 @@ class ExportCreateTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('export_create', args=[
-            self.category.organisation.slug, self.category.slug])
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse(
+            "export_create", args=[self.category.organisation.slug, self.category.slug]
+        )
 
     def test_export_create_cleanup_old_exports(self):
         delete_index()
@@ -31,7 +33,8 @@ class ExportCreateTests(TestCase):
             ExportFactory(
                 owner=self.user,
                 category=self.category,
-                created_on=now + timedelta(days=-delta))
+                created_on=now + timedelta(days=-delta),
+            )
 
         self.assertEqual(Export.objects.all().count(), 25)
 

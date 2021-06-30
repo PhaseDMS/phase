@@ -10,7 +10,7 @@ from .models import Category
 class CategoryList(LoginRequiredMixin, ListView):
     """Display a list of user categories"""
 
-    template_name = 'categories/category_list.html'
+    template_name = "categories/category_list.html"
 
     def get_queryset(self, **kwargs):
         # The category list we will use is set un a context processor
@@ -27,23 +27,26 @@ class CategoryMixin(object):
 
     def extract_category(self):
         """Set the `self.category` variable."""
-        organisation_slug = self.kwargs['organisation']
-        category_slug = self.kwargs['category']
+        organisation_slug = self.kwargs["organisation"]
+        category_slug = self.kwargs["category"]
 
-        qs = Category.objects \
-            .select_related() \
-            .filter(users=self.request.user) \
-            .filter(organisation__slug=organisation_slug) \
+        qs = (
+            Category.objects.select_related()
+            .filter(users=self.request.user)
+            .filter(organisation__slug=organisation_slug)
             .filter(category_template__slug=category_slug)
+        )
         self.category = get_object_or_None(qs)
         if self.category is None:
-            raise Http404('Category not found')
+            raise Http404("Category not found")
 
     def get_context_data(self, **kwargs):
         context = super(CategoryMixin, self).get_context_data(**kwargs)
-        context.update({
-            'category': self.category,
-            'organisation_slug': self.kwargs['organisation'],
-            'category_slug': self.kwargs['category'],
-        })
+        context.update(
+            {
+                "category": self.category,
+                "organisation_slug": self.kwargs["organisation"],
+                "category_slug": self.kwargs["category"],
+            }
+        )
         return context

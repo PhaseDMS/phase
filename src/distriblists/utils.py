@@ -10,19 +10,17 @@ from distriblists.forms import DistributionListForm
 
 
 header_alignment = Alignment(
-    horizontal='center',
+    horizontal="center",
     textRotation=45,
 )
 
-role_alignment = Alignment(
-    horizontal='center'
-)
+role_alignment = Alignment(horizontal="center")
 cell_border = Border(
-    top=Side(style='thin'),
-    bottom=Side(style='thin'),
-    left=Side(style='thin'),
-    right=Side(style='thin'),
-    vertical=Side(style='thin')
+    top=Side(style="thin"),
+    bottom=Side(style="thin"),
+    left=Side(style="thin"),
+    right=Side(style="thin"),
+    vertical=Side(style="thin"),
 )
 
 
@@ -39,7 +37,7 @@ def import_review_members(filepath, category):
     results = []
     for idx, row in enumerate(rows):
         result = _import_review_members(row, emails, user_ids, category)
-        result['line'] = idx + 2
+        result["line"] = idx + 2
         results.append(result)
 
     return results
@@ -51,16 +49,18 @@ def _import_review_members(row, emails, user_ids, category):
 
     key = row[0].value
     try:
-        instance = category.document_class().objects \
-            .filter(document__category=category) \
-            .select_related('latest_revision') \
+        instance = (
+            category.document_class()
+            .objects.filter(document__category=category)
+            .select_related("latest_revision")
             .get(document__document_key=key)
+        )
     except:  # noqa
         instance = None
-        errors.append(_('Document {} does not exist').format(key))
+        errors.append(_("Document {} does not exist").format(key))
 
     if instance.latest_revision.is_under_review():
-        errors.append(_('This document is under review'))
+        errors.append(_("This document is under review"))
 
     # Extract user roles from xls
     reviewers = []
@@ -73,11 +73,11 @@ def _import_review_members(row, emails, user_ids, category):
             if user_id is None:
                 errors.append('Unknown user "{}"'.format(emails[idx]))
 
-            if role == 'R':
+            if role == "R":
                 reviewers.append(user_id)
-            elif role == 'L':
+            elif role == "L":
                 leader = user_id
-            elif role == 'A':
+            elif role == "A":
                 approver = user_id
             else:
                 errors.append('Unknown role "{}"'.format(role))
@@ -94,24 +94,27 @@ def _import_review_members(row, emails, user_ids, category):
         rev.save()
 
     return {
-        'document_key': key,
-        'success': not errors,
-        'errors': errors,
+        "document_key": key,
+        "success": not errors,
+        "errors": errors,
     }
 
 
 def export_review_members(category):
     """Export members of the review for all documents in the category."""
-    documents = category.document_class().objects \
-        .filter(document__category=category) \
+    documents = (
+        category.document_class()
+        .objects.filter(document__category=category)
         .select_related(
-            'document',
-            'latest_revision',
-            'latest_revision__leader',
-            'latest_revision__approver') \
-        .prefetch_related('latest_revision__reviewers') \
-        .order_by('document__document_number')
-    users_qs = User.objects.filter(categories=category).order_by('email')
+            "document",
+            "latest_revision",
+            "latest_revision__leader",
+            "latest_revision__approver",
+        )
+        .prefetch_related("latest_revision__reviewers")
+        .order_by("document__document_number")
+    )
+    users_qs = User.objects.filter(categories=category).order_by("email")
     all_users = list(users_qs)
 
     wb = openpyxl.Workbook()
@@ -132,13 +135,13 @@ def _export_members(ws, idx, doc, all_users):
     rev = doc.latest_revision
 
     if rev.leader:
-        _export_role(ws, line, all_users, rev.leader, 'L')
+        _export_role(ws, line, all_users, rev.leader, "L")
 
     if rev.approver:
-        _export_role(ws, line, all_users, rev.approver, 'A')
+        _export_role(ws, line, all_users, rev.approver, "A")
 
     for reviewer in rev.reviewers.all():
-        _export_role(ws, line, all_users, reviewer, 'R')
+        _export_role(ws, line, all_users, reviewer, "R")
 
     # Set borders for all cells
     for column in range(1, len(all_users) + 2):
@@ -147,11 +150,12 @@ def _export_members(ws, idx, doc, all_users):
 
 def export_lists(category):
     """Export distribution lists in a single category as xlsx file."""
-    lists = DistributionList.objects \
-        .filter(categories=category) \
-        .select_related('leader', 'approver') \
-        .prefetch_related('reviewers')
-    users_qs = User.objects.filter(categories=category).order_by('email')
+    lists = (
+        DistributionList.objects.filter(categories=category)
+        .select_related("leader", "approver")
+        .prefetch_related("reviewers")
+    )
+    users_qs = User.objects.filter(categories=category).order_by("email")
     all_users = list(users_qs)
 
     wb = openpyxl.Workbook()
@@ -167,11 +171,11 @@ def export_lists(category):
 
 def _export_header(ws, all_users):
     """Add header row to exported file."""
-    header_row = next(ws.get_squared_range(
-        min_col=2,
-        min_row=1,
-        max_col=len(all_users) + 1,
-        max_row=1))
+    header_row = next(
+        ws.get_squared_range(
+            min_col=2, min_row=1, max_col=len(all_users) + 1, max_row=1
+        )
+    )
     for idx, cell in enumerate(header_row):
         cell.value = all_users[idx].email
         cell.alignment = header_alignment
@@ -183,13 +187,13 @@ def _export_list(ws, idx, dlist, all_users):
     line = idx + 2
     ws.cell(row=line, column=1).value = dlist.name
 
-    _export_role(ws, line, all_users, dlist.leader, 'L')
+    _export_role(ws, line, all_users, dlist.leader, "L")
 
     if dlist.approver:
-        _export_role(ws, line, all_users, dlist.approver, 'A')
+        _export_role(ws, line, all_users, dlist.approver, "A")
 
     for reviewer in dlist.reviewers.all():
-        _export_role(ws, line, all_users, reviewer, 'R')
+        _export_role(ws, line, all_users, reviewer, "R")
 
     # Set borders for all cells
     for column in range(1, len(all_users) + 2):
@@ -217,7 +221,7 @@ def import_lists(filepath, category):
     results = []
     for idx, row in enumerate(rows):
         result = _import_list(row, emails, user_ids, category)
-        result['line'] = idx + 2
+        result["line"] = idx + 2
         results.append(result)
 
     return results
@@ -241,8 +245,7 @@ def _extract_users(ws):
         column_index += 1
         user_cell = ws.cell(row=1, column=column_index)
 
-    qs = User.objects.filter(email__in=emails) \
-        .values_list('email', 'id')
+    qs = User.objects.filter(email__in=emails).values_list("email", "id")
     user_dict = dict(qs)
 
     user_ids = [user_dict.get(email, None) for email in emails]
@@ -259,11 +262,11 @@ def _import_list(row, emails, user_ids, category):
         instance = DistributionList.objects.get(name=list_name)
         categories = list(instance.categories.all())
         categories.append(category)
-        action = _('Update')
+        action = _("Update")
     except DistributionList.DoesNotExist:
         instance = None
         categories = [category]
-        action = _('Create')
+        action = _("Create")
 
     # Extract user roles from xls
     reviewers = []
@@ -276,22 +279,22 @@ def _import_list(row, emails, user_ids, category):
             if user_id is None:
                 errors.append('Unknown user "{}"'.format(emails[idx]))
 
-            if role == 'R':
+            if role == "R":
                 reviewers.append(user_id)
-            elif role == 'L':
+            elif role == "L":
                 leader = user_id
-            elif role == 'A':
+            elif role == "A":
                 approver = user_id
             else:
                 errors.append('Unknown role "{}"'.format(role))
 
     # Use the model form to validate and save the data
     data = {
-        'name': list_name,
-        'categories': [c.id for c in categories],
-        'reviewers': reviewers,
-        'leader': leader if leader else None,
-        'approver': approver if approver else None,
+        "name": list_name,
+        "categories": [c.id for c in categories],
+        "reviewers": reviewers,
+        "leader": leader if leader else None,
+        "approver": approver if approver else None,
     }
     form = DistributionListForm(data, instance=instance)
     if form.is_valid() and not errors:
@@ -302,8 +305,8 @@ def _import_list(row, emails, user_ids, category):
         errors.append(*form_errors)
 
     return {
-        'list_name': list_name,
-        'action': action,
-        'success': form.is_valid() and not errors,
-        'errors': errors,
+        "list_name": list_name,
+        "action": action,
+        "success": form.is_valid() and not errors,
+        "errors": errors,
     }

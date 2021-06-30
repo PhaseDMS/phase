@@ -11,9 +11,9 @@ from discussion.api.serializers import NoteSerializer
 class DiscussionPermission(permissions.BasePermission):
     """Custom discussion permission.
 
-      * All the category members can access the discussion.
-      * All distribution list members can post a new messages
-      * Only the author of a message can update or delete it.
+    * All the category members can access the discussion.
+    * All distribution list members can post a new messages
+    * Only the author of a message can update or delete it.
 
     """
 
@@ -26,11 +26,12 @@ class DiscussionPermission(permissions.BasePermission):
 
         # Write methods, only distribution list members
         else:
-            reviews = Review.objects \
-                .filter(document__document_key=view.document_key) \
-                .filter(reviewer=request.user) \
+            reviews = (
+                Review.objects.filter(document__document_key=view.document_key)
+                .filter(reviewer=request.user)
                 .filter(revision=view.revision)
-            authorized = (reviews.count() > 0)
+            )
+            authorized = reviews.count() > 0
 
         return authorized
 
@@ -51,30 +52,27 @@ class DiscussionPermission(permissions.BasePermission):
 class DiscussionViewSet(viewsets.ModelViewSet):
     model = Note
     serializer_class = NoteSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-        DiscussionPermission
-    )
+    permission_classes = (permissions.IsAuthenticated, DiscussionPermission)
 
     def dispatch(self, request, *args, **kwargs):
-        self.document_key = kwargs['document_key']
-        self.revision = kwargs['revision']
-        self.document = Document.objects \
-            .select_related('category__organisation', 'category__category_template') \
-            .get(document_key=self.document_key)
+        self.document_key = kwargs["document_key"]
+        self.revision = kwargs["revision"]
+        self.document = Document.objects.select_related(
+            "category__organisation", "category__category_template"
+        ).get(document_key=self.document_key)
         return super(DiscussionViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Note.objects \
-            .filter(document=self.document) \
-            .filter(revision=self.revision) \
-            .order_by('created_on')
+        return (
+            Note.objects.filter(document=self.document)
+            .filter(revision=self.revision)
+            .order_by("created_on")
+        )
 
     def perform_create(self, serializer):
         serializer.save(
-            document=self.document,
-            revision=self.revision,
-            author=self.request.user)
+            document=self.document, revision=self.revision, author=self.request.user
+        )
 
     def destroy(self, request, *args, **kwargs):
         """Delete instance.
