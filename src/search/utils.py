@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 
 from elasticsearch.helpers import bulk
