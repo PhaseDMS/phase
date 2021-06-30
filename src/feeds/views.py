@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.views.generic import TemplateView, ListView
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse

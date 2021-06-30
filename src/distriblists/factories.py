@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import factory
 
 from accounts.factories import UserFactory

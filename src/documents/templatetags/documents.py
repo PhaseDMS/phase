@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django import template
 from django.template.loader import select_template
 from django.core.exceptions import ImproperlyConfigured

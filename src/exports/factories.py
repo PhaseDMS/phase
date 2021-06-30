@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import factory
 
 from exports.models import Export

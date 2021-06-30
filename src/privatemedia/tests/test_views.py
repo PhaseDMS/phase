@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.test import TestCase, override_settings
 from django.http import Http404, HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile

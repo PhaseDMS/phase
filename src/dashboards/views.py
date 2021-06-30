@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.views.generic import DetailView
 
 from braces.views import LoginRequiredMixin

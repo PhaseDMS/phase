@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -20,4 +17,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(copy_contracts_numbers)
     ]
-

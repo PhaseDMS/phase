@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory

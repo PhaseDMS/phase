@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import importlib
 import os
 from io import BytesIO

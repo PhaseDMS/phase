@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 

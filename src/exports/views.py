@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import os
 
 from django.views.generic import ListView, UpdateView, View

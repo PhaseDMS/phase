@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 
 from accounts.forms.widgets import UserAutocomplete, MultipleUserAutocomplete

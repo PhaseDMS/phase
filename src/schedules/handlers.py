@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from metadata.fields import get_choices_from_list
 from schedules.models import ScheduleMixin
 

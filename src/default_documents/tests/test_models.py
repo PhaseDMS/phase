@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from default_documents.tests.test import ContractorDeliverableTestCase
 
 from accounts.factories import EntityFactory

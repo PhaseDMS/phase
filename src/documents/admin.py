@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.contrib import admin
 
 from documents.models import Document

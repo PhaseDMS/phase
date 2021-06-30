@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.dispatch import Signal, receiver
 from accounts.models import User
 

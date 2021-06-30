@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db.models import F, Value as V
 from django.db.models.functions import Concat
 from django.core.cache import cache

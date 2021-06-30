@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from os.path import basename
 
 from django.forms.widgets import ClearableFileInput

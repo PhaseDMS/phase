@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import os
 
 from django.db.models import ManyToManyField

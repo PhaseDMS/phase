@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.template.loader import render_to_string
 
 from crispy_forms.layout import LayoutObject

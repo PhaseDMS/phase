@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf.urls import url
 
 from feeds.views import (

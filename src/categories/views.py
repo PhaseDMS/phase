@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.views.generic import ListView
 from django.http import Http404
 

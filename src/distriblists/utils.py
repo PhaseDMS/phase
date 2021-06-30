@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import openpyxl
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.styles import Alignment, Border, Side
