@@ -280,7 +280,7 @@ class TrsRevision(models.Model):
     created_on = models.DateField(
         _('Created on'),
         null=True, blank=True)
-    accepted = models.NullBooleanField(
+    accepted = models.BooleanField(
         verbose_name=_('Accepted?'))
     comment = models.TextField(
         verbose_name=_('Comment'),

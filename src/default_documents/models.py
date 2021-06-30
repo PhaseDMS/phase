@@ -422,7 +422,7 @@ class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
         max_length=3,
         list_index='STATUSES',
         null=True, blank=True)
-    final_revision = models.NullBooleanField(
+    final_revision = models.BooleanField(
         _('Is final revision?'),
         choices=BOOLEANS,
         null=True,
@@ -481,7 +481,7 @@ class Correspondence(Metadata):
         null=True,
         blank=True,
         list_index='ADDRESSES')
-    response_required = models.NullBooleanField(
+    response_required = models.BooleanField(
         _('Response required'),
         null=True,
         blank=True)
@@ -570,11 +570,11 @@ class CorrespondenceRevision(MetadataRevision):
         _('Status'),
         max_length=20,
         list_index='STATUS_COR_MOM')
-    under_review = models.NullBooleanField(
+    under_review = models.BooleanField(
         _('Under Review'),
         choices=BOOLEANS,
         null=True, blank=True)
-    overdue = models.NullBooleanField(
+    overdue = models.BooleanField(
         _('Overdue'),
         choices=BOOLEANS,
         null=True, blank=True)
@@ -635,7 +635,7 @@ class MinutesOfMeeting(Metadata):
         blank=True,
         max_length=250,
         list_index='AUTHORS')
-    signed = models.NullBooleanField(
+    signed = models.BooleanField(
         _('Signed'),
         null=True, blank=True,
         choices=BOOLEANS)
@@ -1049,7 +1049,7 @@ class GtgMetadataRevision(TransmittableMixin, MetadataRevision):
         max_length=3,
         list_index='GTG_STATUSES',
         null=True, blank=True)
-    final_revision = models.NullBooleanField(
+    final_revision = models.BooleanField(
         _('Is final revision?'),
         choices=BOOLEANS,
         null=True,

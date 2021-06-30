@@ -121,7 +121,7 @@ TYPE_MAPPING = [
     ((models.IntegerField,), 'long'),
     ((models.DecimalField, models.FloatField,), 'double'),
     ((models.DateField, models.TimeField,), 'date'),
-    ((models.BooleanField, models.NullBooleanField,), 'boolean'),
+    ((models.BooleanField, models.BooleanField,), 'boolean'),
 ]
 
 
