@@ -171,6 +171,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 # ######### END URL CONFIGURATION
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 
 # ######### APP CONFIGURATION
 DJANGO_APPS = (
