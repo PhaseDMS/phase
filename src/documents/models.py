@@ -253,7 +253,7 @@ class MetadataManager(models.Manager):
 class Metadata(models.Model, metaclass=MetadataBase):
     objects = MetadataManager()
 
-    document = models.OneToOneField(Document)
+    document = models.OneToOneField(Document, on_delete=models.PROTECT)
     document_key = models.SlugField(
         _('Document key'),
         blank=True,
