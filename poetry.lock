@@ -371,7 +371,7 @@ python-versions = "*"
 
 [[package]]
 name = "django-zipview"
-version = "1.2.0"
+version = "2.0.0"
 description = "A simple Django base view to zip and stream several files."
 category = "main"
 optional = false
@@ -938,7 +938,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "0206f4566dec642fef1ce7ea0400464c3a65a154eb903d53b5e82c86f4b03f42"
+content-hash = "f1cd052d15c752c213946f5deda8023ce4cdfc0a215c6c5aa9d71f8e257f5c36"
 
 [metadata.files]
 alabaster = [
@@ -1171,7 +1171,7 @@ django-widget-tweaks = [
     {file = "django_widget_tweaks-1.4.8-py2.py3-none-any.whl", hash = "sha256:f80bff4a8a59b278bb277a405a76a8b9a884e4bae7a6c70e78a39c626cd1c836"},
 ]
 django-zipview = [
-    {file = "django-zipview-1.2.0.tar.gz", hash = "sha256:61455d211f2d84440fd718e218f65dd28b02ebb2c438af12639d56cb41c0fdc4"},
+    {file = "django_zipview-2.0.0-py3-none-any.whl", hash = "sha256:b7e9839162113f8541dc11ab7a2512442a58558e4e9879d72e789bec4925b430"},
 ]
 djangorestframework = [
     {file = "djangorestframework-3.12.4-py3-none-any.whl", hash = "sha256:6d1d59f623a5ad0509fe0d6bfe93cbdfe17b8116ebc8eda86d45f6e16e819aaf"},
