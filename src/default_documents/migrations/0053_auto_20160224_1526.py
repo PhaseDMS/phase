@@ -11,16 +11,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contractordeliverable',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.ContractorDeliverableRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.ContractorDeliverableRevision', null=True),
         ),
         migrations.AlterField(
             model_name='correspondence',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.CorrespondenceRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.CorrespondenceRevision', null=True),
         ),
         migrations.AlterField(
             model_name='minutesofmeeting',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.MinutesOfMeetingRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.MinutesOfMeetingRevision', null=True),
         ),
     ]

@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
                 ('querystring', models.TextField(help_text='The search filter querystring', verbose_name='Querystring')),
                 ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Created on')),
-                ('category', models.ForeignKey(verbose_name='Category', to='categories.Category')),
-                ('owner', models.ForeignKey(verbose_name='Owner', to=settings.AUTH_USER_MODEL)),
+                ('category', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Category', to='categories.Category')),
+                ('owner', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Owner', to=settings.AUTH_USER_MODEL)),
                 ('status', models.CharField(default='new', max_length=30, verbose_name='Status', choices=[('new', 'New'), ('processing', 'Processing'), ('done', 'Done')])),
             ],
             options={

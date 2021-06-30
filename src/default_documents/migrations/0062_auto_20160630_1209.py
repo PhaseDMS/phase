@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('status_asb_planned_date', models.DateField(null=True, verbose_name='Status ASB Planned Date', blank=True)),
                 ('status_asb_forecast_date', models.DateField(null=True, verbose_name='Status ASB Forecast Date', blank=True)),
                 ('status_asb_actual_date', models.DateField(null=True, verbose_name='Status ASB Actual Date', blank=True)),
-                ('document', models.OneToOneField(to='documents.Document')),
+                ('document', models.OneToOneField(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'ordering': ('document_number',),
@@ -86,13 +86,13 @@ class Migration(migrations.Migration):
                 ('external_review_due_date', models.DateField(null=True, verbose_name='External due date', blank=True)),
                 ('status', metadata.fields.ConfigurableChoiceField(max_length=3, null=True, verbose_name='Status', list_index='GTG_STATUSES', blank=True)),
                 ('final_revision', models.NullBooleanField(verbose_name='Is final revision?', choices=[(True, 'Yes'), (False, 'No')])),
-                ('approver', models.ForeignKey(related_name='default_documents_gtgmetadatarevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('leader', models.ForeignKey(related_name='default_documents_gtgmetadatarevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('metadata', models.ForeignKey(to='default_documents.GtgMetadata')),
+                ('approver', models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_gtgmetadatarevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('leader', models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_gtgmetadatarevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('metadata', models.ForeignKey(on_delete=models.PROTECT, to='default_documents.GtgMetadata')),
                 ('reviewers', models.ManyToManyField(to=settings.AUTH_USER_MODEL, verbose_name='Reviewers', blank=True)),
                 ('transmittal', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, verbose_name='transmittal', blank=True, to='transmittals.OutgoingTransmittal', null=True)),
                 ('transmittals', models.ManyToManyField(related_name='default_documents_gtgmetadatarevision_related', verbose_name='transmittals', to='transmittals.OutgoingTransmittal')),
-                ('under_preparation_by', models.ForeignKey(related_name='+', verbose_name='Under preparation by', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('under_preparation_by', models.ForeignKey(on_delete=models.PROTECT, related_name='+', verbose_name='Under preparation by', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
             options={
                 'abstract': False,
@@ -101,12 +101,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gtgmetadata',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.GtgMetadataRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.GtgMetadataRevision', null=True),
         ),
         migrations.AddField(
             model_name='gtgmetadata',
             name='originator',
-            field=models.ForeignKey(verbose_name='Originator', to='accounts.Entity'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Originator', to='accounts.Entity'),
         ),
         migrations.AddField(
             model_name='gtgmetadata',

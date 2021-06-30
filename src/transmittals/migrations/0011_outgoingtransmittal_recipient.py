@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='outgoingtransmittal',
             name='recipient',
-            field=models.ForeignKey(default=1, verbose_name='Recipient', to='accounts.Entity'),
+            field=models.ForeignKey(on_delete=models.PROTECT, default=1, verbose_name='Recipient', to='accounts.Entity'),
             preserve_default=False,
         ),
     ]

@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
                 ('reviewed_on', models.DateTimeField(null=True, verbose_name='Reviewed on', blank=True)),
                 ('closed', models.BooleanField(default=False, verbose_name='Closed')),
                 ('comments', privatemedia.fields.PrivateFileField(storage=django.core.files.storage.FileSystemStorage(base_url='/private/', location='/home/thibault/code/phase/private'), upload_to=reviews.fileutils.review_comments_file_path, null=True, verbose_name='Comments', blank=True)),
-                ('document', models.ForeignKey(verbose_name='Document', to='documents.Document')),
-                ('reviewer', models.ForeignKey(verbose_name='User', to=settings.AUTH_USER_MODEL)),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Document', to='documents.Document')),
+                ('reviewer', models.ForeignKey(on_delete=models.PROTECT, verbose_name='User', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Review',

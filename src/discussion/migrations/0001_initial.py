@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('revision', models.PositiveIntegerField(verbose_name='Revision')),
                 ('body', models.TextField(verbose_name='Body')),
                 ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Created on')),
-                ('author', models.ForeignKey(verbose_name='Author', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Author', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Note',

@@ -11,11 +11,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='outgoingtransmittal',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='transmittals.OutgoingTransmittalRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='transmittals.OutgoingTransmittalRevision', null=True),
         ),
         migrations.AlterField(
             model_name='transmittal',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='transmittals.TransmittalRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='transmittals.TransmittalRevision', null=True),
         ),
     ]

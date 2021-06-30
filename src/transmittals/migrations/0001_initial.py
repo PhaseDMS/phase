@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('tobechecked_dir', models.CharField(max_length=255)),
                 ('accepted_dir', models.CharField(max_length=255)),
                 ('rejected_dir', models.CharField(max_length=255)),
-                ('document', models.OneToOneField(to='documents.Document')),
+                ('document', models.OneToOneField(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'ordering': ('document_key',),
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('created_on', models.DateField(default=django.utils.timezone.now, verbose_name='Created on')),
                 ('updated_on', models.DateTimeField(auto_now=True, verbose_name='Updated on')),
                 ('trs_status', metadata.fields.ConfigurableChoiceField(default='opened', max_length=20, verbose_name='Status', list_index='STATUS_TRANSMITTALS')),
-                ('document', models.ForeignKey(to='documents.Document')),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'ordering': ('-revision',),
@@ -101,9 +101,9 @@ class Migration(migrations.Migration):
                 ('doc_category', models.CharField(max_length=50, verbose_name='Doc category')),
                 ('pdf_file', transmittals.fields.TransmittalFileField(upload_to=transmittals.fields.transmittal_upload_to, storage=django.core.files.storage.FileSystemStorage(base_url='/private/', location='/home/thibault/code/phase/private'), verbose_name='Pdf file')),
                 ('native_file', transmittals.fields.TransmittalFileField(storage=django.core.files.storage.FileSystemStorage(base_url='/private/', location='/home/thibault/code/phase/private'), upload_to=transmittals.fields.transmittal_upload_to, null=True, verbose_name='Native file', blank=True)),
-                ('category', models.ForeignKey(to='categories.Category')),
-                ('document', models.ForeignKey(verbose_name='Document', blank=True, to='documents.Document', null=True)),
-                ('transmittal', models.ForeignKey(verbose_name='Transmittal', to='transmittals.Transmittal')),
+                ('category', models.ForeignKey(on_delete=models.PROTECT, to='categories.Category')),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Document', blank=True, to='documents.Document', null=True)),
+                ('transmittal', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Transmittal', to='transmittals.Transmittal')),
             ],
             options={
                 'verbose_name': 'Trs Revision',
@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transmittal',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='transmittals.TransmittalRevision'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='transmittals.TransmittalRevision'),
         ),
         migrations.AddField(
             model_name='transmittal',

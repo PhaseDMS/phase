@@ -21,9 +21,9 @@ class Migration(migrations.Migration):
                 ('target_object_id', models.PositiveIntegerField(null=True, blank=True)),
                 ('target_object_str', models.CharField(max_length=255, blank=True)),
                 ('created_on', models.DateTimeField(default=django.utils.timezone.now)),
-                ('action_object_content_type', models.ForeignKey(related_name='action_object', blank=True, to='contenttypes.ContentType', null=True)),
-                ('actor_content_type', models.ForeignKey(related_name='actor', blank=True, to='contenttypes.ContentType', null=True)),
-                ('target_content_type', models.ForeignKey(related_name='target', blank=True, to='contenttypes.ContentType', null=True)),
+                ('action_object_content_type', models.ForeignKey(on_delete=models.PROTECT, related_name='action_object', blank=True, to='contenttypes.ContentType', null=True)),
+                ('actor_content_type', models.ForeignKey(on_delete=models.PROTECT, related_name='actor', blank=True, to='contenttypes.ContentType', null=True)),
+                ('target_content_type', models.ForeignKey(on_delete=models.PROTECT, related_name='target', blank=True, to='contenttypes.ContentType', null=True)),
             ],
             options={
                 'ordering': ['-created_on'],

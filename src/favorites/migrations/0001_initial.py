@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('last_view_date', models.DateTimeField(auto_now_add=True)),
-                ('document', models.ForeignKey(to='documents.Document')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, to='documents.Document')),
+                ('user', models.ForeignKey(on_delete=models.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

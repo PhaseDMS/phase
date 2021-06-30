@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bookmark',
             name='category',
-            field=models.ForeignKey(to='categories.Category'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='categories.Category'),
         ),
         migrations.AddField(
             model_name='bookmark',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=models.PROTECT, to=settings.AUTH_USER_MODEL),
         ),
     ]

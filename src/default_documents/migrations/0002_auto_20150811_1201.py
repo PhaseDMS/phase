@@ -14,17 +14,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='minutesofmeetingrevision',
             name='document',
-            field=models.ForeignKey(to='documents.Document'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='minutesofmeeting',
             name='document',
-            field=models.OneToOneField(to='documents.Document'),
+            field=models.OneToOneField(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='minutesofmeeting',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.MinutesOfMeetingRevision'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.MinutesOfMeetingRevision'),
         ),
         migrations.AddField(
             model_name='minutesofmeeting',
@@ -34,17 +34,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='demometadatarevision',
             name='approver',
-            field=models.ForeignKey(related_name='default_documents_demometadatarevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_demometadatarevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True),
         ),
         migrations.AddField(
             model_name='demometadatarevision',
             name='document',
-            field=models.ForeignKey(to='documents.Document'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='demometadatarevision',
             name='leader',
-            field=models.ForeignKey(related_name='default_documents_demometadatarevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_demometadatarevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
         ),
         migrations.AddField(
             model_name='demometadatarevision',
@@ -54,12 +54,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='demometadata',
             name='document',
-            field=models.OneToOneField(to='documents.Document'),
+            field=models.OneToOneField(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='demometadata',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.DemoMetadataRevision', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.DemoMetadataRevision', null=True),
         ),
         migrations.AddField(
             model_name='demometadata',
@@ -69,22 +69,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='correspondencerevision',
             name='document',
-            field=models.ForeignKey(to='documents.Document'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='correspondencerevision',
             name='leader',
-            field=models.ForeignKey(related_name='leading_correspondance', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='leading_correspondance', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
         ),
         migrations.AddField(
             model_name='correspondence',
             name='document',
-            field=models.OneToOneField(to='documents.Document'),
+            field=models.OneToOneField(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='correspondence',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.CorrespondenceRevision'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.CorrespondenceRevision'),
         ),
         migrations.AddField(
             model_name='correspondence',
@@ -94,17 +94,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contractordeliverablerevision',
             name='approver',
-            field=models.ForeignKey(related_name='default_documents_contractordeliverablerevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_contractordeliverablerevision_related_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True),
         ),
         migrations.AddField(
             model_name='contractordeliverablerevision',
             name='document',
-            field=models.ForeignKey(to='documents.Document'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='contractordeliverablerevision',
             name='leader',
-            field=models.ForeignKey(related_name='default_documents_contractordeliverablerevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='default_documents_contractordeliverablerevision_related_leader', verbose_name='Leader', blank=True, to=settings.AUTH_USER_MODEL, null=True),
         ),
         migrations.AddField(
             model_name='contractordeliverablerevision',
@@ -114,12 +114,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contractordeliverable',
             name='document',
-            field=models.OneToOneField(to='documents.Document'),
+            field=models.OneToOneField(on_delete=models.PROTECT, to='documents.Document'),
         ),
         migrations.AddField(
             model_name='contractordeliverable',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='default_documents.ContractorDeliverableRevision'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='default_documents.ContractorDeliverableRevision'),
         ),
         migrations.AddField(
             model_name='contractordeliverable',

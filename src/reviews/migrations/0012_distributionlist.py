@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=250, verbose_name='Name')),
-                ('approver', models.ForeignKey(related_name='related_lists_as_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('leader', models.ForeignKey(related_name='related_lists_as_leader', verbose_name='Leader', to=settings.AUTH_USER_MODEL)),
+                ('approver', models.ForeignKey(on_delete=models.PROTECT, related_name='related_lists_as_approver', verbose_name='Approver', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('leader', models.ForeignKey(on_delete=models.PROTECT, related_name='related_lists_as_leader', verbose_name='Leader', to=settings.AUTH_USER_MODEL)),
                 ('reviewers', models.ManyToManyField(related_name='related_lists_as_reviewer', verbose_name='Reviewers', to=settings.AUTH_USER_MODEL, blank=True)),
             ],
             options={
