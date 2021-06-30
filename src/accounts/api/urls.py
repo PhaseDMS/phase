@@ -1,5 +1,5 @@
 
-from django.conf.urls import url
+from django.urls import path
 
 from accounts.api.views import UserViewSet
 
@@ -15,7 +15,7 @@ user_detail = UserViewSet.as_view({
 
 
 urlpatterns = [
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$', user_list, name='user-list'),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<pk>\d+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$', user_list, name='user-list'),
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<pk>\d+)/$',
         user_detail, name='user-detail'),
 ]

@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from documents.views import (
     DocumentList, DocumentCreate, DocumentDetail, DocumentEdit,
@@ -9,44 +9,44 @@ from documents.views import (
 urlpatterns = [
 
     # Document short url
-    url(r'^documents/(?P<document_key>[\w-]+)/$',
+    path('documents/(?P<document_key>[\w-]+)/$',
         DocumentRedirect.as_view(),
         name='document_short_url'),
 
     # Downloads
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/download/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/download/$',
         DocumentDownload.as_view(),
         name="document_download"),
 
     # Documents
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
         DocumentList.as_view(),
         name="category_document_list"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/create/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/create/$',
         DocumentCreate.as_view(),
         name="document_create"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/$',
         DocumentDetail.as_view(),
         name="document_detail"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/$',
         DocumentEdit.as_view(),
         name="document_edit"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/(?P<revision>\d+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/(?P<revision>\d+)/$',
         DocumentEdit.as_view(),
         name="document_edit"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revise/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revise/$',
         DocumentRevise.as_view(),
         name="document_revise"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/delete/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/delete/$',
         DocumentDelete.as_view(),
         name="document_delete"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revision_delete/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revision_delete/$',
         DocumentRevisionDelete.as_view(),
         name="document_revision_delete"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<field_name>\w+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<field_name>\w+)/$',
         RevisionFileDownload.as_view(),
         name="revision_file_download"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<field_name>\w+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<field_name>\w+)/$',
         DocumentFileDownload.as_view(),
         name="document_file_download"),
 ]

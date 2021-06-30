@@ -1,5 +1,5 @@
 
-from django.conf.urls import url
+from django.urls import path
 
 from discussion.api.views import DiscussionViewSet
 
@@ -16,6 +16,6 @@ note_detail = DiscussionViewSet.as_view({
 
 
 urlpatterns = [
-    url(r'^(?P<document_key>[\w-]+)/(?P<revision>\d+)/$', note_list, name='note-list'),
-    url(r'^(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<pk>\d+)/$', note_detail, name='note-detail'),
+    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/$', note_list, name='note-list'),
+    path('(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<pk>\d+)/$', note_detail, name='note-detail'),
 ]

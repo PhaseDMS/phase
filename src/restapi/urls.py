@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import path, include
 from rest_framework import routers
 
 from notifications.api import views as notifications_views
@@ -23,14 +23,14 @@ router.register(
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
-    url(r'^discussion/', include('discussion.api.urls')),
-    url(r'^accounts/', include('accounts.api.urls')),
-    url(r'^distribution-lists/', include('distriblists.api.distribution_list_urls')),
-    url(r'^audit-trail/', include('audit_trail.api.urls')),
+    path('', include(router.urls)),
+    path('discussion/', include('discussion.api.urls')),
+    path('accounts/', include('accounts.api.urls')),
+    path('distribution-lists/', include('distriblists.api.distribution_list_urls')),
+    path('audit-trail/', include('audit_trail.api.urls')),
 
     # Task progress polling url
-    url(r'^poll/(?P<job_id>[\w-]+)/$',
+    path('poll/(?P<job_id>[\w-]+)/$',
         TaskPollView.as_view(),
         name='task_poll'),
 ]

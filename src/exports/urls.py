@@ -1,17 +1,17 @@
-from django.conf.urls import url
+from django.urls import path
 
 from exports.views import ExportCreate, ExportList, DownloadView
 
 
 urlpatterns = [
 
-    url(r'^$',
+    path('$',
         ExportList.as_view(),
         name="export_list"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path('(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
         ExportCreate.as_view(),
         name="export_create"),
-    url(r'^(?P<uid>[-\w]+)/$',
+    path('(?P<uid>[-\w]+)/$',
         DownloadView.as_view(),
         name='export_download')
 ]

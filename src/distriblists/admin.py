@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.conf.urls import url
+from django.urls import path
 
 from distriblists.models import DistributionList
 from distriblists.forms import DistributionListForm
@@ -15,22 +15,22 @@ class DistributionListAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(DistributionListAdmin, self).get_urls()
         return [
-            url(r'^import/$',
+            path('import/$',
                 self.admin_site.admin_view(
                     DistributionListImport.as_view(model_admin=self)
                 ),
                 name='distriblists_distriblist_import'),
-            url(r'^export/$',
+            path('export/$',
                 self.admin_site.admin_view(
                     DistributionListExport.as_view(model_admin=self)
                 ),
                 name='distriblists_distriblist_export'),
-            url(r'^review_members_import/$',
+            path('review_members_import/$',
                 self.admin_site.admin_view(
                     ReviewMembersImport.as_view(model_admin=self)
                 ),
                 name='distriblists_reviewmembers_import'),
-            url(r'^review_members_export/$',
+            path('review_members_export/$',
                 self.admin_site.admin_view(
                     ReviewMembersExport.as_view(model_admin=self)
                 ),
