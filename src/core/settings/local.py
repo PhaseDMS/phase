@@ -4,7 +4,7 @@ from unipath import Path  # Avoid pyflakes complains
 import warnings
 
 from .base import *  # noqa
-from .base import INSTALLED_APPS, MIDDLEWARE_CLASSES  # Avoid pyflake complains
+from .base import INSTALLED_APPS, MIDDLEWARE  # Avoid pyflake complains
 
 # ######### DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -86,7 +86,7 @@ INSTALLED_APPS += (
 INTERNAL_IPS = ('127.0.0.1',)
 
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
-MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
+MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # Disable template panel because of this bug:

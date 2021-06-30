@@ -150,7 +150,7 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # ######### MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     # Default Django middleware.
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -162,7 +162,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 
     'accounts.middleware.CategoryMiddleware',
-)
+]
 # ######### END MIDDLEWARE CONFIGURATION
 
 
@@ -318,7 +318,7 @@ WSGI_APPLICATION = 'wsgi.application'
 # ######### END WSGI CONFIGURATION
 
 # ######### PIPELINE CONFIGURATION
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
 
 PIPELINE = {
     'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
