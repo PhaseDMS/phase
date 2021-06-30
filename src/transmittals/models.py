@@ -272,7 +272,7 @@ class TrsRevision(models.Model):
     revision_date = models.DateField(_("Revision date"), null=True, blank=True)
     received_date = models.DateField(_("Received date"), null=True, blank=True)
     created_on = models.DateField(_("Created on"), null=True, blank=True)
-    accepted = models.BooleanField(verbose_name=_("Accepted?"))
+    accepted = models.BooleanField(verbose_name=_("Accepted?"), null=True)
     comment = models.TextField(verbose_name=_("Comment"), null=True, blank=True)
     is_new_revision = models.BooleanField(_("Is new revision?"))
 
