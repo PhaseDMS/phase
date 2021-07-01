@@ -205,7 +205,7 @@ class DocumentCreateTest(TestCase):
                 "docclass": 1,
                 "created_on": "2015-10-10",
                 "received_date": "2015-10-10",
-                "save-create": None,
+                "save-create": '',
             },
             follow=True,
         )
