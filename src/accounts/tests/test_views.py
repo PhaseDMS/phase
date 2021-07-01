@@ -31,7 +31,7 @@ class NavigationTests(TestCase):
 
     def test_authenticated_user_navbar(self):
         self.client.login(username=self.user.email, password="pass")
-        self.assertTrue(self.user.is_authenticated())
+        self.assertTrue(self.user.is_authenticated)
 
         res = self.client.get(self.url, follow=True)
         self.assertContains(res, 'href="/favorites/"')
@@ -42,11 +42,11 @@ class NavigationTests(TestCase):
         self.assertNotContains(res, '<a href="#nav-imports"')
 
     def test_document_controller_navbar(self):
-        self.user.user_permissions = self.dc_perms
+        self.user.user_permissions.add(*self.dc_perms)
         self.user.save()
         self.client.login(username=self.user.email, password="pass")
 
-        self.assertTrue(self.user.is_authenticated())
+        self.assertTrue(self.user.is_authenticated)
         self.assertTrue(self.user.has_perm("documents.add_document"))
 
         res = self.client.get(self.url, follow=True)
@@ -61,7 +61,7 @@ class NavigationTests(TestCase):
         self.user.is_superuser = True
         self.user.save()
         self.client.login(username=self.user.email, password="pass")
-        self.assertTrue(self.user.is_authenticated())
+        self.assertTrue(self.user.is_authenticated)
 
         res = self.client.get(self.url, follow=True)
         self.assertContains(res, 'href="/favorites/"')
@@ -102,7 +102,7 @@ class AclTests(TestCase):
         self.assertRedirects(res, "%s?next=%s" % (self.login_url, self.create_url))
 
     def test_document_controller_access(self):
-        self.user.user_permissions = self.dc_perms
+        self.user.user_permissions.add(*self.dc_perms)
         self.user.save()
         self.client.login(username=self.user.email, password="pass")
 

@@ -55,7 +55,7 @@ class AlertMixin(object):
         if "HTTP_AUTHORIZATION" in request.META:
             self.authenticate_user(request)
 
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             if self.request.is_secure():
                 return HttpResponseUnauthorized("Unauthorized")
             else:

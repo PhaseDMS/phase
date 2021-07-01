@@ -14,8 +14,7 @@ class UserApiAclTests(APITestCase):
 
         self.dc_perms = Permission.objects.filter(codename__endswith="_document")
         self.dc = UserFactory(name="dc", password="pass", category=self.category)
-        self.dc.user_permissions = self.dc_perms
-        self.dc.save()
+        self.dc.user_permissions.add(*self.dc_perms)
 
         self.url = reverse(
             "user-list",
@@ -47,7 +46,7 @@ class UserApiAclTests(APITestCase):
     def test_dc_can_only_access_users_from_his_category(self):
         other_category = CategoryFactory()
         user = UserFactory(name="dc2", password="pass", category=other_category)
-        user.user_permissions = self.dc_perms
+        user.user_permissions.add(*self.dc_perms)
         user.save()
         self.client.login(username=user.email, password="pass")
 
