@@ -85,7 +85,7 @@ class Document(models.Model):
         Otherwise, we return the short url to prevent a useless query.
 
         """
-        if hasattr(self, "_category_cache"):
+        if self._meta.get_field('category').is_cached(self):
             url = reverse(
                 "document_detail",
                 args=[
@@ -281,7 +281,7 @@ class Metadata(models.Model, metaclass=MetadataBase):
     @classmethod
     def get_revision_class(self):
         """Return the class of the associated revision model."""
-        return self._meta.get_field("latest_revision").rel.to
+        return self._meta.get_field("latest_revision").remote_field.model
 
     def get_all_revisions(self):
         """Return all revisions data of this document."""
