@@ -46,7 +46,7 @@ class MetadataTypeChoiceField(forms.ModelChoiceField):
         except ProgrammingError:
             # This will happen when rebuilding db from schatch, e.g
             # when running tests, and can be ignored safely
-            qs = []
+            qs = None
         kwargs.update({"queryset": qs})
 
         super(MetadataTypeChoiceField, self).__init__(*args, **kwargs)
