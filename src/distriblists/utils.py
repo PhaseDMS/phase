@@ -172,7 +172,7 @@ def export_lists(category):
 def _export_header(ws, all_users):
     """Add header row to exported file."""
     header_row = next(
-        ws.get_squared_range(
+        ws.iter_rows(
             min_col=2, min_row=1, max_col=len(all_users) + 1, max_row=1
         )
     )
