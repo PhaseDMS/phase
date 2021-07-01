@@ -2,12 +2,13 @@
 
 
 import factory
+from factory.django import DjangoModelFactory
 
 from categories.factories import CategoryFactory
 from accounts.models import User, Entity
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
 
@@ -27,7 +28,7 @@ class UserFactory(factory.DjangoModelFactory):
             category.users.add(self)
 
 
-class EntityFactory(factory.DjangoModelFactory):
+class EntityFactory(DjangoModelFactory):
     class Meta:
         model = Entity
 

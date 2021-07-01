@@ -1,6 +1,7 @@
 import datetime
 
 import factory
+from factory.django import DjangoModelFactory
 from factory import fuzzy
 
 from accounts.factories import EntityFactory
@@ -19,14 +20,14 @@ DISCIPLINE_CHOICES = ("COM", "CON", "COR", "DRI", "MAI", "MUL", "OPE")
 DOC_TYPE_CHOICES = ("PID", "ANA", "BAS", "FAT", "HAZ", "ISO")
 
 
-class MetadataFactory(factory.DjangoModelFactory):
+class MetadataFactory(DjangoModelFactory):
     class Meta:
         model = DemoMetadata
 
     title = factory.SelfAttribute("document.title")
 
 
-class MetadataRevisionFactory(factory.DjangoModelFactory):
+class MetadataRevisionFactory(DjangoModelFactory):
     class Meta:
         model = DemoMetadataRevision
 

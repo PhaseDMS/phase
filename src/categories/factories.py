@@ -1,4 +1,5 @@
 import factory
+from factory.django import DjangoModelFactory
 from factory import fuzzy
 
 from django.contrib.contenttypes.models import ContentType
@@ -7,7 +8,7 @@ from default_documents.models import DemoMetadata
 from .models import Organisation, CategoryTemplate, Category, Contract
 
 
-class OrganisationFactory(factory.DjangoModelFactory):
+class OrganisationFactory(DjangoModelFactory):
     class Meta:
         model = Organisation
 
@@ -16,7 +17,7 @@ class OrganisationFactory(factory.DjangoModelFactory):
     trigram = fuzzy.FuzzyText(length=3)
 
 
-class CategoryTemplateFactory(factory.DjangoModelFactory):
+class CategoryTemplateFactory(DjangoModelFactory):
     class Meta:
         model = CategoryTemplate
 
@@ -29,7 +30,7 @@ class CategoryTemplateFactory(factory.DjangoModelFactory):
         return ContentType.objects.get_for_model(DemoMetadata)
 
 
-class CategoryFactory(factory.DjangoModelFactory):
+class CategoryFactory(DjangoModelFactory):
     class Meta:
         model = Category
 
@@ -48,7 +49,7 @@ class CategoryFactory(factory.DjangoModelFactory):
                 self.third_parties.add(entity)
 
 
-class ContractFactory(factory.DjangoModelFactory):
+class ContractFactory(DjangoModelFactory):
     class Meta:
         model = Contract
 

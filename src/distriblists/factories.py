@@ -1,17 +1,18 @@
 import factory
+from factory.django import DjangoModelFactory
 
 from accounts.factories import UserFactory
 from distriblists.models import DistributionList
 
 
-class DistributionListReviewerFactory(factory.DjangoModelFactory):
+class DistributionListReviewerFactory(DjangoModelFactory):
     class Meta:
         model = DistributionList.reviewers.through
 
     user = factory.SubFactory(UserFactory)
 
 
-class DistributionListFactory(factory.DjangoModelFactory):
+class DistributionListFactory(DjangoModelFactory):
     class Meta:
         model = DistributionList
 

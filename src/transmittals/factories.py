@@ -3,6 +3,7 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 
 import factory
+from factory.django import DjangoModelFactory
 
 from documents.factories import DocumentFactory
 from accounts.factories import EntityFactory
@@ -21,7 +22,7 @@ from transmittals.models import (
 )
 
 
-class TransmittalFactory(factory.DjangoModelFactory):
+class TransmittalFactory(DjangoModelFactory):
     class Meta:
         model = Transmittal
 
@@ -39,7 +40,7 @@ class TransmittalFactory(factory.DjangoModelFactory):
     )
 
 
-class TransmittalRevisionFactory(factory.DjangoModelFactory):
+class TransmittalRevisionFactory(DjangoModelFactory):
     class Meta:
         model = TransmittalRevision
 
@@ -47,7 +48,7 @@ class TransmittalRevisionFactory(factory.DjangoModelFactory):
     revision = factory.sequence(lambda n: n + 1)
 
 
-class TrsRevisionFactory(factory.DjangoModelFactory):
+class TrsRevisionFactory(DjangoModelFactory):
     class Meta:
         model = TrsRevision
 
@@ -60,12 +61,12 @@ class TrsRevisionFactory(factory.DjangoModelFactory):
     originator = factory.SubFactory(EntityFactory)
 
 
-class OutgoingTransmittalRevisionFactory(factory.DjangoModelFactory):
+class OutgoingTransmittalRevisionFactory(DjangoModelFactory):
     class Meta:
         model = OutgoingTransmittalRevision
 
 
-class OutgoingTransmittalFactory(factory.DjangoModelFactory):
+class OutgoingTransmittalFactory(DjangoModelFactory):
     class Meta:
         model = OutgoingTransmittal
 

@@ -1,9 +1,10 @@
 import factory
+from factory.django import DjangoModelFactory
 
 from .models import ValuesList, ListEntry
 
 
-class ValuesListFactory(factory.DjangoModelFactory):
+class ValuesListFactory(DjangoModelFactory):
     class Meta:
         model = ValuesList
 
@@ -19,7 +20,7 @@ class ValuesListFactory(factory.DjangoModelFactory):
                 ListEntryFactory(values_list=self, index=key, value=val)
 
 
-class ListEntryFactory(factory.DjangoModelFactory):
+class ListEntryFactory(DjangoModelFactory):
     class Meta:
         model = ListEntry
 

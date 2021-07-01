@@ -1,6 +1,7 @@
 import datetime
 
 import factory
+from factory.django import DjangoModelFactory
 from django.contrib.contenttypes.models import ContentType
 from factory.fuzzy import FuzzyDate
 
@@ -115,7 +116,7 @@ TITLES = (
 )
 
 
-class DocumentFactory(factory.DjangoModelFactory):
+class DocumentFactory(DjangoModelFactory):
     class Meta:
         model = Document
 

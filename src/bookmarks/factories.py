@@ -1,9 +1,10 @@
 import factory
+from factory.django import DjangoModelFactory
 
 from bookmarks.models import Bookmark
 
 
-class BookmarkFactory(factory.DjangoModelFactory):
+class BookmarkFactory(DjangoModelFactory):
     class Meta:
         model = Bookmark
 
