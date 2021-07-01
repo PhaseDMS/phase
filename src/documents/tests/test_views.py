@@ -106,7 +106,7 @@ class DocumentDetailTest(TestCase):
             DocumentFactory(document_key="HAZOP-related-2"),
         ]
         document = DocumentFactory(document_key="HAZOP-report", category=self.category)
-        document.metadata.related_documents = documents
+        document.metadata.related_documents.add(*documents)
         document.metadata.save()
 
         url = document.get_absolute_url()
@@ -163,13 +163,13 @@ class DocumentDownloadTest(TestCase):
             },
         )
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r._headers["vary"], ("Vary", "Cookie"))
+        self.assertEqual(r.headers["Vary"], "Cookie")
         self.assertEqual(
-            r._headers["content-type"], ("Content-Type", "application/zip")
+            r.headers["Content-Type"], "application/zip"
         )
         self.assertEqual(
-            r._headers["content-disposition"],
-            ("Content-Disposition", "attachment; filename=download.zip"),
+            r.headers["Content-Disposition"],
+            "attachment; filename=download.zip",
         )
 
     def test_empty_document_download(self):
@@ -190,16 +190,15 @@ class DocumentDownloadTest(TestCase):
         )
         self.assertEqual(r.status_code, 200)
         self.assertDictEqual(
-            r._headers,
+            dict(r.headers),
             {
-                "content-length": ("Content-Length", "22"),
-                "content-type": ("Content-Type", "application/zip"),
-                "vary": ("Vary", "Cookie"),
-                "x-frame-options": ("X-Frame-Options", "SAMEORIGIN"),
-                "content-disposition": (
-                    "Content-Disposition",
-                    "attachment; filename=download.zip",
-                ),
+                "Content-Length": "22",
+                "Content-Type": "application/zip",
+                "Referrer-Policy": "same-origin",
+                "Vary": "Cookie",
+                "X-Frame-Options": "DENY",
+                "X-Content-Type-Options": "nosniff",
+                "Content-Disposition": "attachment; filename=download.zip",
             },
         )
 
