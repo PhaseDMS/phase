@@ -22,5 +22,5 @@ urlpatterns = [
     path("distribution-lists/", include("distriblists.api.distribution_list_urls")),
     path("audit-trail/", include("audit_trail.api.urls")),
     # Task progress polling url
-    path("poll/<int:job_id>/", TaskPollView.as_view(), name="task_poll"),
+    path("poll/<slug:job_id>/", TaskPollView.as_view(), name="task_poll"),
 ]
