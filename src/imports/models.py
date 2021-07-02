@@ -1,6 +1,7 @@
 import csv
 import datetime as dt
 import json
+import uuid
 from itertools import zip_longest
 
 from django.apps import apps
@@ -70,7 +71,7 @@ class ImportBatch(models.Model):
         ("error", _("Error")),
     )
 
-    uid = models.UUIDField(primary_key=True)
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, verbose_name=_("Category")
     )
