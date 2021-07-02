@@ -37,6 +37,7 @@ class ScheduleFieldsTests(ContractorDeliverableTestCase):
             "created_on": self.today.strftime("%Y-%m-%d"),
             "received_date": self.today.strftime("%Y-%m-%d"),
             "status": "",
+            "internal_review": False,
         }
 
     def test_create_doc_with_empty_status(self):
