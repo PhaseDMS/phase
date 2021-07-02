@@ -324,7 +324,7 @@ class DocumentDeleteTests(TestCase):
         metadata = DemoMetadata.objects.filter(document=document)
         self.assertEqual(metadata.count(), 0)
 
-        revisions = DemoMetadataRevision.objects.filter(metadata=metadata)
+        revisions = DemoMetadataRevision.objects.filter(metadata__in=metadata)
         self.assertEqual(revisions.count(), 0)
 
     def test_cannot_revise_document_in_review(self):
