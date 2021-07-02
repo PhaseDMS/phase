@@ -68,7 +68,7 @@ class ReviewMixinTests(TestCase):
         doc = DocumentFactory(category=self.category)
         revision = doc.latest_revision
         revision.approver = self.user
-        revision.reviewers = [self.user]
+        revision.reviewers.add(self.user)
         revision.save()
 
         self.assertFalse(revision.can_be_reviewed)
