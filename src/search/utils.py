@@ -143,6 +143,7 @@ def put_category_mapping(category_id):
         index=settings.ELASTIC_INDEX,
         doc_type=doc_type,
         body=mapping,
+        include_type_name=True,
     )
 
 
