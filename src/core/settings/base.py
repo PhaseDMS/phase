@@ -278,7 +278,7 @@ LOGGING = {
         # This is the "catch all" logger
         "": {
             "handlers": ["console", "syslog", "mail_admins", "sentry"],
-            "level": "DEBUG",
+            "level": "INFO",
             "propagate": False,
         },
         # We have to redefine this. See
