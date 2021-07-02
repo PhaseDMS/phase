@@ -159,7 +159,7 @@ class ScheduleFieldsTests(ContractorDeliverableTestCase):
         self.client.post(doc.get_edit_url(revision=0), first_revision_data, follow=True)
 
         meta.refresh_from_db()
-        self.assertEqual(meta.status_std_actual_date, self.today)
+        self.assertEqual(meta.status_std_actual_date, five_days_ago)
 
         first_revision_data.update({"status": "STD"})
         self.client.post(doc.get_edit_url(revision=0), first_revision_data, follow=True)

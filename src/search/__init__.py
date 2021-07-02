@@ -11,9 +11,7 @@ INDEX_SETTINGS = {
         "analysis": {
             "filter": {
                 "nGram_filter": {
-                    "type": "nGram",
-                    "min_gram": 2,
-                    "max_gram": 256,  # Is this value reasonable? I don't know
+                    "type": "ngram",
                 }
             },
             "analyzer": {
