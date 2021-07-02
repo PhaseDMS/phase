@@ -1,0 +1,22 @@
+---
+- name: Install elasticsearch apt key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: Add elasticsearch apt repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+    state: present
+    filename: elasticsearch
+
+- name: Install elasticsearch
+  apt:
+    name: elasticsearch
+    state: latest
+    update_cache: yes
+
+- name: Start elasticsearch on boot
+  service:
+    name: elasticsearch
+    enabled: yes
+    state: started
