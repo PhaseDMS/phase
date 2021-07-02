@@ -146,5 +146,5 @@ class SearchBuilder(object):
 
     def _limit_fields(self, s, fields):
         """Set the list of returned fields."""
-        s = s.fields(fields)
+        s = s.source(fields)
         return s
