@@ -58,7 +58,7 @@ class Review(models.Model):
         _("Role"), max_length=8, choices=ROLES, default=ROLES.reviewer
     )
     document = models.ForeignKey(
-        Document, on_delete=models.PROTECT, verbose_name=_("Document")
+        Document, on_delete=models.CASCADE, verbose_name=_("Document")
     )
     revision = models.PositiveIntegerField(_("Revision"))
     received_date = models.DateField(_("Review received date"), null=True, blank=True)

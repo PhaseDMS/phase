@@ -23,7 +23,7 @@ from .validators import StringNumberValidator
 class ContractorDeliverable(ScheduleMixin, Metadata):
     latest_revision = models.ForeignKey(
         "ContractorDeliverableRevision",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         verbose_name=_("Latest revision"),
     )
@@ -436,7 +436,7 @@ class ContractorDeliverable(ScheduleMixin, Metadata):
 
 class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
     # Revision
-    metadata = models.ForeignKey("ContractorDeliverable", on_delete=models.PROTECT)
+    metadata = models.ForeignKey("ContractorDeliverable", on_delete=models.CASCADE)
     status = ConfigurableChoiceField(
         verbose_name="Status",
         default="STD",
@@ -456,7 +456,7 @@ class ContractorDeliverableRevision(TransmittableMixin, MetadataRevision):
 class Correspondence(Metadata):
     latest_revision = models.ForeignKey(
         "CorrespondenceRevision",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         verbose_name=_("Latest revision"),
     )
@@ -578,7 +578,7 @@ class Correspondence(Metadata):
 
 
 class CorrespondenceRevision(MetadataRevision):
-    metadata = models.ForeignKey("Correspondence", on_delete=models.PROTECT)
+    metadata = models.ForeignKey("Correspondence", on_delete=models.CASCADE)
     status = ConfigurableChoiceField(
         _("Status"), max_length=20, list_index="STATUS_COR_MOM"
     )
@@ -602,7 +602,7 @@ class CorrespondenceRevision(MetadataRevision):
 class MinutesOfMeeting(Metadata):
     latest_revision = models.ForeignKey(
         "MinutesOfMeetingRevision",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         verbose_name=_("Latest revision"),
     )
@@ -706,7 +706,7 @@ class MinutesOfMeeting(Metadata):
 
 
 class MinutesOfMeetingRevision(MetadataRevision):
-    metadata = models.ForeignKey("MinutesOfMeeting", on_delete=models.PROTECT)
+    metadata = models.ForeignKey("MinutesOfMeeting", on_delete=models.CASCADE)
     status = ConfigurableChoiceField(
         _("Status"), max_length=20, list_index="STATUS_COR_MOM"
     )
@@ -719,7 +719,7 @@ class MinutesOfMeetingRevision(MetadataRevision):
 class DemoMetadata(Metadata):
     latest_revision = models.ForeignKey(
         "DemoMetadataRevision",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name=_("Latest revision"),
         null=True,
     )
@@ -767,7 +767,7 @@ class DemoMetadata(Metadata):
 
 
 class DemoMetadataRevision(ReviewMixin, MetadataRevision):
-    metadata = models.ForeignKey("DemoMetadata", on_delete=models.PROTECT)
+    metadata = models.ForeignKey("DemoMetadata", on_delete=models.CASCADE)
     STATUSES = (
         ("STD", "Started"),
         ("IDC", "Inter Discipline Check"),
@@ -799,7 +799,7 @@ class DemoMetadataRevision(ReviewMixin, MetadataRevision):
 class GtgMetadata(Metadata):
     latest_revision = models.ForeignKey(
         "GtgMetadataRevision",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         verbose_name=_("Latest revision"),
     )
@@ -1050,7 +1050,7 @@ class GtgMetadata(Metadata):
 
 
 class GtgMetadataRevision(TransmittableMixin, MetadataRevision):
-    metadata = models.ForeignKey("GtgMetadata", on_delete=models.PROTECT)
+    metadata = models.ForeignKey("GtgMetadata", on_delete=models.CASCADE)
     status = ConfigurableChoiceField(
         _("Status"), max_length=3, list_index="GTG_STATUSES", null=True, blank=True
     )
