@@ -44,6 +44,7 @@ class BaseReviewFormMixinTests(TestCase):
             "purpose_of_issue": "FR",
             "created_on": "2015-01-01",
             "received_date": "2015-01-01",
+            "internal_review": False,
         }
 
 
