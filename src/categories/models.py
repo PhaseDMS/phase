@@ -121,6 +121,11 @@ class Category(models.Model):
         Model = self.category_template.metadata_model
         return Model.model_class()
 
+    def get_index_name(self):
+        """Return the index name to use in Elasticsearch."""
+
+        return f"{self.organisation.slug}_{self.category_template.slug}"
+
     def revision_class(self):
         return self.document_class().get_revision_class()
 

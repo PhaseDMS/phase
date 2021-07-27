@@ -14,11 +14,13 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         categories = Category.objects.select_related(
-            "category_template__metadata_model"
+            "organisation",
+            "category_template"
         )
         for category in categories:
-            doc_class = category.document_class()
-            logger.info("Creating mapping for document type %s" % doc_class.__name__)
+            index_name = category.get_index_name()
+            logger.info(f"Creating mapping for index {index_name}")
+
             try:
                 put_category_mapping(category.id)
             except ConnectionError:
