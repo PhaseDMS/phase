@@ -325,12 +325,16 @@ class TransmittalErrorNotificationTests(TestCase):
             self.trs.__dict__, category=self.category, instance=self.trs
         )
         form.full_clean()
-        self.form_data = form.cleaned_data
+        form_data = form.cleaned_data
         rev_form = OutgoingTransmittalRevisionForm(
             self.rev.__dict__, category=self.category, instance=self.rev
         )
         rev_form.full_clean()
-        self.form_data.update(rev_form.cleaned_data)
+        form_data.update(rev_form.cleaned_data)
+
+        # We need to filter "None" values since django 2.2
+        # See https://code.djangoproject.com/ticket/30024
+        self.form_data = {k: v for k, v in form_data.items() if v}
 
     def test_no_error_no_notification(self):
         self.assertEqual(self.user.notification_set.count(), 0)
