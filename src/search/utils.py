@@ -104,7 +104,7 @@ def unindex_document(document_id):
 
 
 TYPE_MAPPING = [
-    ((models.CharField, models.TextField), "string"),
+    ((models.CharField, models.TextField), "text"),
     ((models.IntegerField,), "long"),
     (
         (
@@ -141,9 +141,7 @@ def put_category_mapping(category_id):
     mapping = get_mapping(doc_class)
     elastic.indices.put_mapping(
         index=settings.ELASTIC_INDEX,
-        doc_type=doc_type,
         body=mapping,
-        include_type_name=True,
     )
 
 
@@ -160,13 +158,17 @@ def get_mapping(doc_class):
 
     """
     revision_class = doc_class.get_revision_class()
+
+    # Since ES 7.0, you have to manually define an "_all" field
     mapping = {
-        "_all": {
-            "analyzer": "nGram_analyzer",
-            "search_analyzer": "whitespace_analyzer",
-            "index": "not_analyzed",
-        },
-        "properties": {},
+        "properties": {
+            "_all": {
+                "type": "text",
+                "analyzer": "nGram_analyzer",
+                "search_analyzer": "whitespace_analyzer",
+                # "index": "not_analyzed",
+            }
+        }
     }
 
     config = doc_class.PhaseConfig
@@ -198,21 +200,23 @@ def get_mapping(doc_class):
             get_mapping_type(field_name, field, field_types) if field else "string"
         )
 
-        mapping["properties"].update(
-            {
-                field_name: {
-                    "type": es_type,
-                    "include_in_all": field_name in column_fields,
-                    "fields": {
-                        "raw": {
-                            "type": es_type,
-                            "index": "not_analyzed",
-                            "include_in_all": False,
-                        }
-                    },
+        field_dict = {
+            "type": es_type,
+            "fields": {
+                "raw": {
+                    "type": "keyword",
                 }
             }
-        )
+        }
+
+        if field_name in column_fields:
+            field_dict.update({
+                "copy_to": "_all"
+            })
+
+        mapping["properties"].update({
+            field_name: field_dict
+        })
 
     return mapping
 
@@ -225,4 +229,4 @@ def get_mapping_type(name, field, field_types):
     for typeinfo, typename in TYPE_MAPPING:
         if isinstance(field, typeinfo):
             return typename
-    return "string"
+    return "text"
