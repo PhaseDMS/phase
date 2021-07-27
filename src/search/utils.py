@@ -16,21 +16,18 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def refresh_index():
+def refresh_index(index):
     """Make latest data available."""
-    index = settings.ELASTIC_INDEX
     elastic.indices.refresh(index=index)
 
 
-def create_index():
+def create_index(index):
     """Create all needed indexes."""
-    index = settings.ELASTIC_INDEX
     elastic.indices.create(index=index, ignore=400, body=INDEX_SETTINGS)
 
 
-def delete_index():
+def delete_index(index):
     """Delete existing ES indexes."""
-    index = settings.ELASTIC_INDEX
     elastic.indices.delete(index=index, ignore=404)
 
 
@@ -38,10 +35,10 @@ def index_revision(revision):
     """Saves a document's revision into ES's index."""
     document = revision.document
     es_key = "{}_{}".format(document.document_key, revision.revision)
+    index_name = revision.document.category.get_index_name()
     try:
         elastic.index(
-            index=settings.ELASTIC_INDEX,
-            doc_type=document.document_type(),
+            index=index_name,
             id=es_key,
             body=revision.to_json(),
         )
@@ -71,9 +68,9 @@ def bulk_actions(actions):
 
 
 def build_index_data(revision):
+    index_name = revision.document.category.get_index_name()
     return {
-        "_index": settings.ELASTIC_INDEX,
-        "_type": revision.metadata.document.document_type(),
+        "_index": index_name,
         "_id": revision.unique_id,
         "_source": revision.to_json(),
     }
@@ -87,8 +84,7 @@ def unindex_document(document_id):
     actions = [
         {
             "_op_type": "delete",
-            "_index": settings.ELASTIC_INDEX,
-            "_type": document.document_type(),
+            "_index": document.category.get_index_name(),
             "_id": revision.unique_id,
         }
         for revision in revisions
@@ -136,11 +132,11 @@ def put_category_mapping(category_id):
         "organisation", "category_template__metadata_model"
     ).get(pk=category_id)
 
+    index_name = category.get_index_name()
     doc_class = category.document_class()
-    doc_type = category.document_type()
     mapping = get_mapping(doc_class)
     elastic.indices.put_mapping(
-        index=settings.ELASTIC_INDEX,
+        index=index_name,
         body=mapping,
     )
 
