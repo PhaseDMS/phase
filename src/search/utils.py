@@ -60,7 +60,10 @@ def index_revisions(revisions):
     """Index a bunch of revisions."""
     actions = list(map(build_index_data, revisions))
     bulk(elastic, actions, chunk_size=settings.ELASTIC_BULK_SIZE, request_timeout=60)
-    refresh_index()
+
+    indices = set([a['_index'] for a in actions])
+    for index in indices:
+        refresh_index(index)
 
 
 def bulk_actions(actions):
