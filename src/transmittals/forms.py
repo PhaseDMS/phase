@@ -181,6 +181,11 @@ class TransmittalDownloadForm(DocumentDownloadForm):
 
 
 class TransmittableFormMixin(ReviewFormMixin):
+    internal_review = forms.ChoiceField(
+        label=_("Internal review only?"),
+        choices=((False, "No"), (True, "Yes")),
+        required=False)
+
     def get_trs_layout(self):
         if self.read_only:
             layout = (
