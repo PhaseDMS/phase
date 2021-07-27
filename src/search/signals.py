@@ -27,12 +27,12 @@ def update_index(**kwargs):
     created = kwargs.pop("created", False)
     if not created and doc.is_indexable:
         index_document(doc.pk)
-    refresh_index()
+    refresh_index(doc.category.get_index_name())
 
 
 def remove_from_index(sender, instance, **kwargs):
     unindex_document(instance.pk)
-    refresh_index()
+    refresh_index(instance.category.get_index_name())
 
 
 def save_mapping(sender, instance, **kwargs):

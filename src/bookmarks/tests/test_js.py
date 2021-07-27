@@ -17,13 +17,13 @@ class DocumentListTests(CasperTestCase):
     no_colors = False
 
     def setUp(self):
-        delete_index()
-        create_index()
 
         self.category = CategoryFactory()
         self.slug = "/{}/{}/".format(
             self.category.organisation.slug, self.category.category_template.slug
         )
+        delete_index(self.category.get_index_name())
+        create_index(self.category.get_index_name())
         put_category_mapping(self.category.id)
         user = UserFactory(
             email="testadmin@phase.fr",
@@ -65,7 +65,7 @@ class DocumentListTests(CasperTestCase):
 
     def tearDown(self):
         disconnect_signals()
-        delete_index()
+        delete_index(self.category.get_index_name())
 
     def test_js(self):
         self.assertTrue(
