@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 #
 #            REINDEX
 #                           ,,
@@ -29,7 +28,6 @@ from elasticsearch.helpers import bulk
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from django.utils.six.moves import input
 
 from documents.utils import get_all_revision_classes
 from search import elastic
@@ -70,9 +68,9 @@ Type 'yes' to continue, or 'no' to cancel: """
         start_reindex = datetime.datetime.now()
         logger.info("Reindex starting at %s" % start_reindex)
 
-        call_command("delete_index", **options)
-        call_command("create_index", **options)
-        call_command("set_mappings", **options)
+        call_command("delete_index")
+        call_command("create_index")
+        call_command("set_mappings")
 
         logger.info("Preparing index data")
 
