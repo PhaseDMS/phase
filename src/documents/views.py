@@ -101,12 +101,12 @@ class DocumentListMixin(CategoryMixin):
     def get_favorites(self):
         qs = Favorite.objects.select_related("user").filter(user=self.request.user)
         serializer = FavoriteSerializer(qs, many=True)
-        return JSONRenderer().render(serializer.data)
+        return JSONRenderer().render(serializer.data).decode()
 
     def get_bookmarks(self, user, category):
         bookmarks = get_user_bookmarks(user, category)
         serializer = BookmarkSerializer(bookmarks, many=True)
-        return JSONRenderer().render(serializer.data)
+        return JSONRenderer().render(serializer.data).decode()
 
 
 class BaseDocumentList(LoginRequiredMixin, DocumentListMixin, ListView):
