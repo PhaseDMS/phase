@@ -24,10 +24,9 @@ class ExportCreateTests(TestCase):
         self.url = reverse(
             "export_create", args=[self.category.organisation.slug, self.category.slug]
         )
+        create_index(self.category.get_index_name())
 
     def test_export_create_cleanup_old_exports(self):
-        delete_index()
-        create_index()
         now = timezone.now()
         for delta in range(0, 25):
             ExportFactory(
@@ -41,3 +40,6 @@ class ExportCreateTests(TestCase):
         self.client.post(self.url)
 
         self.assertEqual(Export.objects.all().count(), 20)
+
+    def tearDown(self):
+        delete_index(self.category.get_index_name())
