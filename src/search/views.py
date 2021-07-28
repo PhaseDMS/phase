@@ -34,7 +34,7 @@ class SearchDocuments(JSONResponseMixin, BaseDocumentList):
         response = self.get_queryset()
         start = int(self.request.GET.get("start", 0))
         end = start + int(self.request.GET.get("length", settings.PAGINATE_BY))
-        total = response.hits.total
+        total = response.hits.total.value
         display = min(end, total)
         search_data = [hit._d_ for hit in response.hits]
         aggregations = self.format_aggregations(response.aggregations)

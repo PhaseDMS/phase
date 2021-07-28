@@ -52,9 +52,8 @@ class SearchBuilder(object):
     def build_query(self, fields=None, only_latest_revisions=True):
         if fields is None:
             fields = []
-        document_type = self.category.document_type()
 
-        s = Search(using=elastic, doc_type=document_type).index(settings.ELASTIC_INDEX)
+        s = Search(using=elastic).index(self.category.get_index_name())
 
         if only_latest_revisions:
             s = s.filter("term", is_latest_revision=True)
@@ -104,9 +103,9 @@ class SearchBuilder(object):
         """
         for field in self.filter_fields:
             if isinstance(self.filter_form.fields[field], ModelChoiceField):
-                s.aggs.bucket(field, "terms", field="%s_id" % field, size=0)
+                s.aggs.bucket(field, "terms", field="%s_id" % field)
             else:
-                s.aggs.bucket(field, "terms", field="%s.raw" % field, size=0)
+                s.aggs.bucket(field, "terms", field="%s.raw" % field)
 
         return s
 
@@ -139,8 +138,8 @@ class SearchBuilder(object):
 
     def _add_pagination(self, s):
         s = s.extra(
-            from_=self.filters.get("start", 0),
-            size=self.filters.get("size", settings.PAGINATE_BY),
+            from_=self.filters.get("start") or 0,
+            size=self.filters.get("size") or settings.PAGINATE_BY,
         )
         return s
 
