@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db.models import Q
 
 from rest_framework import viewsets
@@ -12,7 +9,7 @@ from accounts.api.serializers import UserSerializer
 
 
 class DCPermissions(BasePermission):
-    perm = 'documents.can_control_document'
+    perm = "documents.can_control_document"
 
     def has_permission(self, request, view):
         return request.user.has_perm(self.perm)
@@ -26,7 +23,7 @@ class UserViewSet(CategoryAPIViewMixin, viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         qs = User.objects.filter(categories=self.get_category())
 
-        q = self.request.query_params.get('q', None)
+        q = self.request.query_params.get("q", None)
         if q:
             # Should we use an index?
             # See http://dba.stackexchange.com/a/21648/85866

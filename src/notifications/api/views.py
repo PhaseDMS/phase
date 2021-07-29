@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.authentication import SessionAuthentication
 
 from notifications.models import Notification
@@ -21,12 +21,12 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = (NoCSRFAuthentication,)
 
     def get_queryset(self):
-        return Notification.objects \
-            .filter(user=self.request.user) \
-            .order_by('-created_on')
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_on"
+        )
 
-    @list_route(methods=['post'])
+    @action(detail=False, methods=["post"])
     def mark_as_read(self, request):
         qs = self.get_queryset()
         qs.update(seen=True)
-        return Response({'status': 'done'})
+        return Response({"status": "done"})

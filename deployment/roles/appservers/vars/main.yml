@@ -1,8 +1,16 @@
 project_name: phase
-project_repo: https://github.com/Talengi/phase.git
+user_name: phase
+project_repo: https://github.com/PhaseDMS/phase.git
 install_root: /home/phase
 project_root: "{{ install_root }}/{{ project_name }}"
 django_root: "{{ project_root }}/src"
-venv_dir: "{{ install_root }}/.virtualenvs/{{ project_name }}"
-python_bin: "{{ venv_dir }}/bin/python"
-django_settings: "core.settings.production"
+requirements_root: "{{ project_root }}/requirements"
+cron_log_root: "{{ install_root }}/cron.log"
+venv_root: "{{ install_root }}/.virtualenvs"
+venv_dir: "{{ venv_root }}/{{ project_name }}"
+pipfile: "{{ project_root }}/Pipfile.lock"
+bin_dir: "{{ venv_dir }}/bin"
+python_bin: "{{ bin_dir }}/python"
+poetry_bin: "{{ install_root }}/.local/bin/poetry"
+activate_bin: "{{ bin_dir }}/activate"
+gunicorn_bin: "{{ bin_dir }}/gunicorn"

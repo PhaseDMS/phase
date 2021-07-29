@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
 from django.core.cache import cache
 
 
 def get_cache_key(document, revision):
-    cache_key = 'discussion_length_{}_{}'.format(document.pk, revision)
+    cache_key = "discussion_length_{}_{}".format(document.pk, revision)
     return cache_key
 
 

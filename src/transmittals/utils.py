@@ -14,9 +14,11 @@ from documents.utils import save_document_forms
 from transmittals import errors
 from transmittals import signals
 from transmittals.models import (
-    OutgoingTransmittal, OutgoingTransmittalRevision, TransmittableMixin)
-from transmittals.forms import (
-    OutgoingTransmittalForm, OutgoingTransmittalRevisionForm)
+    OutgoingTransmittal,
+    OutgoingTransmittalRevision,
+    TransmittableMixin,
+)
+from transmittals.forms import OutgoingTransmittalForm, OutgoingTransmittalRevisionForm
 
 
 logger = logging.getLogger(__name__)
@@ -49,71 +51,90 @@ class FieldWrapper(object):
                 obj = next(it)
             return getattr(obj, attr)
         except StopIteration:
-            raise AttributeError('Attribute {} not found'.format(attr))
+            raise AttributeError("Attribute {} not found".format(attr))
 
     def __getattr__(self, attr):
         return self[attr]
 
 
-def create_transmittal(from_category, to_category, revisions, contract_nb,
-                       recipient, purpose_of_issue='FR', **form_data):
+def create_transmittal(
+    from_category,
+    to_category,
+    revisions,
+    contract_nb,
+    recipient,
+    purpose_of_issue="FR",
+    **form_data
+):
     """Create an outgoing transmittal with the given revisions."""
 
     # Do we have a list of revisions?
     if not isinstance(revisions, list) or len(revisions) == 0:
         raise errors.MissingRevisionsError(
-            'Please provide a valid list of transmittals')
+            "Please provide a valid list of transmittals"
+        )
 
     # The "from" category must contain transmittable documents
     from_type = from_category.revision_class()
     if not issubclass(from_type, TransmittableMixin):
         raise errors.InvalidCategoryError(
-            'Source category must contain transmittable documents')
+            "Source category must contain transmittable documents"
+        )
 
     # The "destination" category must contain transmittals
     dest_type = to_category.revision_class()
     if not issubclass(dest_type, OutgoingTransmittalRevision):
         raise errors.InvalidCategoryError(
-            'Destination category must contain transmittals')
+            "Destination category must contain transmittals"
+        )
 
     # The recipient must be linked to the "from" category
     if from_category not in recipient.linked_categories.all():
         raise errors.InvalidRecipientError(
-            'Recipient is not linked to the document category')
+            "Recipient is not linked to the document category"
+        )
 
     # The 'contract_nb' must belong to the contracts linked by the category
-    cat_contracts = from_category.contracts.values_list('number', flat=True)
+    cat_contracts = from_category.contracts.values_list("number", flat=True)
     if contract_nb not in cat_contracts:
         raise errors.InvalidContractNumberError(
-            'Contract number is not linked to the document category')
+            "Contract number is not linked to the document category"
+        )
 
     # Do we have valid revisions?
     for rev in revisions:
         if not isinstance(rev, TransmittableMixin):
             raise errors.InvalidRevisionsError(
-                'At least one of the revisions is invalid.')
+                "At least one of the revisions is invalid."
+            )
 
         if not rev.can_be_transmitted_to_recipient(recipient=recipient):
             raise errors.InvalidRevisionsError(
-                'At least one of the revisions cannot be transmitted')
+                "At least one of the revisions cannot be transmitted"
+            )
 
         if not rev.document.category == from_category:
             raise errors.InvalidRevisionsError(
-                'Some revisions are not from the correct category')
+                "Some revisions are not from the correct category"
+            )
 
     originator = from_category.organisation.trigram
     sequential_number = find_next_trs_number(originator, recipient, contract_nb)
-    form_data.update({
-        'sequential_number': sequential_number,
-        'created_on': timezone.now(),
-        'received_date': timezone.now(),
-    })
+    form_data.update(
+        {
+            "sequential_number": sequential_number,
+            "created_on": timezone.now(),
+            "received_date": timezone.now(),
+        }
+    )
 
     # Some fields are excluded from the form, so we have to
     # provide a base instance instead
     today = timezone.now()
-    later = today + datetime.timedelta(days=OutgoingTransmittal.EXTERNAL_REVIEW_DURATION)
-    if purpose_of_issue == 'FR':
+    later = today + datetime.timedelta(
+        days=OutgoingTransmittal.EXTERNAL_REVIEW_DURATION
+    )
+    if purpose_of_issue == "FR":
         external_review_due_date = later
     else:
         external_review_due_date = None
@@ -128,30 +149,29 @@ def create_transmittal(from_category, to_category, revisions, contract_nb,
 
     # Let's create the transmittal, then
     trs_form = OutgoingTransmittalForm(
-        form_data, instance=base_instance, category=to_category)
-    revision_form = OutgoingTransmittalRevisionForm(
-        form_data, category=to_category)
+        form_data, instance=base_instance, category=to_category
+    )
+    revision_form = OutgoingTransmittalRevisionForm(form_data, category=to_category)
 
     with transaction.atomic():
         doc, trs, revision = save_document_forms(trs_form, revision_form, to_category)
         trs.link_to_revisions(revisions)
 
     signals.transmittal_created.send(
-        document=doc,
-        metadata=trs,
-        revision=revision,
-        sender=trs.__class__)
+        document=doc, metadata=trs, revision=revision, sender=trs.__class__
+    )
     return doc, trs, revision
 
 
 def find_next_trs_number(originator, recipient, contract_nb):
     """Returns the first available transmittal sequential number."""
-    qs = OutgoingTransmittal.objects \
-        .filter(originator=originator) \
-        .filter(recipient=recipient) \
-        .filter(contract_number=contract_nb) \
-        .aggregate(Max('sequential_number'))
-    max_nb = qs.get('sequential_number__max')
+    qs = (
+        OutgoingTransmittal.objects.filter(originator=originator)
+        .filter(recipient=recipient)
+        .filter(contract_number=contract_nb)
+        .aggregate(Max("sequential_number"))
+    )
+    max_nb = qs.get("sequential_number__max")
     return max_nb + 1 if max_nb else 1
 
 
@@ -162,38 +182,42 @@ def send_transmittal_creation_notifications(trs, revision):
         return
 
     translation.activate(settings.LANGUAGE_CODE)
-    subject = 'Phase - {} - {}'.format(
-        trs.contract_number,
-        trs.document.document_number)
-    tpl = get_template('transmittals/creation_notification_email.txt')
-    html_tpl = get_template('transmittals/creation_notification_email.html')
+    subject = "Phase - {} - {}".format(
+        trs.contract_number, trs.document.document_number
+    )
+    tpl = get_template("transmittals/creation_notification_email.txt")
+    html_tpl = get_template("transmittals/creation_notification_email.html")
     site = Site.objects.get_current()
     recipients = trs.recipient.users.all()
 
     for user in recipients:
-        logger.info('Notifying user {}'.format(user.email))
-        content = tpl.render({
-            'user': user,
-            'site': site,
-            'document': trs.document,
-            'transmittal': trs,
-            'revision': revision,
-            'related_revisions': trs.get_revisions()})
+        logger.info("Notifying user {}".format(user.email))
+        content = tpl.render(
+            {
+                "user": user,
+                "site": site,
+                "document": trs.document,
+                "transmittal": trs,
+                "revision": revision,
+                "related_revisions": trs.get_revisions(),
+            }
+        )
 
         email = EmailMultiAlternatives(
-            subject,
-            content,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email])
+            subject, content, settings.DEFAULT_FROM_EMAIL, [user.email]
+        )
 
-        html_content = html_tpl.render({
-            'user': user,
-            'site': site,
-            'document': trs.document,
-            'transmittal': trs,
-            'revision': revision,
-            'related_revisions': trs.get_revisions()})
-        email.attach_alternative(html_content, 'text/html')
+        html_content = html_tpl.render(
+            {
+                "user": user,
+                "site": site,
+                "document": trs.document,
+                "transmittal": trs,
+                "revision": revision,
+                "related_revisions": trs.get_revisions(),
+            }
+        )
+        email.attach_alternative(html_content, "text/html")
 
         if revision.pdf_file:
             storage = revision.pdf_file.storage

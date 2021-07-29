@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -14,6 +11,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contractordeliverable',
             name='originator_new',
-            field=models.ForeignKey(verbose_name='Originator', to='accounts.Entity'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Originator', to='accounts.Entity'),
         ),
     ]

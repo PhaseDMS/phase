@@ -9,4 +9,4 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bookmark
-        fields = ('id', 'category', 'name', 'url')
+        fields = ("id", "category", "name", "url")

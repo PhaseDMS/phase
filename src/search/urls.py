@@ -1,11 +1,13 @@
-from django.conf.urls import url
+from django.urls import path
 
 
 from search.views import SearchDocuments
 
 
 urlpatterns = [
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path(
+        "<slug:organisation>/<slug:category>/",
         SearchDocuments.as_view(),
-        name='search_documents'),
+        name="search_documents",
+    ),
 ]

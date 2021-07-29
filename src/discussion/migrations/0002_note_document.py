@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 
 
@@ -15,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='note',
             name='document',
-            field=models.ForeignKey(verbose_name='Document', to='documents.Document'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Document', to='documents.Document'),
         ),
     ]

@@ -1,0 +1,25 @@
+---
+- name: Create virtualenv directory
+  become: yes
+  become_user: "{{ user_name }}"
+  file:
+    path: "{{ venv_root }}"
+    state: directory
+
+- name: Create the virtualenv
+  become: yes
+  become_user: "{{ user_name }}"
+  command: python3 -m venv {{ venv_dir }}
+  args:
+    creates: "{{ venv_dir }}"
+
+- name: Fetch poetry install script
+  get_url:
+    url: https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py
+    dest: /tmp/
+    mode: 0755
+
+- name: Install poetry
+  become: yes
+  become_user: "{{ user_name }}"
+  command: python3 /tmp/install-poetry.py -y

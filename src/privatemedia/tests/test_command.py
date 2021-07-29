@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import os
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -18,11 +15,12 @@ class CleanMediaTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         user = UserFactory(
-            email='test@phase.fr',
-            password='pass',
+            email="test@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=user.email, password='pass')
+            category=self.category,
+        )
+        self.client.login(email=user.email, password="pass")
         self.doc = DocumentFactory()
         self.rev = self.doc.get_latest_revision()
 
@@ -30,14 +28,14 @@ class CleanMediaTests(TestCase):
         document = DocumentFactory(
             category=self.category,
         )
-        native_doc = 'sample_doc_native.docx'
-        pdf_doc = 'sample_doc_pdf.pdf'
+        native_doc = "sample_doc_native.docx"
+        pdf_doc = "sample_doc_pdf.pdf"
 
         MetadataRevisionFactory(
             metadata=document.get_metadata(),
             revision=2,
-            native_file=SimpleUploadedFile(native_doc, b'content'),
-            pdf_file=SimpleUploadedFile(pdf_doc, b'content'),
+            native_file=SimpleUploadedFile(native_doc, b"content"),
+            pdf_file=SimpleUploadedFile(pdf_doc, b"content"),
         )
         # Document without files
         DocumentFactory(
@@ -49,6 +47,6 @@ class CleanMediaTests(TestCase):
         document.delete()
         self.assertTrue(os.path.exists(filepath))
 
-        call_command('clearmedia')
+        call_command("clearmedia")
         # command has deleted file
         self.assertFalse(os.path.exists(filepath))

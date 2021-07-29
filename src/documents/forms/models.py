@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
-
 from django import forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
@@ -21,13 +18,12 @@ def documentform_factory(model):
     We are looking for the form class in all installed apps.
 
     """
-    form_class_name = '%sForm' % model.__name__
+    form_class_name = "%sForm" % model.__name__
     apps = settings.INSTALLED_APPS
     DocumentForm = None
 
     for app in apps:
-        form_path = '{}.forms.{}'.format(
-            app, form_class_name)
+        form_path = "{}.forms.{}".format(app, form_class_name)
         try:
             DocumentForm = import_string(form_path)
             break
@@ -35,28 +31,30 @@ def documentform_factory(model):
             continue
 
     else:
-        raise ImproperlyConfigured('Cannot find class %s' % form_class_name)
+        raise ImproperlyConfigured("Cannot find class %s" % form_class_name)
 
     return DocumentForm
 
 
 class SameCategoryRelatedDocument(object):
     """Form mixin used to limit related documents choices to those belonging to
-     the same category."""
+    the same category."""
+
     def __init__(self, *args, **kwargs):
         super(SameCategoryRelatedDocument, self).__init__(*args, **kwargs)
-        if 'related_documents' in self.fields:
+        if "related_documents" in self.fields:
             qs = self.category.documents.all()
-            self.fields['related_documents'].queryset = qs
+            self.fields["related_documents"].queryset = qs
 
 
 class GenericBaseDocumentForm(forms.ModelForm):
     """Base form used for transmittals. Transmittals need to handle
-    related documents in différent catégories """
+    related documents in différent catégories"""
+
     def __init__(self, *args, **kwargs):
-        self.read_only = kwargs.pop('read_only', False)
-        self.request = kwargs.pop('request', None)
-        self.category = kwargs.pop('category')
+        self.read_only = kwargs.pop("read_only", False)
+        self.request = kwargs.pop("request", None)
+        self.category = kwargs.pop("category")
         super(GenericBaseDocumentForm, self).__init__(*args, **kwargs)
         self.prepare_form(*args, **kwargs)
         self.helper = FormHelper()
@@ -79,14 +77,14 @@ class GenericBaseDocumentForm(forms.ModelForm):
                 self.fields[field_name].choices = model_field.get_choices()
 
             # Call custom prepare method
-            method_name = 'prepare_field_%s' % field_name
+            method_name = "prepare_field_%s" % field_name
             if hasattr(self, method_name):
                 getattr(self, method_name)()
 
     def prepare_field_document_number(self):
         # Document key is automatically generated, this field should not
         # be required
-        self.fields['document_number'].required = False
+        self.fields["document_number"].required = False
 
     def prepare_field_contract_number(self):
         # Contract numbers must belong to the category
@@ -94,46 +92,54 @@ class GenericBaseDocumentForm(forms.ModelForm):
         # This method is overriden for outgoing transmittals
         if not self.read_only:
             # Todo find a cleaner way
-            self.allowed_contracts = self.category.contracts.all().\
-                values_list('number', 'number')
-            self.fields['contract_number'].widget = forms.Select(
-                choices=self.allowed_contracts)
+            self.allowed_contracts = self.category.contracts.all().values_list(
+                "number", "number"
+            )
+            self.fields["contract_number"].widget = forms.Select(
+                choices=self.allowed_contracts
+            )
 
     def prepare_field_native_file(self):
         if self.instance.native_file:
-            url = reverse('revision_file_download', args=[
-                self.category.organisation.slug,
-                self.category.slug,
-                self.instance.document.document_key,
-                self.instance.revision,
-                'native_file',
-            ])
-            self.fields['native_file'].widget.value_url = url
+            url = reverse(
+                "revision_file_download",
+                args=[
+                    self.category.organisation.slug,
+                    self.category.slug,
+                    self.instance.document.document_key,
+                    self.instance.revision,
+                    "native_file",
+                ],
+            )
+            self.fields["native_file"].widget.value_url = url
 
     def prepare_field_pdf_file(self):
 
         if self.instance.pdf_file:
-            url = reverse('revision_file_download', args=[
-                self.category.organisation.slug,
-                self.category.slug,
-                self.instance.document.document_key,
-                self.instance.revision,
-                'pdf_file',
-            ])
-            self.fields['pdf_file'].widget.value_url = url
+            url = reverse(
+                "revision_file_download",
+                args=[
+                    self.category.organisation.slug,
+                    self.category.slug,
+                    self.instance.document.document_key,
+                    self.instance.revision,
+                    "pdf_file",
+                ],
+            )
+            self.fields["pdf_file"].widget.value_url = url
 
     def get_related_documents_layout(self):
         # Init related documents field
-        if 'related_documents' in self.fields:
+        if "related_documents" in self.fields:
             if self.read_only:
                 related_documents = DocumentFieldset(
-                    _('Related documents'),
-                    FlatRelatedDocumentsLayout('related_documents'),
+                    _("Related documents"),
+                    FlatRelatedDocumentsLayout("related_documents"),
                 )
             else:
                 related_documents = DocumentFieldset(
-                    _('Related documents'),
-                    'related_documents',
+                    _("Related documents"),
+                    "related_documents",
                 )
         return related_documents
 
@@ -142,14 +148,11 @@ class GenericBaseDocumentForm(forms.ModelForm):
 
         Checks both the content type and the filename.
         """
-        native_file = self.cleaned_data['native_file']
-        if native_file is not None and hasattr(native_file, 'content_type'):
+        native_file = self.cleaned_data["native_file"]
+        if native_file is not None and hasattr(native_file, "content_type"):
             content_type = native_file.content_type
-            if content_type == 'application/pdf'\
-                    or native_file.name.endswith('.pdf'):
-                raise forms.ValidationError(
-                    'A PDF file is not allowed in this field.'
-                )
+            if content_type == "application/pdf" or native_file.name.endswith(".pdf"):
+                raise forms.ValidationError("A PDF file is not allowed in this field.")
         return native_file
 
     def clean(self):
@@ -162,11 +165,11 @@ class GenericBaseDocumentForm(forms.ModelForm):
         # document_key. In that case, we must copy the key to have a valid
         # document number. Project History is the reason this is so
         # complicated.See ticket #145 for more details.
-        if 'document_number' in data and 'document_key' in data:
-            if data['document_key'] and not data['document_number']:
-                data['document_number'] = data['document_key']
-            elif data['document_number']:
-                data['document_key'] = slugify(data['document_number']).upper()
+        if "document_number" in data and "document_key" in data:
+            if data["document_key"] and not data["document_number"]:
+                data["document_number"] = data["document_key"]
+            elif data["document_number"]:
+                data["document_key"] = slugify(data["document_number"]).upper()
 
         return data
 
@@ -176,4 +179,5 @@ class BaseDocumentForm(SameCategoryRelatedDocument, GenericBaseDocumentForm):
     These documents must handle related documents belonging to the same
     category. We keep this name to avoid breaking imports from customized
     models."""
+
     pass

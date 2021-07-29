@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 from django.conf import settings
 
@@ -31,7 +28,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='Name')),
                 ('slug', models.SlugField(verbose_name='Slug')),
                 ('description', models.CharField(max_length=200, null=True, verbose_name='Description', blank=True)),
-                ('metadata_model', models.ForeignKey(to='contenttypes.ContentType')),
+                ('metadata_model', models.ForeignKey(on_delete=models.PROTECT, to='contenttypes.ContentType')),
             ],
             options={
                 'verbose_name': 'Category template',
@@ -50,7 +47,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='category_template',
-            field=models.ForeignKey(verbose_name='Category template', to='categories.CategoryTemplate'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Category template', to='categories.CategoryTemplate'),
         ),
         migrations.AddField(
             model_name='category',
@@ -60,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='organisation',
-            field=models.ForeignKey(related_name='categories', verbose_name='Organisation', to='categories.Organisation'),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='categories', verbose_name='Organisation', to='categories.Organisation'),
         ),
         migrations.AddField(
             model_name='category',

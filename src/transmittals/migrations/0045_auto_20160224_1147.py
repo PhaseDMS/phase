@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -14,11 +11,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='outgoingtransmittalrevision',
             name='metadata',
-            field=models.ForeignKey(blank=True, to='transmittals.OutgoingTransmittal', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, blank=True, to='transmittals.OutgoingTransmittal', null=True),
         ),
         migrations.AddField(
             model_name='transmittalrevision',
             name='metadata',
-            field=models.ForeignKey(blank=True, to='transmittals.Transmittal', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, blank=True, to='transmittals.Transmittal', null=True),
         ),
     ]

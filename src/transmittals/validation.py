@@ -6,8 +6,9 @@ from documents.models import Document
 
 class Validator(object):
     """An object which purpose is to check a single validation point."""
-    error = 'Undefined error'
-    error_key = 'undefined_key'
+
+    error = "Undefined error"
+    error_key = "undefined_key"
 
     def test(self, trs_import):
         raise NotImplementedError()
@@ -61,9 +62,10 @@ class AndValidator(Validator):
 
 class DirnameValidator(Validator):
     """Checks the transmittals directory name."""
-    error = 'The directory name is incorrect'
-    pattern = r'FAC(09001|10005)-\w{3}-\w{3}-TRS-\d{5}'
-    error_key = 'invalid_dirname'
+
+    error = "The directory name is incorrect"
+    pattern = r"FAC(09001|10005)-\w{3}-\w{3}-TRS-\d{5}"
+    error_key = "invalid_dirname"
 
     def test(self, trs_import):
         return re.match(self.pattern, trs_import.basename)
@@ -71,28 +73,32 @@ class DirnameValidator(Validator):
 
 class TrsExistenceValidator(Validator):
     """Checks that the corresponding trs does not already exist."""
-    error = 'The current transmittal already exist'
-    error_key = 'already_exists'
+
+    error = "The current transmittal already exist"
+    error_key = "already_exists"
 
     def test(self, trs_import):
         from transmittals.models import Transmittal
+
         name = trs_import.basename
-        qs = Transmittal.objects \
-            .filter(document_key=name) \
-            .filter(status__in=['new', 'tobechecked', 'accepted'])
+        qs = Transmittal.objects.filter(document_key=name).filter(
+            status__in=["new", "tobechecked", "accepted"]
+        )
         return qs.count() == 0
 
 
 class TrsSequentialNumberValidator(Validator):
     """Checks that the sequential number is correct."""
-    error = 'The sequential number is incorrect'
-    error_key = 'wrong_sequential_number'
+
+    error = "The sequential number is incorrect"
+    error_key = "wrong_sequential_number"
 
     def test(self, trs_import):
         """Check that the previous trs exists."""
         from transmittals.models import Transmittal
+
         name = trs_import.basename
-        split = name.split('-')
+        split = name.split("-")
 
         # Directory name is incorrect, let's just ignore this test
         if len(split) != 5:
@@ -111,19 +117,21 @@ class TrsSequentialNumberValidator(Validator):
         if seq_number == 1:
             return True
 
-        qs = Transmittal.objects \
-            .filter(contract_number=contract_number) \
-            .filter(originator=originator) \
-            .filter(recipient=recipient) \
-            .filter(sequential_number=seq_number - 1) \
-            .exclude(status='rejected')
+        qs = (
+            Transmittal.objects.filter(contract_number=contract_number)
+            .filter(originator=originator)
+            .filter(recipient=recipient)
+            .filter(sequential_number=seq_number - 1)
+            .exclude(status="rejected")
+        )
         return qs.count() == 1
 
 
 class CSVPresenceValidator(Validator):
     """Checks the existance of the transmittals csv file."""
-    error = 'The csv file is missing, or it\'s name is incorrect'
-    error_key = 'missing_csv'
+
+    error = "The csv file is missing, or it's name is incorrect"
+    error_key = "missing_csv"
 
     def test(self, trs_import):
         csv_fullname = trs_import.csv_fullname
@@ -132,8 +140,9 @@ class CSVPresenceValidator(Validator):
 
 class CSVColumnsValidator(Validator):
     """Checks that the csv columns are correct."""
-    error = 'The csv columns are incorrect.'
-    error_key = 'csv_columns'
+
+    error = "The csv columns are incorrect."
+    error_key = "csv_columns"
 
     def test(self, trs_import):
         columns = set(trs_import.csv_cols())
@@ -143,8 +152,9 @@ class CSVColumnsValidator(Validator):
 
 class PdfCountValidator(Validator):
     """Checks the number of pdf documents."""
-    error = 'The number of pdf documents is incorrect'
-    error_key = 'wrong_pdf_count'
+
+    error = "The number of pdf documents is incorrect"
+    error_key = "wrong_pdf_count"
 
     def test(self, trs_import):
         csv_lines = trs_import.csv_lines()
@@ -155,8 +165,9 @@ class PdfCountValidator(Validator):
 
 class NativeFileValidator(Validator):
     """Checks that every file correspond to a line in the csv."""
-    error = 'This file should not be there'
-    error_key = 'native_files'
+
+    error = "This file should not be there"
+    error_key = "native_files"
 
     def validate(self, trs_import):
         """
@@ -171,7 +182,7 @@ class NativeFileValidator(Validator):
 
         for filename in native_files:
             name, ext = os.path.splitext(filename)
-            pdf_name = '%s.pdf' % name
+            pdf_name = "%s.pdf" % name
             if pdf_name not in pdf_files:
                 errors[filename] = self.error
 
@@ -183,8 +194,9 @@ class NativeFileValidator(Validator):
 
 class PdfFilenameValidator(Validator):
     """Checks that the pdf exists."""
-    error = 'The pdf for this document is missing.'
-    error_key = 'missing_pdf'
+
+    error = "The pdf for this document is missing."
+    error_key = "missing_pdf"
 
     def test(self, import_line):
         return os.path.exists(import_line.pdf_fullname)
@@ -192,34 +204,39 @@ class PdfFilenameValidator(Validator):
 
 class MissingDataValidator(Validator):
     """Checks that the csv data has the minimal required fields."""
-    error = 'There are some missing fields in the csv data'
-    error_key = 'missing_data'
+
+    error = "There are some missing fields in the csv data"
+    error_key = "missing_data"
 
     def test(self, import_line):
         data = import_line.csv_data
-        return all((
-            'document_key' in data,
-            'revision' in data,
-            'status' in data,
-            'title' in data,
-        ))
+        return all(
+            (
+                "document_key" in data,
+                "revision" in data,
+                "status" in data,
+                "title" in data,
+            )
+        )
 
 
 class RevisionFormatValidator(Validator):
     """Checks that the revision is a two number integer."""
-    pattern = r'\d{2}'
-    error = 'The revision must be a two number integer'
-    error_key = 'revision_format'
+
+    pattern = r"\d{2}"
+    error = "The revision must be a two number integer"
+    error_key = "revision_format"
 
     def test(self, import_line):
-        revision = import_line.csv_data['revision']
+        revision = import_line.csv_data["revision"]
         return re.match(self.pattern, revision)
 
 
 class DocumentExistsValidator(Validator):
     """Checks that the document already exists in Phase."""
-    error = 'The corresponding document cannot be found.'
-    error_key = 'document_not_found'
+
+    error = "The corresponding document cannot be found."
+    error_key = "document_not_found"
 
     def test(self, import_line):
         return import_line.get_metadata() is not None
@@ -227,8 +244,9 @@ class DocumentExistsValidator(Validator):
 
 class DocumentCategoryValidator(Validator):
     """Checks that the document belongs to the same category as the transmittal."""
-    error = 'The transmittal and document categories do not match.'
-    error_key = 'wrong_category'
+
+    error = "The transmittal and document categories do not match."
+    error_key = "wrong_category"
 
     def test(self, import_line):
         metadata = import_line.get_metadata()
@@ -242,8 +260,9 @@ class DocumentCategoryValidator(Validator):
 
 class FormValidator(Validator):
     """Checks that the submitted data is correct."""
-    error = 'The data is incorrect.'
-    error_key = 'data_validation'
+
+    error = "The data is incorrect."
+    error_key = "data_validation"
 
     def validate(self, import_line):
         document_form, revision_form = import_line.get_forms()
@@ -258,15 +277,16 @@ class FormValidator(Validator):
 
 class SameTitleValidator(Validator):
     """Checks that the title in csv is the same as existing document."""
-    error = 'The document title is incorrect.'
-    error_key = 'wrong_title'
+
+    error = "The document title is incorrect."
+    error_key = "wrong_title"
 
     def test(self, import_line):
         metadata = import_line.get_metadata()
         if not metadata:
             return True
 
-        return metadata.title == import_line.csv_data['title']
+        return metadata.title == import_line.csv_data["title"]
 
 
 class CSVLineValidator(AndValidator):
@@ -279,7 +299,8 @@ class CSVLineValidator(AndValidator):
       * the title is the same as in the existing document
 
     """
-    error_key = 'csv_content'
+
+    error_key = "csv_content"
     VALIDATORS = (
         MissingDataValidator(),
         RevisionFormatValidator(),
@@ -292,7 +313,8 @@ class CSVLineValidator(AndValidator):
 
 class TrsValidator(CompositeValidator):
     """Global validator for the transmittals."""
-    error_key = 'global_errors'
+
+    error_key = "global_errors"
     VALIDATORS = (
         DirnameValidator(),
         TrsExistenceValidator(),
@@ -300,13 +322,14 @@ class TrsValidator(CompositeValidator):
         CSVPresenceValidator(),
         CSVColumnsValidator(),
         PdfCountValidator(),
-        NativeFileValidator()
+        NativeFileValidator(),
     )
 
 
 class RevisionsValidator(Validator):
     """Global revision number validator."""
-    error_key = 'revisions'
+
+    error_key = "revisions"
 
     def validate(self, trs_import):
         """Validate the revision numbers.
@@ -323,8 +346,8 @@ class RevisionsValidator(Validator):
         # Let's store the list of revisions for each document
         revisions = dict()
         for line in trs_import.csv_lines():
-            document_key = line['document_key']
-            revision = int(line['revision'])
+            document_key = line["document_key"]
+            revision = int(line["revision"])
 
             if document_key not in revisions:
                 revisions[document_key] = list()
@@ -332,9 +355,9 @@ class RevisionsValidator(Validator):
             revisions[document_key].append(revision)
 
         # Get latest revision for each document
-        latest_revisions = Document.objects \
-            .filter(document_key__in=revisions.keys()) \
-            .values_list('document_key', 'current_revision')
+        latest_revisions = Document.objects.filter(
+            document_key__in=revisions.keys()
+        ).values_list("document_key", "current_revision")
         latest_revisions = dict(latest_revisions)
 
         # Check revisions for each document
@@ -358,9 +381,9 @@ class RevisionsValidator(Validator):
         previous_revision = latest_revision
         for revision in revisions:
             if revision < 0:
-                errors[revision] = '%d is not a valid revision number' % revision
+                errors[revision] = "%d is not a valid revision number" % revision
             elif revision > previous_revision + 1:
-                errors[revision] = '%d is missing some previous revisions' % revision
+                errors[revision] = "%d is missing some previous revisions" % revision
 
             if revision > latest_revision:
                 previous_revision = revision

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from collections import OrderedDict
 
 from django.test import TestCase, override_settings
@@ -11,7 +8,9 @@ from mock import MagicMock
 from documents.factories import DocumentFactory
 from categories.factories import CategoryFactory
 from default_documents.factories import (
-    ContractorDeliverableFactory, ContractorDeliverableRevisionFactory)
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 from default_documents.models import ContractorDeliverable
 from exports.generators import ExportGenerator, CSVGenerator
 
@@ -24,13 +23,14 @@ class ExportGeneratorTests(TestCase):
             DocumentFactory(
                 metadata_factory_class=ContractorDeliverableFactory,
                 revision_factory_class=ContractorDeliverableRevisionFactory,
-                category=self.category)
-            for i in range(1, 20))
+                category=self.category,
+            )
+            for i in range(1, 20)
+        )
 
-        self.es_mock = MagicMock(return_value=(
-            [doc.latest_revision.pk for doc in self.docs],
-            20
-        ))
+        self.es_mock = MagicMock(
+            return_value=([doc.latest_revision.pk for doc in self.docs], 20)
+        )
 
     @override_settings(EXPORTS_CHUNK_SIZE=5)
     def test_generator_iterator(self):
@@ -55,11 +55,9 @@ class ExportGeneratorTests(TestCase):
             chunk = next(iterator)
 
     def test_csv_generator_header(self):
-        fields = OrderedDict((
-            ('Title', 'title'),
-            ('Document number', 'document_key')))
+        fields = OrderedDict((("Title", "title"), ("Document number", "document_key")))
         generator = CSVGenerator(self.category, {}, fields)
         generator.get_es_results = self.es_mock
         iterator = iter(generator)
         chunk = next(iterator)
-        self.assertEqual(chunk, [['Title', 'Document number']])
+        self.assertEqual(chunk, [["Title", "Document number"]])

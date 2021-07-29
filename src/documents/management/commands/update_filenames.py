@@ -7,16 +7,16 @@ from documents.models import Document
 
 
 class Command(BaseCommand):
-    args = '<document> <revision>'
-    help = 'Update the native and pdf file names'
+    args = "<document> <revision>"
+    help = "Update the native and pdf file names"
 
     def add_arguments(self, parser):
-        parser.add_argument('document_number', type=str)
-        parser.add_argument('revision_id', type=str)
+        parser.add_argument("document_number", type=str)
+        parser.add_argument("revision_id", type=str)
 
     def handle(self, *args, **options):
-        document_number = options['document_number']
-        revision_id = options['revision_id']
+        document_number = options["document_number"]
+        revision_id = options["revision_id"]
 
         document = Document.objects.get(document_key=document_number)
         metadata = document.metadata
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                     self.rename_file(revision, field.name)
 
     def rename_file(self, revision, field_name):
-        self.stdout.write('Renaming {}'.format(field_name))
+        self.stdout.write("Renaming {}".format(field_name))
 
         field = revision._meta.get_field(field_name)
         f = getattr(revision, field_name)
@@ -44,5 +44,8 @@ class Command(BaseCommand):
         f.name = new_name
         revision.save()
         os.rename(initial_path, new_path)
-        self.stdout.write(self.style.SUCCESS(
-            'Renamed\n    {} ->\n    {}'.format(initial_path, new_path)))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Renamed\n    {} ->\n    {}".format(initial_path, new_path)
+            )
+        )

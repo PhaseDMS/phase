@@ -3,37 +3,44 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 
 import factory
+from factory.django import DjangoModelFactory
 
 from documents.factories import DocumentFactory
 from accounts.factories import EntityFactory
 from categories.factories import CategoryFactory
 from default_documents.models import ContractorDeliverable
 from default_documents.factories import (
-    ContractorDeliverableFactory, ContractorDeliverableRevisionFactory)
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 from transmittals.models import (
-    Transmittal, TransmittalRevision, TrsRevision, OutgoingTransmittal,
-    OutgoingTransmittalRevision)
+    Transmittal,
+    TransmittalRevision,
+    TrsRevision,
+    OutgoingTransmittal,
+    OutgoingTransmittalRevision,
+)
 
 
-class TransmittalFactory(factory.DjangoModelFactory):
+class TransmittalFactory(DjangoModelFactory):
     class Meta:
         model = Transmittal
 
-    contractor = 'test'
-    tobechecked_dir = '/tmp/test_ctr_clt/tobechecked/'
-    accepted_dir = '/tmp/test_ctr_clt/accepted/'
-    rejected_dir = '/tmp/test_ctr_clt/rejected/'
-    contract_number = 'FAC10005'
-    originator = 'CTR'
-    recipient = 'CLT'
+    contractor = "test"
+    tobechecked_dir = "/tmp/test_ctr_clt/tobechecked/"
+    accepted_dir = "/tmp/test_ctr_clt/accepted/"
+    rejected_dir = "/tmp/test_ctr_clt/rejected/"
+    contract_number = "FAC10005"
+    originator = "CTR"
+    recipient = "CLT"
     sequential_number = factory.Sequence(lambda n: n + 1)
-    document_key = factory.Sequence(lambda n: 'transmittal-{}'.format(n))
+    document_key = factory.Sequence(lambda n: "transmittal-{}".format(n))
     document = factory.SubFactory(
-        DocumentFactory,
-        document_key=factory.SelfAttribute('..document_key'))
+        DocumentFactory, document_key=factory.SelfAttribute("..document_key")
+    )
 
 
-class TransmittalRevisionFactory(factory.DjangoModelFactory):
+class TransmittalRevisionFactory(DjangoModelFactory):
     class Meta:
         model = TransmittalRevision
 
@@ -41,39 +48,39 @@ class TransmittalRevisionFactory(factory.DjangoModelFactory):
     revision = factory.sequence(lambda n: n + 1)
 
 
-class TrsRevisionFactory(factory.DjangoModelFactory):
+class TrsRevisionFactory(DjangoModelFactory):
     class Meta:
         model = TrsRevision
 
     transmittal = factory.SubFactory(TransmittalFactory)
-    document_key = 'FAC10005-CTR-000-EXP-LAY-4891'
-    title = factory.Sequence(lambda n: 'Trs Revision {0:05}'.format(n))
+    document_key = "FAC10005-CTR-000-EXP-LAY-4891"
+    title = factory.Sequence(lambda n: "Trs Revision {0:05}".format(n))
     revision = factory.Sequence(lambda n: n)
     is_new_revision = True
     received_date = datetime.date.today()
     originator = factory.SubFactory(EntityFactory)
 
 
-class OutgoingTransmittalRevisionFactory(factory.DjangoModelFactory):
+class OutgoingTransmittalRevisionFactory(DjangoModelFactory):
     class Meta:
         model = OutgoingTransmittalRevision
 
 
-class OutgoingTransmittalFactory(factory.DjangoModelFactory):
+class OutgoingTransmittalFactory(DjangoModelFactory):
     class Meta:
         model = OutgoingTransmittal
 
-    contract_number = 'FAC10005'
-    originator = 'CTR'
-    recipient = 'CLT'
+    contract_number = "FAC10005"
+    originator = "CTR"
+    recipient = "CLT"
     sequential_number = factory.Sequence(lambda n: n + 1)
     document = factory.SubFactory(
-        DocumentFactory,
-        document_key=factory.SelfAttribute('..document_key'))
+        DocumentFactory, document_key=factory.SelfAttribute("..document_key")
+    )
     revisions_category = factory.SubFactory(CategoryFactory)
     latest_revision = factory.SubFactory(
-        TransmittalRevisionFactory,
-        document=factory.SelfAttribute('..document'))
+        TransmittalRevisionFactory, document=factory.SelfAttribute("..document")
+    )
 
 
 def create_transmittal():
@@ -83,16 +90,14 @@ def create_transmittal():
     entity = EntityFactory()
     CDModel = ContentType.objects.get_for_model(ContractorDeliverable)
     deliverables_category = CategoryFactory(
-        category_template__metadata_model=CDModel,
-        third_parties=[entity])
+        category_template__metadata_model=CDModel, third_parties=[entity]
+    )
 
     data = {
-        'category': deliverables_category,
-        'revision': {
-            'return_code': 1
-        },
-        'metadata_factory_class': ContractorDeliverableFactory,
-        'revision_factory_class': ContractorDeliverableRevisionFactory,
+        "category": deliverables_category,
+        "revision": {"return_code": 1},
+        "metadata_factory_class": ContractorDeliverableFactory,
+        "revision_factory_class": ContractorDeliverableRevisionFactory,
     }
     revisions = []
     for _ in range(10):
@@ -100,20 +105,20 @@ def create_transmittal():
         revisions.append(doc.latest_revision)
 
     # Create the actual transmittal
-    OutgoingTransmittalModel = ContentType.objects.get_for_model(
-        OutgoingTransmittal)
+    OutgoingTransmittalModel = ContentType.objects.get_for_model(OutgoingTransmittal)
     transmittal_category = CategoryFactory(
-        category_template__metadata_model=OutgoingTransmittalModel)
+        category_template__metadata_model=OutgoingTransmittalModel
+    )
     data = {
-        'category': transmittal_category,
-        'metadata': {
-            'revisions_category': deliverables_category,
-            'originator': 'CTR',
-            'recipient': entity,
-            'contract_number': 'FAC10005',
+        "category": transmittal_category,
+        "metadata": {
+            "revisions_category": deliverables_category,
+            "originator": "CTR",
+            "recipient": entity,
+            "contract_number": "FAC10005",
         },
-        'metadata_factory_class': OutgoingTransmittalFactory,
-        'revision_factory_class': OutgoingTransmittalRevisionFactory,
+        "metadata_factory_class": OutgoingTransmittalFactory,
+        "revision_factory_class": OutgoingTransmittalRevisionFactory,
     }
     doc = DocumentFactory(**data)
     transmittal = doc.metadata

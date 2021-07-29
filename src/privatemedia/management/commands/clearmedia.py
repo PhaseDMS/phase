@@ -25,27 +25,30 @@ class Command(BaseCommand):
     are not present in db anymore.
 
     """
+
     def handle(self, *args, **options):
-        logger.info('Starting private media files cleanup')
+        logger.info("Starting private media files cleanup")
 
         db_files = self.find_files_in_db()
-        logger.info('{} files found in db'.format(len(db_files)))
+        logger.info("{} files found in db".format(len(db_files)))
 
         disk_files = self.find_files_on_disk()
-        logger.info('{} files found on disk'.format(len(disk_files)))
+        logger.info("{} files found on disk".format(len(disk_files)))
 
         on_disk_only = disk_files - db_files
         in_db_only = db_files - disk_files
 
-        logger.info('{} files found on disk that need cleaning'.format(
-            len(on_disk_only)))
+        logger.info(
+            "{} files found on disk that need cleaning".format(len(on_disk_only))
+        )
         self.clean_files(on_disk_only)
 
-        logger.info('Cleaning done')
+        logger.info("Cleaning done")
 
         if len(in_db_only) > 0:
-            logger.warning('{} files found in db with missing file on disk'.format(
-                len(in_db_only)))
+            logger.warning(
+                "{} files found in db with missing file on disk".format(len(in_db_only))
+            )
 
     def find_files_in_db(self):
         """Return list of all instances of PrivateFile in db."""
@@ -64,9 +67,9 @@ class Command(BaseCommand):
             # Some migrations seem to introduce null values in
             # OutgoingTransmittal archived_pdf field, so we filter
             # against them
-            values = Model.objects \
-                .exclude(**{'%s' % field: '', '%s' % field: None}) \
-                .values_list(field, flat=True)
+            values = Model.objects.exclude(
+                **{"%s" % field: "", "%s" % field: None}
+            ).values_list(field, flat=True)
             all_files += values
 
         def prepend_private_root(path):
@@ -99,15 +102,17 @@ class Command(BaseCommand):
         # Make sure the file we are about to delete
         # really belongs to PRIVATE_ROOT
         if not path.startswith(settings.PRIVATE_ROOT):
-            raise RuntimeError('Cannot delete file {}.'.format(path))
+            raise RuntimeError("Cannot delete file {}.".format(path))
 
         # Check that the file is really a file
         if not os.path.isfile(path):
-            raise RuntimeError('{} should be a file.'.format(path))
+            raise RuntimeError("{} should be a file.".format(path))
 
         # Just in case, make sure we don't delete system files
-        if len(path.split('/')) <= 4:
-            raise RuntimeError('Something is fishy with file {}. Aborting.'.format(path))
+        if len(path.split("/")) <= 4:
+            raise RuntimeError(
+                "Something is fishy with file {}. Aborting.".format(path)
+            )
 
         # Sounds good. Let's delete the file.
         os.remove(path)

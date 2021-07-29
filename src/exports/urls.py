@@ -1,20 +1,14 @@
-# -*- coding: utf-8 -*-
-
-
-from django.conf.urls import url
+from django.urls import path
 
 from exports.views import ExportCreate, ExportList, DownloadView
 
 
 urlpatterns = [
-
-    url(r'^$',
-        ExportList.as_view(),
-        name="export_list"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path("", ExportList.as_view(), name="export_list"),
+    path(
+        "<slug:organisation>/<slug:category>/",
         ExportCreate.as_view(),
-        name="export_create"),
-    url(r'^(?P<uid>[-\w]+)/$',
-        DownloadView.as_view(),
-        name='export_download')
+        name="export_create",
+    ),
+    path("<slug:uid>/", DownloadView.as_view(), name="export_download"),
 ]

@@ -1,20 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 
 from imports.views import ImportList, FileUpload, ImportStatus, ImportTemplate
 
 
 urlpatterns = [
-
-    url(r'^$',
-        ImportList.as_view(),
-        name='import_list'),
-    url(r'^template/$',
-        ImportTemplate.as_view(),
-        name='import_template'),
-    url(r'^import/$',
-        FileUpload.as_view(),
-        name='import_file'),
-    url(r'^(?P<uid>[\w-]+)/$',
-        ImportStatus.as_view(),
-        name='import_status')
+    path("", ImportList.as_view(), name="import_list"),
+    path("template/", ImportTemplate.as_view(), name="import_template"),
+    path("import/", FileUpload.as_view(), name="import_file"),
+    path("<slug:uid>/", ImportStatus.as_view(), name="import_status"),
 ]

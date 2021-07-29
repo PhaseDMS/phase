@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import datetime
 from uuid import UUID
 
@@ -18,27 +15,26 @@ class ExportTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
 
     def create_export(self, **kwargs):
-        data = {
-            'owner': self.user,
-            'category': self.category}
+        data = {"owner": self.user, "category": self.category}
         data.update(kwargs)
         return ExportFactory(**data)
 
     def test_get_filename(self):
-        uuid = UUID('12345678-1234-5678-1234-567812345678')
+        uuid = UUID("12345678-1234-5678-1234-567812345678")
         date = datetime.datetime(2015, 1, 1, tzinfo=utc)
         export = self.create_export(id=uuid, created_on=date)
 
         filename = export.get_filename()
         self.assertEqual(
-            filename,
-            'export_20150101_12345678-1234-5678-1234-567812345678.csv')
+            filename, "export_20150101_12345678-1234-5678-1234-567812345678.csv"
+        )
 
     def test_get_data_generator(self):
         export = self.create_export()
@@ -51,9 +47,9 @@ class ExportTests(TestCase):
         self.assertTrue(isinstance(formatter, CSVFormatter))
 
     def test_get_filters(self):
-        qs = 'toto=riri&tata=fifi&tutu=loulou'
+        qs = "toto=riri&tata=fifi&tutu=loulou"
         export = self.create_export(querystring=qs)
         filters = export.get_filters()
-        self.assertEqual(filters['toto'], 'riri')
-        self.assertEqual(filters['tata'], 'fifi')
-        self.assertEqual(filters['tutu'], 'loulou')
+        self.assertEqual(filters["toto"], "riri")
+        self.assertEqual(filters["tata"], "fifi")
+        self.assertEqual(filters["tutu"], "loulou")

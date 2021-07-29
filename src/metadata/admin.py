@@ -10,7 +10,10 @@ class EntryInline(admin.TabularInline):
 
 
 class ValuesListAdmin(admin.ModelAdmin):
-    list_display = ('index', 'name',)
+    list_display = (
+        "index",
+        "name",
+    )
     inlines = [EntryInline]
 
     def save_formset(self, request, form, formset, change):

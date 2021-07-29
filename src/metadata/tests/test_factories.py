@@ -13,11 +13,13 @@ class ValuesListFactoryTests(TestCase):
 
     def test_value_list_with_values_factory(self):
         """Generation with values parmaeters."""
-        vlf = ValuesListFactory(values={
-            'X': 'A',
-            'Y': 'B',
-        })
+        vlf = ValuesListFactory(
+            values={
+                "X": "A",
+                "Y": "B",
+            }
+        )
         values = vlf.values.all()
         assert len(values) == 2
-        assert values.get(index='X', value="A")
-        assert values.get(index='Y', value="B")
+        assert values.get(index="X", value="A")
+        assert values.get(index="Y", value="B")

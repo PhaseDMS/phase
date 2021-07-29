@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 
 
@@ -12,17 +9,21 @@ def navigation(request):
 
     """
     context = {}
-    if hasattr(request, 'user_categories'):
-        context.update({
-            'user_categories': request.user_categories,
-        })
+    if hasattr(request, "user_categories"):
+        context.update(
+            {
+                "user_categories": request.user_categories,
+            }
+        )
     return context
 
 
 def branding_on_login(request):
     context = {}
-    display_branding = getattr(settings, 'DISPLAY_LOGIN_BRANDING', False)
-    context.update({
-        'display_branding': display_branding,
-    })
+    display_branding = getattr(settings, "DISPLAY_LOGIN_BRANDING", False)
+    context.update(
+        {
+            "display_branding": display_branding,
+        }
+    )
     return context

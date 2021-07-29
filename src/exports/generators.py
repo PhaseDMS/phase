@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 
 from accounts.models import Entity
@@ -16,14 +13,15 @@ class ExportGenerator(object):
     Yields data in chunks.
 
     """
-    def __init__(self, category, filters, fields, owner=None, export_all_revisions=False):
+
+    def __init__(
+        self, category, filters, fields, owner=None, export_all_revisions=False
+    ):
         self.category = category
         self.fields = fields
         self.export_all_revisions = export_all_revisions
         self.filters = filters
-        self.filters.update({
-            'start': 0,
-            'size': 60000})
+        self.filters.update({"start": 0, "size": 60000})
 
         self.owner = owner
 
@@ -35,8 +33,9 @@ class ExportGenerator(object):
 
     def get_entities(self):
         if self.owner and self.owner.is_external:
-            entities = list(Entity.objects.filter(users=self.owner).
-                            values_list('pk', flat=True))
+            entities = list(
+                Entity.objects.filter(users=self.owner).values_list("pk", flat=True)
+            )
         else:
             entities = None
 
@@ -53,13 +52,12 @@ class ExportGenerator(object):
         # OutgoingTransmittals according to recipient
         entities = self.get_entities()
         builder = SearchBuilder(
-            self.category,
-            self.filters,
-            filter_on_entities=entities)
+            self.category, self.filters, filter_on_entities=entities
+        )
         result = builder.scan_results(
-            ['pk'],
-            only_latest_revisions=not self.export_all_revisions)
-        pks = [doc['pk'][0] for doc in result]
+            ["pk"], only_latest_revisions=not self.export_all_revisions
+        )
+        pks = [doc["pk"][0] for doc in result]
         total = len(pks)
         return pks, total
 
@@ -90,10 +88,8 @@ class ExportGenerator(object):
     def get_chunk(self):
         """Get a single piece of data."""
         Model = self.category.revision_class()
-        pks = self.pks[self.start:self.start + self.chunk_size]
-        qs = Model.objects \
-            .filter(pk__in=pks) \
-            .select_related()
+        pks = self.pks[self.start : self.start + self.chunk_size]
+        qs = Model.objects.filter(pk__in=pks).select_related()
         return qs
 
 

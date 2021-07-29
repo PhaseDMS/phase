@@ -22,19 +22,18 @@ class TrsReport(object):
             self.get_subject(),
             self.get_body(),
             settings.DEFAULT_FROM_EMAIL,
-            self.email_list
+            self.email_list,
         )
 
 
 class ErrorReport(TrsReport):
-
     def get_subject(self):
-        return 'Error log on transmittal %s' % self.trs_import.basename
+        return "Error log on transmittal %s" % self.trs_import.basename
 
     def get_body(self):
         context = {
-            'basename': self.trs_import.basename,
-            'errors': self.trs_import.errors,
+            "basename": self.trs_import.basename,
+            "errors": self.trs_import.errors,
         }
-        tpl = render_to_string('reports/error.txt', context)
+        tpl = render_to_string("reports/error.txt", context)
         return tpl

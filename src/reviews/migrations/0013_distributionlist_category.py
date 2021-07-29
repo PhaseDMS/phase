@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 
 
@@ -15,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='distributionlist',
             name='category',
-            field=models.ForeignKey(default=1, verbose_name='Category', to='categories.Category'),
+            field=models.ForeignKey(on_delete=models.PROTECT, default=1, verbose_name='Category', to='categories.Category'),
             preserve_default=False,
         ),
     ]

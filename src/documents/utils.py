@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_text
 from django.utils import timezone
@@ -9,7 +6,9 @@ from django.db import transaction
 from documents import signals
 
 
-def save_document_forms(metadata_form, revision_form, category, rewrite_schedule=True, **doc_kwargs):
+def save_document_forms(
+    metadata_form, revision_form, category, rewrite_schedule=True, **doc_kwargs
+):
     """Creates or updates a document from it's different forms.
 
     Two forms are necessary to edit a document : the metadata and revision forms.
@@ -22,12 +21,20 @@ def save_document_forms(metadata_form, revision_form, category, rewrite_schedule
 
     """
     if not metadata_form.is_valid():
-        raise RuntimeError('Metadata form MUST be valid. \
-                           ({})'.format(metadata_form.errors))
+        raise RuntimeError(
+            "Metadata form MUST be valid. \
+                           ({})".format(
+                metadata_form.errors
+            )
+        )
 
     if not revision_form.is_valid():
-        raise RuntimeError('Revision form MUST be valid. \
-                           ({})'.format(revision_form.errors))
+        raise RuntimeError(
+            "Revision form MUST be valid. \
+                           ({})".format(
+                revision_form.errors
+            )
+        )
 
     revision = revision_form.save(commit=False)
     metadata = metadata_form.save(commit=False)
@@ -36,20 +43,24 @@ def save_document_forms(metadata_form, revision_form, category, rewrite_schedule
     # an if / else russian mountain
     if metadata.pk is None:
         doc, meta, rev = create_document_from_forms(
-            metadata_form, revision_form, category, **doc_kwargs)
+            metadata_form, revision_form, category, **doc_kwargs
+        )
     elif revision.pk is None:
         doc, meta, rev = create_revision_from_forms(
-            metadata_form, revision_form, category)
+            metadata_form, revision_form, category
+        )
     else:
         doc, meta, rev = update_revision_from_forms(
-            metadata_form, revision_form, category)
+            metadata_form, revision_form, category
+        )
 
     signals.document_form_saved.send(
         document=doc,
         metadata=meta,
         revision=rev,
         rewrite_schedule=rewrite_schedule,
-        sender=doc.__class__)
+        sender=doc.__class__,
+    )
 
     return doc, meta, rev
 
@@ -80,7 +91,8 @@ def create_document_from_forms(metadata_form, revision_form, category, **doc_kwa
             current_revision_date=revision.revision_date,
             updated_on=timezone.now(),
             title=metadata.title,
-            **doc_kwargs)
+            **doc_kwargs
+        )
 
         metadata.document = document
         metadata.document_key = doc_key
@@ -99,7 +111,8 @@ def create_document_from_forms(metadata_form, revision_form, category, **doc_kwa
         document=document,
         metadata=metadata,
         revision=revision,
-        sender=metadata.__class__)
+        sender=metadata.__class__,
+    )
     return document, metadata, revision
 
 
@@ -131,7 +144,8 @@ def create_revision_from_forms(metadata_form, revision_form, category):
         document=document,
         metadata=metadata,
         revision=revision,
-        sender=metadata.__class__)
+        sender=metadata.__class__,
+    )
 
     return document, metadata, revision
 
@@ -153,12 +167,13 @@ def update_revision_from_forms(metadata_form, revision_form, category):
         document=document,
         metadata=metadata,
         revision=revision,
-        sender=revision.__class__)
+        sender=revision.__class__,
+    )
 
     return document, metadata, revision
 
 
-def stringify_value(val, none_val='NC'):
+def stringify_value(val, none_val="NC"):
     """Returns a value suitable for display in a document list.
 
     >>> stringify_value('toto')
@@ -177,7 +192,7 @@ def stringify_value(val, none_val='NC'):
     if val is None:
         unicode_val = none_val
     elif type(val) == bool:
-        unicode_val = 'Yes' if val else 'No'
+        unicode_val = "Yes" if val else "No"
     else:
         unicode_val = force_text(val)
 
@@ -187,10 +202,13 @@ def stringify_value(val, none_val='NC'):
 def get_all_document_types():
     """Return all Metadata content types."""
     from documents.models import Metadata
+
     qs = ContentType.objects.all()
-    types = (ct for ct in qs if
-             ct.model_class() is not None and
-             issubclass(ct.model_class(), Metadata))
+    types = (
+        ct
+        for ct in qs
+        if ct.model_class() is not None and issubclass(ct.model_class(), Metadata)
+    )
     return types
 
 
@@ -210,10 +228,14 @@ def get_all_document_classes():
 def get_all_revision_types():
     """Return all MetadataRevisionBase content types."""
     from documents.models import MetadataRevisionBase
+
     qs = ContentType.objects.all()
-    types = (ct for ct in qs
-             if ct.model_class() is not None and
-             issubclass(ct.model_class(), MetadataRevisionBase))
+    types = (
+        ct
+        for ct in qs
+        if ct.model_class() is not None
+        and issubclass(ct.model_class(), MetadataRevisionBase)
+    )
     return types
 
 

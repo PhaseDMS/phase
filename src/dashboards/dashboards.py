@@ -1,8 +1,8 @@
 class DashboardProvider(object):
-    es_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+    es_date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     def __init__(self, **kwargs):
-        self.category = kwargs.get('category', None)
+        self.category = kwargs.get("category", None)
 
     def query_elasticsearch(self):
         """Performs actual query to Elastic Search.
@@ -16,10 +16,10 @@ class DashboardProvider(object):
     def fetch_data(self):
         """Sends a request to ES, and save the response in local variables."""
         data = self.query_elasticsearch()
-        self.hits = data['hits']['hits']
-        self.total_hits = data['hits']['total']
-        self.took = data['took']
-        self.aggregations = data['aggregations']
+        self.hits = data["hits"]["hits"]
+        self.total_hits = data["hits"]["total"]
+        self.took = data["took"]
+        self.aggregations = data["aggregations"]
 
     def get_headers(self):
         """Must return a list of dates."""

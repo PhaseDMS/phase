@@ -1,46 +1,64 @@
-# -*- coding: utf-8 -*-
-
-
-from django.conf.urls import url
+from django.urls import path
 
 from feeds.views import (
-    AlertHome, AlertNewDocuments, AlertClosedReviews, AlertStartedReviews,
-    AlertOverdueDocuments)
+    AlertHome,
+    AlertNewDocuments,
+    AlertClosedReviews,
+    AlertStartedReviews,
+    AlertOverdueDocuments,
+)
 from feeds.feeds import (
-    FeedNewDocuments, FeedClosedReviews, FeedStartedReviews,
-    FeedOverdueDocuments)
+    FeedNewDocuments,
+    FeedClosedReviews,
+    FeedStartedReviews,
+    FeedOverdueDocuments,
+)
 
 
 urlpatterns = [
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path(
+        "<slug:organisation>/<slug:category>/",
         AlertHome.as_view(),
-        name='category_feeds'),
-
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/new_documents/$',
+        name="category_feeds",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/new_documents/",
         AlertNewDocuments.as_view(),
-        name='alert_new_documents'),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/new_documents.rss$',
+        name="alert_new_documents",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/new_documents.rss",
         FeedNewDocuments.as_view(),
-        name='feed_new_documents'),
-
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/closed_reviews/$',
+        name="feed_new_documents",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/closed_reviews/",
         AlertClosedReviews.as_view(),
-        name='alert_closed_reviews'),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/closed_reviews.rss$',
+        name="alert_closed_reviews",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/closed_reviews.rss",
         FeedClosedReviews.as_view(),
-        name='feed_closed_reviews'),
-
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/under_review/$',
+        name="feed_closed_reviews",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/under_review/",
         AlertStartedReviews.as_view(),
-        name='alert_started_reviews'),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/under_review.rss$',
+        name="alert_started_reviews",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/under_review.rss",
         FeedStartedReviews.as_view(),
-        name='feed_started_reviews'),
-
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/overdue_documents/$',
+        name="feed_started_reviews",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/overdue_documents/",
         AlertOverdueDocuments.as_view(),
-        name='alert_overdue_documents'),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/overdue_documents.rss$',
+        name="alert_overdue_documents",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/overdue_documents.rss",
         FeedOverdueDocuments.as_view(),
-        name='feed_overdue_documents'),
+        name="feed_overdue_documents",
+    ),
 ]

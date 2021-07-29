@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
-
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from feeds.feeds import BaseAlertFeed
 from reviews.views import (
-    ReviewersDocumentList, LeaderDocumentList, ApproverDocumentList)
+    ReviewersDocumentList,
+    LeaderDocumentList,
+    ApproverDocumentList,
+)
 
 
 class BaseReviewFeed(BaseAlertFeed):
@@ -17,38 +17,38 @@ class BaseReviewFeed(BaseAlertFeed):
         return item.document.title
 
     def item_description(self, item):
-        return ''
+        return ""
 
     def item_pubdate(self, item):
         return item.created_on
 
     def item_link(self, item):
-        return reverse('review_document', args=[item.document.document_key])
+        return reverse("review_document", args=[item.document.document_key])
 
     def get_queryset(self):
         qs = super(BaseReviewFeed, self).get_queryset()
-        return qs.order_by('created_on')
+        return qs.order_by("created_on")
 
 
 class FeedReviewersDocumentList(BaseReviewFeed, ReviewersDocumentList):
     title = _("Documents for which I'm a reviewer")
-    description = ''
+    description = ""
 
     def link(self):
-        return reverse('feed_reviewers_review_document_list')
+        return reverse("feed_reviewers_review_document_list")
 
 
 class FeedLeaderDocumentList(BaseReviewFeed, LeaderDocumentList):
     title = _("Documents for which I'm review leader")
-    description = ''
+    description = ""
 
     def link(self):
-        return reverse('feed_leader_review_document_list')
+        return reverse("feed_leader_review_document_list")
 
 
 class FeedApproverDocumentList(BaseReviewFeed, ApproverDocumentList):
     title = _("Documents for which I'm a review approver")
-    description = ''
+    description = ""
 
     def link(self):
-        return reverse('feed_approver_review_document_list')
+        return reverse("feed_approver_review_document_list")

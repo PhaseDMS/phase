@@ -1,12 +1,12 @@
 import datetime
 
 import factory
+from factory.django import DjangoModelFactory
 from django.contrib.contenttypes.models import ContentType
 from factory.fuzzy import FuzzyDate
 
 from categories.factories import CategoryFactory
-from default_documents.factories import MetadataFactory, \
-    MetadataRevisionFactory
+from default_documents.factories import MetadataFactory, MetadataRevisionFactory
 from .models import Document
 
 fuzzy_date = FuzzyDate(datetime.date(2012, 1, 1))
@@ -116,13 +116,13 @@ TITLES = (
 )
 
 
-class DocumentFactory(factory.DjangoModelFactory):
+class DocumentFactory(DjangoModelFactory):
     class Meta:
         model = Document
 
     title = factory.fuzzy.FuzzyChoice(TITLES)
-    document_key = factory.Sequence(lambda n: 'document-{0}'.format(n))
-    document_number = factory.SelfAttribute('document_key')
+    document_key = factory.Sequence(lambda n: "document-{0}".format(n))
+    document_number = factory.SelfAttribute("document_key")
     current_revision = 1
     current_revision_date = fuzzy_date.fuzz()
     category = factory.SubFactory(CategoryFactory)
@@ -130,41 +130,45 @@ class DocumentFactory(factory.DjangoModelFactory):
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
         """Takes custom args to set metadata and revision fields."""
-        cls.metadata_factory_class = kwargs.pop('metadata_factory_class',
-                                                MetadataFactory)
-        cls.metadata_kwargs = kwargs.pop('metadata', {})
+        cls.metadata_factory_class = kwargs.pop(
+            "metadata_factory_class", MetadataFactory
+        )
+        cls.metadata_kwargs = kwargs.pop("metadata", {})
 
-        cls.revision_factory_class = kwargs.pop('revision_factory_class',
-                                                MetadataRevisionFactory)
-        cls.revision_kwargs = kwargs.pop('revision', {})
+        cls.revision_factory_class = kwargs.pop(
+            "revision_factory_class", MetadataRevisionFactory
+        )
+        cls.revision_kwargs = kwargs.pop("revision", {})
 
         return super(DocumentFactory, cls)._adjust_kwargs(**kwargs)
 
     @classmethod
     def _after_postgeneration(cls, obj, create, results=None):
         metadata_kwargs = {
-            'document': obj,
-            'document_key': obj.document_key,
-            'document_number': obj.document_number,
-            'latest_revision': None,
+            "document": obj,
+            "document_key": obj.document_key,
+            "document_number": obj.document_number,
+            "latest_revision": None,
         }
 
         metadata_kwargs.update(cls.metadata_kwargs)
         metadata = cls.metadata_factory_class(**metadata_kwargs)
 
         revision_kwargs = {
-            'metadata': metadata,
-            'revision': obj.current_revision,
-            'revision_date': obj.current_revision_date,
-            'created_on': obj.current_revision_date,
-            'updated_on': obj.current_revision_date,
+            "metadata": metadata,
+            "revision": obj.current_revision,
+            "revision_date": obj.current_revision_date,
+            "created_on": obj.current_revision_date,
+            "updated_on": obj.current_revision_date,
         }
         # When instanciating factories for OutgoingTransmitals, we must not
         # pass `received_date` which has been removed from the model.
         # It's why we check if we can safely pass it in kwargs.
         try:
-            cls.revision_factory_class._get_model_class()._meta.get_field('received_date')
-            revision_kwargs['received_date'] = obj.current_revision_date
+            cls.revision_factory_class._get_model_class()._meta.get_field(
+                "received_date"
+            )
+            revision_kwargs["received_date"] = obj.current_revision_date
         except:  # noqa
             pass
         revision_kwargs.update(cls.revision_kwargs)

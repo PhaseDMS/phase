@@ -1,15 +1,15 @@
 ---
-- name: Collect static
-  django_manage:
-    command: collectstatic
-    app_path: "{{ django_root }}"
-    virtualenv: "{{ venv_dir }}"
-    settings: "{{ django_settings }}"
-
-- name: Restart phase
-  become: no
-  supervisorctl: name=phase state=restarted
+- name: Restart django
+  supervisorctl:
+    name: "{{ project_name }}"
+    state: restarted
 
 - name: Restart celery
-  become: no
-  supervisorctl: name=celery state=restarted
+  supervisorctl:
+    name: "celery"
+    state: restarted
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted

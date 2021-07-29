@@ -16,8 +16,8 @@ from categories.models import Category
 from accounts.models import User
 
 
-ALERT_MAIL_BODY_TPL = 'schedules/behind_schedule_alert_body.txt'
-ALERT_MAIL_BODY_HTML_TPL = 'schedules/behind_schedule_alert_body.html'
+ALERT_MAIL_BODY_TPL = "schedules/behind_schedule_alert_body.txt"
+ALERT_MAIL_BODY_HTML_TPL = "schedules/behind_schedule_alert_body.html"
 
 
 class Command(BaseCommand):
@@ -39,43 +39,50 @@ class Command(BaseCommand):
             # Let's build a subset of the document list, depending on the
             # categories the current recipient has access to.
             recipient_categories = recipient.categories.all()
-            recipient_documents = [(cat, doc) for cat, doc in documents
-                                   if cat in recipient_categories]
+            recipient_documents = [
+                (cat, doc) for cat, doc in documents if cat in recipient_categories
+            ]
             if not recipient_documents:
                 continue
 
-            email_subject = 'Documents behind schedule on {:%d/%m/%Y}'.format(
+            email_subject = "Documents behind schedule on {:%d/%m/%Y}".format(
                 timezone.now()
             )
-            email_body = render_to_string(ALERT_MAIL_BODY_TPL, {
-                'user': recipient,
-                'documents': recipient_documents,
-                'scheme': 'https',
-                'domain': site.domain,
-            })
-            html_body = render_to_string(ALERT_MAIL_BODY_HTML_TPL, {
-                'user': recipient,
-                'documents': recipient_documents,
-                'scheme': 'https',
-                'domain': site.domain,
-            })
+            email_body = render_to_string(
+                ALERT_MAIL_BODY_TPL,
+                {
+                    "user": recipient,
+                    "documents": recipient_documents,
+                    "scheme": "https",
+                    "domain": site.domain,
+                },
+            )
+            html_body = render_to_string(
+                ALERT_MAIL_BODY_HTML_TPL,
+                {
+                    "user": recipient,
+                    "documents": recipient_documents,
+                    "scheme": "https",
+                    "domain": site.domain,
+                },
+            )
             send_mail(
                 email_subject,
                 email_body,
                 settings.DEFAULT_FROM_EMAIL,
                 [recipient.email],
-                html_message=html_body
+                html_message=html_body,
             )
-            self.stdout.write('Sending mail to {} ({})'.format(
-                recipient, recipient.email))
+            self.stdout.write(
+                "Sending mail to {} ({})".format(recipient, recipient.email)
+            )
 
     def fetch_categories_with_schedulable_content(self):
         """Fetch all categories where the document class has a Schedulable behavior."""
 
-        categories = Category.objects \
-            .select_related(
-                'organisation',
-                'category_template__metadata_model')
+        categories = Category.objects.select_related(
+            "organisation", "category_template__metadata_model"
+        )
 
         def has_schedulable_content(category):
             metadata_cls = category.document_class()
@@ -102,10 +109,8 @@ class Command(BaseCommand):
         # Get the list of existing statuses for this category's document class
         Metadata = category.document_class()
         Revision = Metadata.get_revision_class()
-        list_index = Revision._meta.get_field('status').list_index
-        statuses = [
-            status.lower() for status, _ in get_choices_from_list(list_index)
-        ]
+        list_index = Revision._meta.get_field("status").list_index
+        statuses = [status.lower() for status, _ in get_choices_from_list(list_index)]
         today = timezone.now().date()
 
         # Create a first coarse filter to get all documents that MAY be
@@ -123,8 +128,8 @@ class Command(BaseCommand):
         # would make the said query ridiculously complex.
         conditions = []
         for status in statuses:
-            forecast_field = 'status_{}_forecast_date'.format(status)
-            actual_field = 'status_{}_actual_date'.format(status)
+            forecast_field = "status_{}_forecast_date".format(status)
+            actual_field = "status_{}_actual_date".format(status)
 
             # Let's check that the actual schedule fields corresponding to
             # this status exists
@@ -134,16 +139,18 @@ class Command(BaseCommand):
             except FieldDoesNotExist:
                 continue
 
-            forecast_condition = '{}__lt'.format(forecast_field)
-            actual_condition = '{}__isnull'.format(actual_field)
+            forecast_condition = "{}__lt".format(forecast_field)
+            actual_condition = "{}__isnull".format(actual_field)
             conditions.append(
-                Q(**{forecast_condition: today}) & Q(**{actual_condition: True}))
+                Q(**{forecast_condition: today}) & Q(**{actual_condition: True})
+            )
 
         coarse_filter = reduce(operator.or_, conditions)
-        documents = Metadata.objects \
-            .filter(document__category=category) \
-            .filter(coarse_filter) \
-            .select_related('document', 'latest_revision')
+        documents = (
+            Metadata.objects.filter(document__category=category)
+            .filter(coarse_filter)
+            .select_related("document", "latest_revision")
+        )
 
         def is_behind_schedule(document):
             """Tells if a single document is actually behind schedule.
@@ -161,8 +168,8 @@ class Command(BaseCommand):
                     # this schedule line.
                     continue
 
-                forecast_field = 'status_{}_forecast_date'.format(status)
-                actual_field = 'status_{}_actual_date'.format(status)
+                forecast_field = "status_{}_forecast_date".format(status)
+                actual_field = "status_{}_actual_date".format(status)
 
                 if getattr(document, forecast_field, None) is None:
                     continue
@@ -181,7 +188,7 @@ class Command(BaseCommand):
     def fetch_alert_recipients(self):
         """Return users that must receive the alerts."""
 
-        users = User.objects \
-            .filter(send_behind_schedule_alert_mails=True) \
-            .prefetch_related('categories')
+        users = User.objects.filter(
+            send_behind_schedule_alert_mails=True
+        ).prefetch_related("categories")
         return users

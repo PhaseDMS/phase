@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations
 from documents.utils import get_all_document_classes
 from django.db.models import F

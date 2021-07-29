@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 import django.utils.timezone
 
@@ -23,7 +20,7 @@ class Migration(migrations.Migration):
                 ('is_indexable', models.BooleanField(default=True, verbose_name='Indexable')),
                 ('current_revision', models.PositiveIntegerField(verbose_name='Revision')),
                 ('current_revision_date', models.DateField(null=True, verbose_name='Revision Date', blank=True)),
-                ('category', models.ForeignKey(related_name='documents', verbose_name='Category', to='categories.Category')),
+                ('category', models.ForeignKey(on_delete=models.PROTECT, related_name='documents', verbose_name='Category', to='categories.Category')),
             ],
             options={
                 'verbose_name': 'Document',

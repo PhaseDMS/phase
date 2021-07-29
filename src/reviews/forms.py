@@ -1,17 +1,18 @@
-# -*- coding: utf-8 -*-
-
-
 from django import forms
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from crispy_forms.layout import Field
 
 from accounts.forms import UserChoiceField, UserMultipleChoiceField
 from default_documents.layout import (
-    DocumentFieldset, PropertyLayout, YesNoLayout, DateField)
+    DocumentFieldset,
+    PropertyLayout,
+    YesNoLayout,
+    DateField,
+)
 from privatemedia.widgets import PhaseClearableFileInput
 from distriblists.forms import DistributionListValidationMixin
 from reviews.utils import get_cached_reviews
@@ -21,39 +22,36 @@ from categories.models import Category
 
 
 class ReviewSearchForm(forms.Form):
-    key_title = forms.CharField(
-        label=_('Document nb. / Title'),
-        required=False)
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
-        required=False)
+    key_title = forms.CharField(label=_("Document nb. / Title"), required=False)
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
     status = forms.ChoiceField(choices=[], required=False)
     step = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.user = kwargs.pop("user", None)
         if self.user is None:
             raise ImproperlyConfigured('Missing "user" parameter')
 
-        self.reviews = kwargs.pop('reviews', None)
+        self.reviews = kwargs.pop("reviews", None)
         if self.reviews is None:
             raise ImproperlyConfigured('Missing "reviews" parameter')
 
         super(ReviewSearchForm, self).__init__(*args, **kwargs)
 
         # Only display categories the user has access to
-        self.fields['category'].queryset = Category.objects \
-            .filter(users=self.user) \
-            .select_related() \
-            .order_by('organisation__name', 'category_template__name')
+        self.fields["category"].queryset = (
+            Category.objects.filter(users=self.user)
+            .select_related()
+            .order_by("organisation__name", "category_template__name")
+        )
 
         # Only display existing statuses
-        statuses = self.reviews.values_list('revision_status', flat=True)
+        statuses = self.reviews.values_list("revision_status", flat=True)
         statuses = [_f for _f in statuses if _f]
         choices = [
-            ('', '---------'),
+            ("", "---------"),
         ] + list(zip(statuses, statuses))
-        self.fields['status'].choices = choices
+        self.fields["status"].choices = choices
 
     def filter_reviews(self):
         if not self.is_bound:
@@ -69,7 +67,7 @@ class ReviewSearchForm(forms.Form):
         return qs
 
     def filter_qs_by_number_and_title(self, qs):
-        search = self.cleaned_data['key_title']
+        search = self.cleaned_data["key_title"]
         if search:
             q_doc_number = Q(document__document_key__icontains=search)
             q_title = Q(document__title__icontains=search)
@@ -78,21 +76,21 @@ class ReviewSearchForm(forms.Form):
         return qs
 
     def filter_qs_by_category(self, qs):
-        category = self.cleaned_data['category']
+        category = self.cleaned_data["category"]
         if category:
             qs = qs.filter(document__category=category)
 
         return qs
 
     def filter_qs_by_status(self, qs):
-        status = self.cleaned_data['status']
+        status = self.cleaned_data["status"]
         if status:
             qs = qs.filter(revision_status__icontains=status)
 
         return qs
 
     def filter_qs_by_step(self, qs):
-        step = self.cleaned_data['step']
+        step = self.cleaned_data["step"]
         if step:
             qs = qs.filter(status__icontains=step)
 
@@ -100,13 +98,12 @@ class ReviewSearchForm(forms.Form):
 
 
 class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
-
     class Media:
         js = (
-            'js/reviews/models.js',
-            'js/reviews/collections.js',
-            'js/reviews/views.js',
-            'js/reviews/distribution_list_app.js',
+            "js/reviews/models.js",
+            "js/reviews/collections.js",
+            "js/reviews/views.js",
+            "js/reviews/distribution_list_app.js",
         )
 
     def __init__(self, *args, **kwargs):
@@ -115,21 +112,20 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
         # We declare those fields in __init__ because
         # we need to pass the `category` attribute, which we
         # only have at the form instantiation
-        self.fields['leader'] = UserChoiceField(
+        self.fields["leader"] = UserChoiceField(
             category=self.category,
-            label=_('Leader'),
+            label=_("Leader"),
             required=False,
-            help_text=_('The leader is required to start the review'))
+            help_text=_("The leader is required to start the review"),
+        )
 
-        self.fields['approver'] = UserChoiceField(
-            category=self.category,
-            label=_('Approver'),
-            required=False)
+        self.fields["approver"] = UserChoiceField(
+            category=self.category, label=_("Approver"), required=False
+        )
 
-        self.fields['reviewers'] = UserMultipleChoiceField(
-            category=self.category,
-            label=_('Reviewers'),
-            required=False)
+        self.fields["reviewers"] = UserMultipleChoiceField(
+            category=self.category, label=_("Reviewers"), required=False
+        )
 
     def prepare_form(self, *args, **kwargs):
         if self.instance.id:
@@ -149,28 +145,34 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
         super(ReviewFormMixin, self).prepare_form(*args, **kwargs)
 
     def prepare_field_file_transmitted(self):
-        self.fields['file_transmitted'].widget = PhaseClearableFileInput()
+        self.fields["file_transmitted"].widget = PhaseClearableFileInput()
         if self.instance.file_transmitted:
-            url = reverse('revision_file_download', args=[
-                self.category.organisation.slug,
-                self.category.slug,
-                self.instance.document.document_key,
-                self.instance.revision,
-                'file_transmitted',
-            ])
-            self.fields['file_transmitted'].widget.value_url = url
+            url = reverse(
+                "revision_file_download",
+                args=[
+                    self.category.organisation.slug,
+                    self.category.slug,
+                    self.instance.document.document_key,
+                    self.instance.revision,
+                    "file_transmitted",
+                ],
+            )
+            self.fields["file_transmitted"].widget.value_url = url
 
     def prepare_field_client_comments(self):
-        self.fields['client_comments'].widget = PhaseClearableFileInput()
+        self.fields["client_comments"].widget = PhaseClearableFileInput()
         if self.instance.client_comments:
-            url = reverse('revision_file_download', args=[
-                self.category.organisation.slug,
-                self.category.slug,
-                self.instance.document.document_key,
-                self.instance.revision,
-                'client_comments',
-            ])
-            self.fields['client_comments'].widget.value_url = url
+            url = reverse(
+                "revision_file_download",
+                args=[
+                    self.category.organisation.slug,
+                    self.category.slug,
+                    self.instance.document.document_key,
+                    self.instance.revision,
+                    "client_comments",
+                ],
+            )
+            self.fields["client_comments"].widget.value_url = url
 
     def clean_reviewers(self):
         """Validate the reviewers
@@ -179,7 +181,7 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
         A reviewer that posted a review cannot be deleted anymore.
 
         """
-        reviewers = self.cleaned_data['reviewers']
+        reviewers = self.cleaned_data["reviewers"]
         if self.instance.review_start_date is None:
             return reviewers
 
@@ -190,50 +192,56 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
 
             # If reviewers step is finished, reviewers cannot be modified anymore
             if self.instance.reviewers_step_closed:
-                error = _('Reviewers step is over, you cannot modify reviewers anymore')
-                raise ValidationError(error, code='reviewers')
+                error = _("Reviewers step is over, you cannot modify reviewers anymore")
+                raise ValidationError(error, code="reviewers")
 
             # if some reviewers were deleted, check that none of the them
             # actually submitted a review
             deleted_reviewers = set(old_reviewers) - set(reviewers)
             deleted_reviews_with_comments = self.instance.get_filtered_reviews(
-                lambda rev: rev.reviewer in deleted_reviewers and
-                rev.status != 'progress')
+                lambda rev: rev.reviewer in deleted_reviewers
+                and rev.status != "progress"
+            )
             if len(deleted_reviews_with_comments) > 0:
                 errors = []
                 for review in deleted_reviews_with_comments:
-                    errors.append(ValidationError(
-                        _('%(user)s already submitted a review, and cannot be '
-                          'removed from the distribution list.'),
-                        code='reviewers',
-                        params={'user': review.reviewer}))
-                raise ValidationError(errors, code='reviewers')
+                    errors.append(
+                        ValidationError(
+                            _(
+                                "%(user)s already submitted a review, and cannot be "
+                                "removed from the distribution list."
+                            ),
+                            code="reviewers",
+                            params={"user": review.reviewer},
+                        )
+                    )
+                raise ValidationError(errors, code="reviewers")
 
         return reviewers
 
     def clean_leader(self):
-        leader = self.cleaned_data['leader']
+        leader = self.cleaned_data["leader"]
         if self.instance.review_start_date is None:
             return leader
 
         # If leader step is over, leader cannot be changed anymore
         if self.instance.leader_step_closed:
             if leader != self.instance.leader:
-                error = _('Leader stop is over, you cannot modify leader anymore.')
-                raise ValidationError(error, code='leader')
+                error = _("Leader stop is over, you cannot modify leader anymore.")
+                raise ValidationError(error, code="leader")
 
         return leader
 
     def clean_approver(self):
-        approver = self.cleaned_data['approver']
+        approver = self.cleaned_data["approver"]
         if self.instance.review_start_date is None:
             return approver
 
         # If approver step is over, leader cannot be changed anymore
         if self.instance.review_end_date:
             if approver != self.instance.approver:
-                error = _('Approver stop is over, you cannot modify approver anymore.')
-                raise ValidationError(error, code='approver')
+                error = _("Approver stop is over, you cannot modify approver anymore.")
+                raise ValidationError(error, code="approver")
 
         return approver
 
@@ -248,37 +256,39 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
         if self.read_only:
             review_layout = (
                 DocumentFieldset(
-                    _('Review'),
-                    DateField('received_date'),
-                    PropertyLayout('return_code'),
-                    Field('review_start_date', readonly='readonly'),
-                    Field('review_due_date', readonly='readonly'),
-                    PropertyLayout('get_current_review_step_display'),
-                    YesNoLayout('is_under_review'),
-                    YesNoLayout('is_overdue'),
-                    'file_transmitted'),
-                DocumentFieldset(
-                    _('Distribution list'),
-                    ReviewsLayout()))
+                    _("Review"),
+                    DateField("received_date"),
+                    PropertyLayout("return_code"),
+                    Field("review_start_date", readonly="readonly"),
+                    Field("review_due_date", readonly="readonly"),
+                    PropertyLayout("get_current_review_step_display"),
+                    YesNoLayout("is_under_review"),
+                    YesNoLayout("is_overdue"),
+                    "file_transmitted",
+                ),
+                DocumentFieldset(_("Distribution list"), ReviewsLayout()),
+            )
         else:
             review_layout = (
                 DocumentFieldset(
-                    _('Review'),
-                    DateField('received_date'),
-                    PropertyLayout('return_code'),
-                    Field('review_start_date', readonly='readonly'),
-                    Field('review_due_date', readonly='readonly'),
-                    PropertyLayout('get_current_review_step_display'),
-                    YesNoLayout('is_under_review'),
-                    YesNoLayout('is_overdue'),
-                    'file_transmitted'),
+                    _("Review"),
+                    DateField("received_date"),
+                    PropertyLayout("return_code"),
+                    Field("review_start_date", readonly="readonly"),
+                    Field("review_due_date", readonly="readonly"),
+                    PropertyLayout("get_current_review_step_display"),
+                    YesNoLayout("is_under_review"),
+                    YesNoLayout("is_overdue"),
+                    "file_transmitted",
+                ),
                 DocumentFieldset(
-                    _('Distribution list'),
+                    _("Distribution list"),
                     QuickDistributionListWidgetLayout(),
-                    'reviewers',
-                    'leader',
-                    'approver',
-                ),)
+                    "reviewers",
+                    "leader",
+                    "approver",
+                ),
+            )
 
         return review_layout
 
@@ -286,7 +296,7 @@ class ReviewFormMixin(DistributionListValidationMixin, forms.ModelForm):
 class BasePostReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ('comments', 'return_code')
+        fields = ("comments", "return_code")
 
     def clean_return_code(self):
         """Validate the return code field.
@@ -300,11 +310,11 @@ class BasePostReviewForm(forms.ModelForm):
         "cancel X step" or "send back to leader" buttons.
 
         """
-        return_code = self.cleaned_data['return_code']
-        empty_values = self.fields['return_code'].empty_values
+        return_code = self.cleaned_data["return_code"]
+        empty_values = self.fields["return_code"].empty_values
 
         # The user tried to submit a review without a return code
-        if return_code in empty_values and 'review' in self.data:
-            raise forms.ValidationError('This field is required.')
+        if return_code in empty_values and "review" in self.data:
+            raise forms.ValidationError("This field is required.")
 
         return return_code

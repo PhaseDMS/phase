@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 
 
@@ -39,6 +36,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='listentry',
             name='values_list',
-            field=models.ForeignKey(related_name='values', verbose_name='List', to='metadata.ValuesList'),
+            field=models.ForeignKey(on_delete=models.PROTECT, related_name='values', verbose_name='List', to='metadata.ValuesList'),
         ),
     ]

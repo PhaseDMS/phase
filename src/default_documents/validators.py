@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import re
 
 from django.core.exceptions import ValidationError
@@ -12,9 +9,9 @@ from django.utils.deconstruct import deconstructible
 class StringNumberValidator(object):
     """Validate numbers that should be typed in with a fixed length"""
 
-    base_regex = r'\d{%d}'
-    message = _('The value is incorrect')
-    code = 'invalid'
+    base_regex = r"\d{%d}"
+    message = _("The value is incorrect")
+    code = "invalid"
 
     def __init__(self, length=4):
         self.length = length

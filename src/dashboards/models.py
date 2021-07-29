@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from categories.models import Category
 from dashboards.fields import DashboardProviderChoiceField
@@ -11,42 +8,33 @@ from accounts.models import User
 
 
 class Dashboard(models.Model):
-    title = models.CharField(
-        _('Title'),
-        max_length=50)
-    slug = models.SlugField(
-        _('Slug'),
-        db_index=True,
-        max_length=250)
+    title = models.CharField(_("Title"), max_length=50)
+    slug = models.SlugField(_("Slug"), db_index=True, max_length=250)
     category = models.ForeignKey(
-        Category,
-        verbose_name=_('Category'))
-    data_provider = DashboardProviderChoiceField(
-        _('Dashboard data provider'))
+        Category, on_delete=models.PROTECT, verbose_name=_("Category")
+    )
+    data_provider = DashboardProviderChoiceField(_("Dashboard data provider"))
     authorized_users = models.ManyToManyField(
-        User,
-        verbose_name=_('Authorized users'),
-        blank=True,
-        related_name='dashboards')
+        User, verbose_name=_("Authorized users"), blank=True, related_name="dashboards"
+    )
 
     class Meta:
-        verbose_name = _('Dashboard')
-        verbose_name_plural = _('Dashboard provider')
-        unique_together = ('slug', 'category')
+        verbose_name = _("Dashboard")
+        verbose_name_plural = _("Dashboard provider")
+        unique_together = ("slug", "category")
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
-        url = reverse('dashboard_detail', args=[
-            self.category.organisation.slug,
-            self.slug
-        ])
+        url = reverse(
+            "dashboard_detail", args=[self.category.organisation.slug, self.slug]
+        )
         return url
 
     @property
     def data_strategy(self):
-        if not hasattr(self, '_data_strategy'):
+        if not hasattr(self, "_data_strategy"):
             self._data_strategy = self.data_provider(category=self.category)
         return self._data_strategy
 

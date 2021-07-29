@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -15,21 +12,21 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contractordeliverablerevision',
             name='metadata',
-            field=models.ForeignKey(to='default_documents.ContractorDeliverable'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='default_documents.ContractorDeliverable'),
         ),
         migrations.AlterField(
             model_name='correspondencerevision',
             name='metadata',
-            field=models.ForeignKey(to='default_documents.Correspondence'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='default_documents.Correspondence'),
         ),
         migrations.AlterField(
             model_name='demometadatarevision',
             name='metadata',
-            field=models.ForeignKey(to='default_documents.DemoMetadata'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='default_documents.DemoMetadata'),
         ),
         migrations.AlterField(
             model_name='minutesofmeetingrevision',
             name='metadata',
-            field=models.ForeignKey(to='default_documents.MinutesOfMeeting'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='default_documents.MinutesOfMeeting'),
         ),
     ]

@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-
-
 import factory
+from factory.django import DjangoModelFactory
 from factory import fuzzy
 
 from accounts.factories import UserFactory
 from .models import Activity
 
 
-class ActivityFactory(factory.DjangoModelFactory):
+class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
 

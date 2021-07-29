@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from rest_framework import generics
 
 from restapi.views import CategoryAPIViewMixin
@@ -13,13 +10,14 @@ class DistributionListList(CategoryAPIViewMixin, generics.ListAPIView):
     serializer_class = DistributionListSerializer
 
     def get_queryset(self):
-        qs = DistributionList.objects \
-            .filter(categories=self.get_category()) \
-            .select_related('leader', 'approver') \
-            .prefetch_related('reviewers') \
-            .order_by('name')
+        qs = (
+            DistributionList.objects.filter(categories=self.get_category())
+            .select_related("leader", "approver")
+            .prefetch_related("reviewers")
+            .order_by("name")
+        )
 
-        q = self.request.query_params.get('q', None)
+        q = self.request.query_params.get("q", None)
         if q:
             # Should we use an index?
             # See http://dba.stackexchange.com/a/21648/85866

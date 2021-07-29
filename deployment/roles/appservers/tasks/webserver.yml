@@ -1,0 +1,27 @@
+---
+- name: Create main supervisor configuration
+  template:
+    src: supervisor.j2
+    dest: /etc/supervisor/conf.d/{{ project_name }}.conf
+
+- name: Create main nginx configuration
+  template:
+    src: nginx_main.j2
+    dest: /etc/nginx/sites-available/{{ project_name }}
+
+- name: Create nginx configuration symlink
+  file:
+    src: /etc/nginx/sites-available/{{ project_name }}
+    dest: /etc/nginx/sites-enabled/{{ project_name }}
+    state: link
+
+- name: Create nginx default configuration
+  template:
+    src: nginx_default.j2
+    dest: /etc/nginx/sites-available/default
+
+- name: Create nginx default host symlink
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link

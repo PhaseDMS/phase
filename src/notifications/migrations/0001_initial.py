@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 import django.utils.timezone
 from django.conf import settings
@@ -21,7 +18,7 @@ class Migration(migrations.Migration):
                 ('body', models.TextField(null=True, verbose_name='Body', blank=True)),
                 ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Created on')),
                 ('seen', models.BooleanField(default=False, verbose_name='Seen')),
-                ('user', models.ForeignKey(verbose_name='User', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.PROTECT, verbose_name='User', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Notification',

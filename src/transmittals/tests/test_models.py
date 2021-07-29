@@ -9,38 +9,40 @@ from django.utils import timezone
 from accounts.factories import UserFactory
 from documents.factories import DocumentFactory
 from transmittals.factories import (
-    TransmittalFactory, TransmittalRevisionFactory, create_transmittal)
+    TransmittalFactory,
+    TransmittalRevisionFactory,
+    create_transmittal,
+)
 
 
 def touch(path):
     """Simply creates an empty file."""
-    open(path, 'a').close()
+    open(path, "a").close()
 
 
 class TransmittalModelTests(TestCase):
-
     def setUp(self):
-        self.tmpdir = tempfile.mkdtemp(prefix='phasetest_', suffix='_trs')
-        self.incoming = join(self.tmpdir, 'incoming')
-        self.tobechecked = join(self.tmpdir, 'tobechecked')
-        self.accepted = join(self.tmpdir, 'accepted')
-        self.rejected = join(self.tmpdir, 'rejected')
+        self.tmpdir = tempfile.mkdtemp(prefix="phasetest_", suffix="_trs")
+        self.incoming = join(self.tmpdir, "incoming")
+        self.tobechecked = join(self.tmpdir, "tobechecked")
+        self.accepted = join(self.tmpdir, "accepted")
+        self.rejected = join(self.tmpdir, "rejected")
 
         os.mkdir(self.accepted)
         os.mkdir(self.rejected)
         os.mkdir(self.tobechecked)
 
         doc = DocumentFactory(
-            document_key='FAC10005-CTR-CLT-TRS-00001',
+            document_key="FAC10005-CTR-CLT-TRS-00001",
             metadata_factory_class=TransmittalFactory,
             revision_factory_class=TransmittalRevisionFactory,
             metadata={
-                'status': 'tobechecked',
-                'tobechecked_dir': self.tobechecked,
-                'accepted_dir': self.accepted,
-                'rejected_dir': self.rejected,
-                'contractor': 'test'
-            }
+                "status": "tobechecked",
+                "tobechecked_dir": self.tobechecked,
+                "accepted_dir": self.accepted,
+                "rejected_dir": self.rejected,
+                "contractor": "test",
+            },
         )
         self.transmittal = doc.get_metadata()
         os.mkdir(self.transmittal.full_tobechecked_name)
@@ -50,11 +52,11 @@ class TransmittalModelTests(TestCase):
             rmtree(self.tmpdir)
 
     def test_reject_trs_with_wrong_status(self):
-        trs = TransmittalFactory(status='accepted')
+        trs = TransmittalFactory(status="accepted")
         with self.assertRaises(RuntimeError):
             trs.reject()
 
-        trs = TransmittalFactory(status='refused')
+        trs = TransmittalFactory(status="refused")
         with self.assertRaises(RuntimeError):
             trs.reject()
 
@@ -67,35 +69,35 @@ class TransmittalModelTests(TestCase):
         self.assertTrue(os.path.exists(self.transmittal.full_rejected_name))
 
     def test_reject_with_already_existing_rejected_directory(self):
-        touch(join(self.transmittal.full_tobechecked_name, 'toto.csv'))
+        touch(join(self.transmittal.full_tobechecked_name, "toto.csv"))
 
         copytree(
-            self.transmittal.full_tobechecked_name,
-            self.transmittal.full_rejected_name)
+            self.transmittal.full_tobechecked_name, self.transmittal.full_rejected_name
+        )
         self.assertTrue(os.path.exists(self.transmittal.full_tobechecked_name))
         self.assertTrue(os.path.exists(self.transmittal.full_rejected_name))
 
         self.transmittal.reject()
-        self.assertEqual(self.transmittal.status, 'rejected')
+        self.assertEqual(self.transmittal.status, "rejected")
         self.assertFalse(os.path.exists(self.transmittal.full_tobechecked_name))
         self.assertTrue(os.path.exists(self.transmittal.full_rejected_name))
 
     def test_accept_trs_with_wrong_status(self):
-        trs = TransmittalFactory(status='accepted')
+        trs = TransmittalFactory(status="accepted")
         with self.assertRaises(RuntimeError):
             trs.accept()
 
-        trs = TransmittalFactory(status='processing')
+        trs = TransmittalFactory(status="processing")
         with self.assertRaises(RuntimeError):
             trs.accept()
 
-        trs = TransmittalFactory(status='rejected')
+        trs = TransmittalFactory(status="rejected")
         with self.assertRaises(RuntimeError):
             trs.accept()
 
     def test_accept(self):
         self.transmittal.accept()
-        self.assertEqual(self.transmittal.status, 'processing')
+        self.assertEqual(self.transmittal.status, "processing")
 
 
 class OutgoingTransmittalModelTests(TestCase):

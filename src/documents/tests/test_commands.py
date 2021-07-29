@@ -8,7 +8,6 @@ from categories.factories import CategoryFactory
 
 
 class CommandTest(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
 

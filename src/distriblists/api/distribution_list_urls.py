@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
-from django.conf.urls import url
+from django.urls import path
 
 from distriblists.api.views import DistributionListList  # Yes, a list of lists
 
 
 urlpatterns = [
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path(
+        "<slug:organisation>/<slug:category>/",
         DistributionListList.as_view(),
-        name='distributionlist-list'),
+        name="distributionlist-list",
+    ),
 ]

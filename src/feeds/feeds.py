@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
-
 import base64
 from datetime import datetime, time
 
 from django.contrib.syndication.views import Feed
 from django.views.generic import View
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
@@ -24,7 +21,7 @@ class HttpResponseUnauthorized(HttpResponse):
 
     def __init__(self, *args, **kwargs):
         super(HttpResponseUnauthorized, self).__init__(*args, **kwargs)
-        self['WWW-Authenticate'] = 'Basic realm="Phase feeds"'
+        self["WWW-Authenticate"] = 'Basic realm="Phase feeds"'
 
 
 class AlertMixin(object):
@@ -38,11 +35,12 @@ class AlertMixin(object):
     login + password.
 
     """
+
     def authenticate_user(self, request):
         try:
-            auth = request.META['HTTP_AUTHORIZATION'].split()
+            auth = request.META["HTTP_AUTHORIZATION"].split()
             decoded_auth = base64.b64decode(auth[1]).decode()
-            username, password = decoded_auth.split(':')
+            username, password = decoded_auth.split(":")
         except:  # noqa
             # Invalid authorization header sent by client
             # Let's block everything.
@@ -54,14 +52,14 @@ class AlertMixin(object):
                 login(request, user)
 
     def dispatch(self, request, *args, **kwargs):
-        if 'HTTP_AUTHORIZATION' in request.META:
+        if "HTTP_AUTHORIZATION" in request.META:
             self.authenticate_user(request)
 
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             if self.request.is_secure():
-                return HttpResponseUnauthorized('Unauthorized')
+                return HttpResponseUnauthorized("Unauthorized")
             else:
-                msg = _('This url cannot be accessed through a non-secure protocol')
+                msg = _("This url cannot be accessed through a non-secure protocol")
                 raise PermissionDenied(msg)
         else:
             return super(AlertMixin, self).dispatch(request, *args, **kwargs)
@@ -75,6 +73,7 @@ class BaseAlertFeed(AlertMixin, Feed, View):
 
 class BaseCategoryAlertFeed(AlertMixin, CategoryMixin, Feed, View):
     """Base class for feeds in a single category."""
+
     def populate(self, request, *args, **kwargs):
         self.request = request
         self.kwargs = kwargs
@@ -87,26 +86,26 @@ class BaseCategoryAlertFeed(AlertMixin, CategoryMixin, Feed, View):
 
 
 class FeedNewDocuments(BaseCategoryAlertFeed):
-    title = _('New documents')
-    description = _('List of newly created documents in the category')
+    title = _("New documents")
+    description = _("List of newly created documents in the category")
 
     def link(self):
-        return reverse('feed_new_documents', args=[
-            self.category.organisation.slug,
-            self.category.slug
-        ])
+        return reverse(
+            "feed_new_documents",
+            args=[self.category.organisation.slug, self.category.slug],
+        )
 
     def items(self, *args, **kwargs):
-        qs = Document.objects \
-            .filter(category=self.category) \
-            .order_by('-created_on')[:settings.ALERT_ELEMENTS]
+        qs = Document.objects.filter(category=self.category).order_by("-created_on")[
+            : settings.ALERT_ELEMENTS
+        ]
         return qs
 
     def item_title(self, item):
         return item.document_number
 
     def item_description(self, item):
-        return render_to_string('feeds/revision_document.html', {'item': item})
+        return render_to_string("feeds/revision_document.html", {"item": item})
 
     def item_pubdate(self, item):
         # Feeds expect a full datetime obj but documents only store
@@ -116,21 +115,23 @@ class FeedNewDocuments(BaseCategoryAlertFeed):
 
 
 class FeedClosedReviews(BaseCategoryAlertFeed):
-    title = _('Closed reviews')
-    description = _('List of recently closed reviews')
+    title = _("Closed reviews")
+    description = _("List of recently closed reviews")
 
     def link(self):
-        return reverse('feed_closed_reviews', args=[
-            self.category.organisation.slug,
-            self.category.slug
-        ])
+        return reverse(
+            "feed_closed_reviews",
+            args=[self.category.organisation.slug, self.category.slug],
+        )
 
     def items(self, *args, **kwargs):
-        qs = self.category.revision_class().objects \
-            .filter(metadata__document__category=self.category) \
-            .filter(review_end_date__isnull=False) \
-            .select_related('metadata__document') \
-            .order_by('-review_end_date')[:settings.ALERT_ELEMENTS]
+        qs = (
+            self.category.revision_class()
+            .objects.filter(metadata__document__category=self.category)
+            .filter(review_end_date__isnull=False)
+            .select_related("metadata__document")
+            .order_by("-review_end_date")[: settings.ALERT_ELEMENTS]
+        )
         return qs
 
     def item_link(self, item):
@@ -140,7 +141,7 @@ class FeedClosedReviews(BaseCategoryAlertFeed):
         return item.metadata.document_number
 
     def item_description(self, item):
-        return render_to_string('feeds/revision_item.html', {'item': item})
+        return render_to_string("feeds/revision_item.html", {"item": item})
 
     def item_pubdate(self, item):
         # Feeds expect a full datetime obj but documents only store
@@ -150,21 +151,23 @@ class FeedClosedReviews(BaseCategoryAlertFeed):
 
 
 class FeedStartedReviews(BaseCategoryAlertFeed):
-    title = _('Documents under review')
-    description = _('Documents that just went under review.')
+    title = _("Documents under review")
+    description = _("Documents that just went under review.")
 
     def link(self):
-        return reverse('feed_started_reviews', args=[
-            self.category.organisation.slug,
-            self.category.slug
-        ])
+        return reverse(
+            "feed_started_reviews",
+            args=[self.category.organisation.slug, self.category.slug],
+        )
 
     def items(self, *args, **kwargs):
-        qs = self.category.revision_class().objects \
-            .filter(metadata__document__category=self.category) \
-            .filter(review_start_date__isnull=False) \
-            .select_related('metadata__document') \
-            .order_by('-review_start_date')[:settings.ALERT_ELEMENTS]
+        qs = (
+            self.category.revision_class()
+            .objects.filter(metadata__document__category=self.category)
+            .filter(review_start_date__isnull=False)
+            .select_related("metadata__document")
+            .order_by("-review_start_date")[: settings.ALERT_ELEMENTS]
+        )
         return qs
 
     def item_link(self, item):
@@ -174,7 +177,7 @@ class FeedStartedReviews(BaseCategoryAlertFeed):
         return item.metadata.title
 
     def item_description(self, item):
-        return render_to_string('feeds/revision_item.html', {'item': item})
+        return render_to_string("feeds/revision_item.html", {"item": item})
 
     def item_pubdate(self, item):
         # Feeds expect a full datetime obj but documents only store
@@ -184,24 +187,26 @@ class FeedStartedReviews(BaseCategoryAlertFeed):
 
 
 class FeedOverdueDocuments(BaseCategoryAlertFeed):
-    title = _('Overdue documents')
-    description = _('Overdue documents.')
+    title = _("Overdue documents")
+    description = _("Overdue documents.")
 
     def link(self):
-        return reverse('feed_overdue_documents', args=[
-            self.category.organisation.slug,
-            self.category.slug
-        ])
+        return reverse(
+            "feed_overdue_documents",
+            args=[self.category.organisation.slug, self.category.slug],
+        )
 
     def items(self, *args, **kwargs):
         today = timezone.now().date()
-        qs = self.category.revision_class().objects \
-            .filter(metadata__document__category=self.category) \
-            .filter(review_start_date__isnull=False) \
-            .filter(review_end_date__isnull=True) \
-            .filter(review_due_date__lt=today) \
-            .select_related('metadata__document') \
-            .order_by('-review_due_date')[:settings.ALERT_ELEMENTS]
+        qs = (
+            self.category.revision_class()
+            .objects.filter(metadata__document__category=self.category)
+            .filter(review_start_date__isnull=False)
+            .filter(review_end_date__isnull=True)
+            .filter(review_due_date__lt=today)
+            .select_related("metadata__document")
+            .order_by("-review_due_date")[: settings.ALERT_ELEMENTS]
+        )
         return qs
 
     def item_link(self, item):
@@ -211,7 +216,7 @@ class FeedOverdueDocuments(BaseCategoryAlertFeed):
         return item.metadata.title
 
     def item_description(self, item):
-        return render_to_string('feeds/revision_item.html', {'item': item})
+        return render_to_string("feeds/revision_item.html", {"item": item})
 
     def item_pubdate(self, item):
         return datetime.combine(item.review_due_date, time())

@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
-
 from datetime import timedelta
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 
 from categories.factories import CategoryFactory
@@ -18,26 +15,31 @@ class ExportCreateTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('export_create', args=[
-            self.category.organisation.slug, self.category.slug])
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse(
+            "export_create", args=[self.category.organisation.slug, self.category.slug]
+        )
+        create_index(self.category.get_index_name())
 
     def test_export_create_cleanup_old_exports(self):
-        delete_index()
-        create_index()
         now = timezone.now()
         for delta in range(0, 25):
             ExportFactory(
                 owner=self.user,
                 category=self.category,
-                created_on=now + timedelta(days=-delta))
+                created_on=now + timedelta(days=-delta),
+            )
 
         self.assertEqual(Export.objects.all().count(), 25)
 
         self.client.post(self.url)
 
         self.assertEqual(Export.objects.all().count(), 20)
+
+    def tearDown(self):
+        delete_index(self.category.get_index_name())

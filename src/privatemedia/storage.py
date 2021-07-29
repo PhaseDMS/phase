@@ -6,10 +6,12 @@ from django.conf import settings
 @deconstructible
 class ProtectedStorage(FileSystemStorage):
     def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'location': '{}'.format(settings.PROTECTED_ROOT),
-            'base_url': '{}'.format(settings.PROTECTED_URL)
-        })
+        kwargs.update(
+            {
+                "location": "{}".format(settings.PROTECTED_ROOT),
+                "base_url": "{}".format(settings.PROTECTED_URL),
+            }
+        )
         super(ProtectedStorage, self).__init__(*args, **kwargs)
         self.xaccel_prefix = settings.PROTECTED_X_ACCEL_PREFIX
 
@@ -17,10 +19,12 @@ class ProtectedStorage(FileSystemStorage):
 @deconstructible
 class PrivateStorage(FileSystemStorage):
     def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'location': '{}'.format(settings.PRIVATE_ROOT),
-            'base_url': '{}'.format(settings.PRIVATE_URL)
-        })
+        kwargs.update(
+            {
+                "location": "{}".format(settings.PRIVATE_ROOT),
+                "base_url": "{}".format(settings.PRIVATE_URL),
+            }
+        )
         super(PrivateStorage, self).__init__(*args, **kwargs)
         self.xaccel_prefix = settings.PRIVATE_X_ACCEL_PREFIX
 

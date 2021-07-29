@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 import django.utils.timezone
-import django_extensions.db.fields
 
 
 class Migration(migrations.Migration):
@@ -26,11 +22,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ImportBatch',
             fields=[
-                ('uid', django_extensions.db.fields.UUIDField(max_length=36, serialize=False, editable=False, primary_key=True, blank=True)),
+                ('uid', models.UUIDField(max_length=36, serialize=False, editable=False, primary_key=True, blank=True)),
                 ('file', models.FileField(upload_to='import_%Y%m%d', verbose_name='File')),
                 ('status', models.CharField(default='new', max_length=50, verbose_name='Status', choices=[('new', 'New'), ('started', 'Started'), ('success', 'Success'), ('partial_success', 'Partial success'), ('error', 'Error')])),
                 ('created_on', models.DateField(default=django.utils.timezone.now, verbose_name='Created on')),
-                ('category', models.ForeignKey(verbose_name='Category', to='categories.Category')),
+                ('category', models.ForeignKey(on_delete=models.PROTECT, verbose_name='Category', to='categories.Category')),
             ],
             options={
                 'ordering': ['-created_on'],
@@ -41,11 +37,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='import',
             name='batch',
-            field=models.ForeignKey(verbose_name='Batch', to='imports.ImportBatch'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Batch', to='imports.ImportBatch'),
         ),
         migrations.AddField(
             model_name='import',
             name='document',
-            field=models.ForeignKey(blank=True, to='documents.Document', null=True),
+            field=models.ForeignKey(on_delete=models.PROTECT, blank=True, to='documents.Document', null=True),
         ),
     ]

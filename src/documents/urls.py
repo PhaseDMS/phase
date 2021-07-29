@@ -1,52 +1,81 @@
-from django.conf.urls import url
+from django.urls import path
 
 from documents.views import (
-    DocumentList, DocumentCreate, DocumentDetail, DocumentEdit,
-    DocumentDownload, DocumentRedirect, DocumentRevise, DocumentDelete,
-    DocumentRevisionDelete, RevisionFileDownload, DocumentFileDownload
+    DocumentList,
+    DocumentCreate,
+    DocumentDetail,
+    DocumentEdit,
+    DocumentDownload,
+    DocumentRedirect,
+    DocumentRevise,
+    DocumentDelete,
+    DocumentRevisionDelete,
+    RevisionFileDownload,
+    DocumentFileDownload,
 )
 
 urlpatterns = [
-
     # Document short url
-    url(r'^documents/(?P<document_key>[\w-]+)/$',
+    path(
+        "documents/<slug:document_key>/",
         DocumentRedirect.as_view(),
-        name='document_short_url'),
-
+        name="document_short_url",
+    ),
     # Downloads
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/download/$',
+    path(
+        "<slug:organisation>/<slug:category>/download/",
         DocumentDownload.as_view(),
-        name="document_download"),
-
+        name="document_download",
+    ),
     # Documents
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/$',
+    path(
+        "<slug:organisation>/<slug:category>/",
         DocumentList.as_view(),
-        name="category_document_list"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/create/$',
+        name="category_document_list",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/create/",
         DocumentCreate.as_view(),
-        name="document_create"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/$',
+        name="document_create",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/",
         DocumentDetail.as_view(),
-        name="document_detail"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/$',
+        name="document_detail",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/edit/",
         DocumentEdit.as_view(),
-        name="document_edit"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/edit/(?P<revision>\d+)/$',
+        name="document_edit",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/edit/<int:revision>/",
         DocumentEdit.as_view(),
-        name="document_edit"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revise/$',
+        name="document_edit",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/revise/",
         DocumentRevise.as_view(),
-        name="document_revise"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/delete/$',
+        name="document_revise",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/delete/",
         DocumentDelete.as_view(),
-        name="document_delete"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/revision_delete/$',
+        name="document_delete",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/revision_delete/",
         DocumentRevisionDelete.as_view(),
-        name="document_revision_delete"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<revision>\d+)/(?P<field_name>\w+)/$',
+        name="document_revision_delete",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/<int:revision>/<slug:field_name>/",
         RevisionFileDownload.as_view(),
-        name="revision_file_download"),
-    url(r'^(?P<organisation>[\w-]+)/(?P<category>[\w-]+)/(?P<document_key>[\w-]+)/(?P<field_name>\w+)/$',
+        name="revision_file_download",
+    ),
+    path(
+        "<slug:organisation>/<slug:category>/<slug:document_key>/<slug:field_name>/",
         DocumentFileDownload.as_view(),
-        name="document_file_download"),
+        name="document_file_download",
+    ),
 ]

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.utils.html import escape
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,101 +8,104 @@ from documents.factories import DocumentFactory
 from default_documents.tests.test import ContractorDeliverableTestCase
 from default_documents.models import ContractorDeliverable
 from default_documents.factories import (
-    ContractorDeliverableFactory, ContractorDeliverableRevisionFactory)
+    ContractorDeliverableFactory,
+    ContractorDeliverableRevisionFactory,
+)
 from categories.factories import CategoryFactory
 from accounts.factories import UserFactory
 from transmittals.factories import (
-    TransmittalFactory, TrsRevisionFactory, create_transmittal)
+    TransmittalFactory,
+    TrsRevisionFactory,
+    create_transmittal,
+)
 from transmittals.models import TrsRevision
-from transmittals.forms import (
-    OutgoingTransmittalForm, OutgoingTransmittalRevisionForm)
+from transmittals.forms import OutgoingTransmittalForm, OutgoingTransmittalRevisionForm
 
 
 class TransmittalListTests(TestCase):
-
     def setUp(self):
         self.category = CategoryFactory()
         user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=user.email, password='pass')
-        self.url = reverse('transmittal_list')
+            category=self.category,
+        )
+        self.client.login(email=user.email, password="pass")
+        self.url = reverse("transmittal_list")
 
     def test_empty_transmittal_list(self):
         res = self.client.get(self.url)
-        self.assertContains(res, 'There are no transmittals here')
+        self.assertContains(res, "There are no transmittals here")
 
     def test_transmittal_list(self):
         TransmittalFactory(document__category=self.category)
         TransmittalFactory(document__category=self.category)
         TransmittalFactory(document__category=self.category)
         res = self.client.get(self.url)
-        self.assertNotContains(res, 'There are no transmittals here')
+        self.assertNotContains(res, "There are no transmittals here")
         self.assertContains(res, 'tr class="document_row"', 3)
 
 
 class BaseTransmittalDiffViewTests(TestCase):
-
     def setUp(self):
         Model = ContentType.objects.get_for_model(ContractorDeliverable)
         self.category = CategoryFactory(category_template__metadata_model=Model)
-        self.transmittal = TransmittalFactory(
-            document__category=self.category)
+        self.transmittal = TransmittalFactory(document__category=self.category)
         user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=user.email, password='pass')
-        self.url = reverse('transmittal_diff', args=[
-            self.transmittal.pk,
-            self.transmittal.document_key])
+            category=self.category,
+        )
+        self.client.login(email=user.email, password="pass")
+        self.url = reverse(
+            "transmittal_diff",
+            args=[self.transmittal.pk, self.transmittal.document_key],
+        )
 
     def create_lines(self, nb_existing=1, nb_new=1, **kwargs):
         """Create `nb_existing` + `nb_new` lines in the transmittal."""
         doc = DocumentFactory(
             metadata_factory_class=ContractorDeliverableFactory,
             revision_factory_class=ContractorDeliverableRevisionFactory,
-            category=self.category)
+            category=self.category,
+        )
         rev = doc.get_latest_revision()
         metadata = doc.metadata
 
         arguments = {
-            'transmittal': self.transmittal,
-            'document': doc,
-            'document_key': doc.document_key,
-            'title': doc.title,
-            'is_new_revision': False,
-            'category': self.category,
-            'revision': rev.revision,
+            "transmittal": self.transmittal,
+            "document": doc,
+            "document_key": doc.document_key,
+            "title": doc.title,
+            "is_new_revision": False,
+            "category": self.category,
+            "revision": rev.revision,
         }
         arguments.update(kwargs)
 
         # Existing revisions
         for i in range(nb_existing):
-            rev = ContractorDeliverableRevisionFactory(
-                metadata=metadata)
+            rev = ContractorDeliverableRevisionFactory(metadata=metadata)
 
-            arguments.update({'revision': rev.revision})
+            arguments.update({"revision": rev.revision})
             TrsRevisionFactory(**arguments)
 
         metadata.latest_revision = rev
         metadata.save()
 
-        arguments.update({'is_new_revision': True})
+        arguments.update({"is_new_revision": True})
 
         # New revisions
         for i in range(nb_new):
-            arguments.update({'revision': rev.revision + i + 1})
+            arguments.update({"revision": rev.revision + i + 1})
             TrsRevisionFactory(**arguments)
 
         return doc
 
 
 class TransmittalDiffViewTests(BaseTransmittalDiffViewTests):
-
     def test_transmittal_detail_view(self):
         self.create_lines(2, 3)
         res = self.client.get(self.url)
@@ -120,22 +123,21 @@ class TransmittalDiffViewTests(BaseTransmittalDiffViewTests):
         self.create_lines(3, 3, accepted=False)
 
         res = self.client.get(self.url)
-        self.assertContains(res, 'glyphicon-empty', 2)
+        self.assertContains(res, "glyphicon-empty", 2)
         # "+ 2" because there are icons elsewhere in the page
-        self.assertContains(res, 'glyphicon-ok', 4 + 2)
-        self.assertContains(res, 'glyphicon-remove', 6 + 1)
+        self.assertContains(res, "glyphicon-ok", 4 + 2)
+        self.assertContains(res, "glyphicon-remove", 6 + 1)
 
 
 class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
-
     def setUp(self):
         super(TrsRevisionDiffViewTests, self).setUp()
         self.doc = self.create_lines(1, 2)
-        self.trs_revisions = self.transmittal.trsrevision_set.order_by('revision')
+        self.trs_revisions = self.transmittal.trsrevision_set.order_by("revision")
 
     def test_diff_with_existing_revision(self):
         trs_revision = self.trs_revisions[0]
-        trs_revision.title = 'New title yeah!'
+        trs_revision.title = "New title yeah!"
         trs_revision.save()
 
         res = self.client.get(trs_revision.get_absolute_url())
@@ -144,7 +146,7 @@ class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
 
     def test_diff_with_single_new_revision(self):
         trs_revision = self.trs_revisions[1]
-        trs_revision.title = 'New title yeah!'
+        trs_revision.title = "New title yeah!"
         trs_revision.save()
 
         res = self.client.get(trs_revision.get_absolute_url())
@@ -153,11 +155,11 @@ class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
 
     def test_diff_with_new_revisions(self):
         new_revision = self.trs_revisions[1]
-        new_revision.title = 'Old title yeah!'
+        new_revision.title = "Old title yeah!"
         new_revision.save()
 
         newest_revision = self.trs_revisions[2]
-        newest_revision.title = 'New title yeah!'
+        newest_revision.title = "New title yeah!"
         newest_revision.save()
 
         res = self.client.get(newest_revision.get_absolute_url())
@@ -168,7 +170,7 @@ class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
         trs_revision = self.trs_revisions[0]
         self.assertIsNone(trs_revision.accepted)
 
-        self.client.post(trs_revision.get_absolute_url(), {'accept': 'accept'})
+        self.client.post(trs_revision.get_absolute_url(), {"accept": "accept"})
         trs_revision = TrsRevision.objects.get(pk=trs_revision.pk)
         self.assertTrue(trs_revision.accepted)
 
@@ -176,7 +178,7 @@ class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
         trs_revision = self.trs_revisions[0]
         self.assertIsNone(trs_revision.accepted)
 
-        self.client.post(trs_revision.get_absolute_url(), {'refuse': 'refuse'})
+        self.client.post(trs_revision.get_absolute_url(), {"refuse": "refuse"})
         trs_revision = TrsRevision.objects.get(pk=trs_revision.pk)
         self.assertFalse(trs_revision.accepted)
 
@@ -184,34 +186,37 @@ class TrsRevisionDiffViewTests(BaseTransmittalDiffViewTests):
         trs_revision = self.trs_revisions[0]
         self.assertIsNone(trs_revision.comment)
 
-        self.client.post(trs_revision.get_absolute_url(), {
-            'accept': 'accept',
-            'comment': 'Gloubiboulga'
-        })
+        self.client.post(
+            trs_revision.get_absolute_url(),
+            {"accept": "accept", "comment": "Gloubiboulga"},
+        )
         trs_revision = TrsRevision.objects.get(pk=trs_revision.pk)
-        self.assertEqual(trs_revision.comment, 'Gloubiboulga')
+        self.assertEqual(trs_revision.comment, "Gloubiboulga")
 
 
 class TestPrepareTransmittalTests(ContractorDeliverableTestCase):
-
     def setUp(self):
         super(TestPrepareTransmittalTests, self).setUp()
-        self.prepare_transmittals_url = reverse('transmittal_prepare', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-        ])
+        self.prepare_transmittals_url = reverse(
+            "transmittal_prepare",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+            ],
+        )
 
     def test_prepare_documents(self):
-        under_prep_qs = ContractorDeliverable.objects \
-            .filter(latest_revision__under_preparation_by=self.user)
+        under_prep_qs = ContractorDeliverable.objects.filter(
+            latest_revision__under_preparation_by=self.user
+        )
 
         docs = [self.create_doc() for _ in range(5)]
         self.assertEqual(under_prep_qs.count(), 0)
 
         meta_ids = [doc.get_metadata().id for doc in docs]
-        self.client.post(self.prepare_transmittals_url, {
-            'document_ids': meta_ids
-        }, follow=True)
+        self.client.post(
+            self.prepare_transmittals_url, {"document_ids": meta_ids}, follow=True
+        )
 
         self.assertEqual(under_prep_qs.count(), 5)
 
@@ -221,16 +226,20 @@ class AckReceiptOfTransmittalTests(TestCase):
         self.trs = create_transmittal()
         self.category = self.trs.document.category
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('transmittal_ack_of_receipt', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.trs.document.document_key
-        ])
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse(
+            "transmittal_ack_of_receipt",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.trs.document.document_key,
+            ],
+        )
 
     def test_non_contractor_acks_receipt(self):
         """Non contractor cannot ack receipt of transmittals."""
@@ -265,18 +274,22 @@ class BatchAckOfTransmittalsTests(TestCase):
         self.trs = create_transmittal()
         self.category = self.trs.document.category
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
-        self.client.login(email=self.user.email, password='pass')
-        self.url = reverse('transmittal_batch_ack_of_receipt', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-        ])
+            category=self.category,
+        )
+        self.client.login(email=self.user.email, password="pass")
+        self.url = reverse(
+            "transmittal_batch_ack_of_receipt",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+            ],
+        )
 
     def test_internal_user_cannot_ack_transmittal(self):
-        res = self.client.post(self.url, {'document_ids': [self.trs.document_id]})
+        res = self.client.post(self.url, {"document_ids": [self.trs.document_id]})
         self.assertEqual(res.status_code, 403)
 
     def test_acks_receipt(self):
@@ -284,9 +297,8 @@ class BatchAckOfTransmittalsTests(TestCase):
         self.user.save()
 
         res = self.client.post(
-            self.url,
-            {'document_ids': [self.trs.document_id]},
-            follow=True)
+            self.url, {"document_ids": [self.trs.document_id]}, follow=True
+        )
         self.assertEqual(res.status_code, 200)
 
         self.trs.refresh_from_db()
@@ -300,26 +312,29 @@ class TransmittalErrorNotificationTests(TestCase):
         self.rev = self.trs.latest_revision
         self.category = self.trs.document.category
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
-            category=self.category)
+            category=self.category,
+        )
         self.trs.recipient.users.add(self.user)
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
         self.url = self.trs.document.get_edit_url()
 
         form = OutgoingTransmittalForm(
-            self.trs.__dict__,
-            category=self.category,
-            instance=self.trs)
+            self.trs.__dict__, category=self.category, instance=self.trs
+        )
         form.full_clean()
-        self.form_data = form.cleaned_data
+        form_data = form.cleaned_data
         rev_form = OutgoingTransmittalRevisionForm(
-            self.rev.__dict__,
-            category=self.category,
-            instance=self.rev)
+            self.rev.__dict__, category=self.category, instance=self.rev
+        )
         rev_form.full_clean()
-        self.form_data.update(rev_form.cleaned_data)
+        form_data.update(rev_form.cleaned_data)
+
+        # We need to filter "None" values since django 2.2
+        # See https://code.djangoproject.com/ticket/30024
+        self.form_data = {k: v for k, v in form_data.items() if v}
 
     def test_no_error_no_notification(self):
         self.assertEqual(self.user.notification_set.count(), 0)
@@ -328,7 +343,7 @@ class TransmittalErrorNotificationTests(TestCase):
         self.assertEqual(self.user.notification_set.count(), 0)
 
     def test_on_error_send_notification(self):
-        self.form_data['error_msg'] = 'This is an error'
+        self.form_data["error_msg"] = "This is an error"
 
         self.assertEqual(self.user.notification_set.count(), 0)
         res = self.client.post(self.url, self.form_data)
@@ -336,7 +351,7 @@ class TransmittalErrorNotificationTests(TestCase):
         self.assertEqual(self.user.notification_set.count(), 1)
 
     def test_notifications_are_sent_only_once(self):
-        self.form_data['error_msg'] = 'This is an error'
+        self.form_data["error_msg"] = "This is an error"
 
         self.assertEqual(self.user.notification_set.count(), 0)
         self.client.post(self.url, self.form_data)
@@ -346,15 +361,15 @@ class TransmittalErrorNotificationTests(TestCase):
         self.assertEqual(self.user.notification_set.count(), 1)
 
     def test_cancel_error_and_error_again(self):
-        self.form_data['error_msg'] = 'This is an error'
+        self.form_data["error_msg"] = "This is an error"
         self.client.post(self.url, self.form_data)
         self.assertEqual(self.user.notification_set.count(), 1)
 
-        self.form_data['error_msg'] = ''
+        self.form_data["error_msg"] = ""
         self.client.post(self.url, self.form_data)
         self.assertEqual(self.user.notification_set.count(), 1)
 
-        self.form_data['error_msg'] = 'Another error'
+        self.form_data["error_msg"] = "Another error"
         self.client.post(self.url, self.form_data)
         self.assertEqual(self.user.notification_set.count(), 2)
 
@@ -365,23 +380,27 @@ class FileTransmittedDownloadTests(TestCase):
         self.rev = self.trs.latest_revision
         self.category = self.trs.document.category
         self.user = UserFactory(
-            email='testadmin@phase.fr',
-            password='pass',
+            email="testadmin@phase.fr",
+            password="pass",
             is_superuser=True,
             is_external=True,
-            category=self.category)
+            category=self.category,
+        )
         self.trs.recipient.users.add(self.user)
-        self.client.login(email=self.user.email, password='pass')
+        self.client.login(email=self.user.email, password="pass")
         self.linked_rev = self.trs.get_revisions()[0]
-        self.url = reverse('file_transmitted_download', args=[
-            self.category.organisation.slug,
-            self.category.slug,
-            self.trs.document_number,
-            self.linked_rev.metadata.document_key,
-            self.linked_rev.revision,
-        ])
-        pdf_doc = 'sample_doc_pdf.pdf'
-        sample_pdf = SimpleUploadedFile(pdf_doc, b'content')
+        self.url = reverse(
+            "file_transmitted_download",
+            args=[
+                self.category.organisation.slug,
+                self.category.slug,
+                self.trs.document_number,
+                self.linked_rev.metadata.document_key,
+                self.linked_rev.revision,
+            ],
+        )
+        pdf_doc = "sample_doc_pdf.pdf"
+        sample_pdf = SimpleUploadedFile(pdf_doc, b"content")
         self.linked_rev.file_transmitted = sample_pdf
         self.linked_rev.save()
 

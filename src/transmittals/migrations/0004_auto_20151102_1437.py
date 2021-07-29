@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import models, migrations
 import documents.fileutils
 import metadata.fields
@@ -25,7 +22,7 @@ class Migration(migrations.Migration):
                 ('title', models.TextField(verbose_name='Title')),
                 ('status', models.CharField(max_length=5, verbose_name='Status')),
                 ('return_code', models.CharField(max_length=5, verbose_name='Return code')),
-                ('document', models.ForeignKey(to='documents.Document')),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'verbose_name': 'Exported revision',
@@ -41,7 +38,7 @@ class Migration(migrations.Migration):
                 ('originator', metadata.fields.ConfigurableChoiceField(default='CTR', max_length=3, verbose_name='Originator', list_index='ORIGINATORS')),
                 ('recipient', metadata.fields.ConfigurableChoiceField(max_length=50, verbose_name='Recipient', list_index='RECIPIENTS')),
                 ('sequential_number', models.PositiveIntegerField(null=True, verbose_name='sequential number', blank=True)),
-                ('document', models.OneToOneField(to='documents.Document')),
+                ('document', models.OneToOneField(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'ordering': ('document_key',),
@@ -60,7 +57,7 @@ class Migration(migrations.Migration):
                 ('received_date', models.DateField(verbose_name='Received date')),
                 ('created_on', models.DateField(default=django.utils.timezone.now, verbose_name='Created on')),
                 ('updated_on', models.DateTimeField(auto_now=True, verbose_name='Updated on')),
-                ('document', models.ForeignKey(to='documents.Document')),
+                ('document', models.ForeignKey(on_delete=models.PROTECT, to='documents.Document')),
             ],
             options={
                 'ordering': ('-revision',),
@@ -71,7 +68,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='outgoingtransmittal',
             name='latest_revision',
-            field=models.ForeignKey(verbose_name='Latest revision', to='transmittals.OutgoingTransmittalRevision'),
+            field=models.ForeignKey(on_delete=models.PROTECT, verbose_name='Latest revision', to='transmittals.OutgoingTransmittalRevision'),
         ),
         migrations.AddField(
             model_name='outgoingtransmittal',
@@ -81,7 +78,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='exportedrevision',
             name='transmittal',
-            field=models.ForeignKey(to='transmittals.OutgoingTransmittal'),
+            field=models.ForeignKey(on_delete=models.PROTECT, to='transmittals.OutgoingTransmittal'),
         ),
         migrations.AlterUniqueTogether(
             name='outgoingtransmittalrevision',
