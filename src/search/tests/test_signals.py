@@ -7,7 +7,8 @@ from mock import patch
 from accounts.factories import UserFactory
 from categories.factories import CategoryFactory
 from documents.utils import save_document_forms
-from search.signals import connect_signals
+from search.signals import connect_signals, disconnect_signals
+from search.utils import create_index, put_category_mapping, delete_index
 from default_documents.forms import DemoMetadataForm, DemoMetadataRevisionForm
 
 
@@ -15,6 +16,8 @@ from default_documents.forms import DemoMetadataForm, DemoMetadataRevisionForm
 class SignalTests(TestCase):
     def setUp(self):
         self.category = CategoryFactory()
+        create_index(self.category.get_index_name())
+        put_category_mapping(self.category.id)
         user = UserFactory(
             email="testadmin@phase.fr",
             password="pass",
@@ -26,9 +29,10 @@ class SignalTests(TestCase):
         # Since test settings disable auto indexing, we need to
         # manually connect the signal here
         connect_signals()
-        call_command("delete_index")
-        call_command("create_index")
-        call_command("set_mappings")
+
+    def tearDown(self):
+        delete_index(self.category.get_index_name())
+        disconnect_signals()
 
     @patch("search.signals.put_category_mapping.delay")
     def test_new_category_mapping_are_created(self, index_mock):
