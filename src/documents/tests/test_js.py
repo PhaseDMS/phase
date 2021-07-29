@@ -20,10 +20,9 @@ from search.utils import (
 @override_settings(PAGINATE_BY=5)
 class DocumentListTests(CasperTestCase):
     def setUp(self):
-        delete_index()
-        create_index()
 
         self.category = CategoryFactory()
+        create_index(self.category.get_index_name())
         put_category_mapping(self.category.id)
         user = UserFactory(
             email="testadmin@phase.fr",
@@ -55,7 +54,7 @@ class DocumentListTests(CasperTestCase):
 
     def tearDown(self):
         disconnect_signals()
-        delete_index()
+        delete_index(self.category.get_index_name())
 
     def test_js(self):
         self.assertTrue(self.casper(self.test_file, url=self.url))
