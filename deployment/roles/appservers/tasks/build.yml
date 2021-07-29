@@ -9,19 +9,6 @@
         msg: "Starting building tasks"
         verbosity: 3
 
-    - name: Get the virtualenv path
-      shell: "{{ poetry_bin }} env info --path"
-      register: poetry_output
-      args:
-        chdir: "{{ django_root }}"
-
-
-    - name: Stores the virtualenv path for further usage
-      set_fact:
-        venv_dir: "{{ poetry_output.stdout }}"
-        bin_dir: "{{ poetry_output.stdout }}/bin"
-        activate_bin: "{{ poetry_output.stdout }}/bin/activate"
-
     - name: Pull / clone main project repo
       when: project_env == "production"
       git:
@@ -29,6 +16,18 @@
         dest: "{{ project_root }}"
         version: "{{ project_version }}"
         accept_hostkey: yes
+
+    - name: Get the virtualenv path
+      shell: "{{ poetry_bin }} env info --path"
+      register: poetry_output
+      args:
+        chdir: "{{ django_root }}"
+
+    - name: Stores the virtualenv path for further usage
+      set_fact:
+        venv_dir: "{{ poetry_output.stdout }}"
+        bin_dir: "{{ poetry_output.stdout }}/bin"
+        activate_bin: "{{ poetry_output.stdout }}/bin/activate"
 
     - name: Install additional document apps
       when: project_env == "production"

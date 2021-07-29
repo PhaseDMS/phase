@@ -19,7 +19,7 @@
     user: "{{ project_name }}"
     minute: "0"
     hour: "4"
-    job: "cd {{ django_root }} && source {{ activate_bin }} && {{ pipenv_bin }} run ./manage.py clearmedia --settings={{ django_settings }} &>> {{ cron_log_root }}"
+    job: "cd {{ django_root }} && source {{ activate_bin }} && python ./manage.py clearmedia --settings={{ django_settings }} &>> {{ cron_log_root }}"
 
 - name: Add pending review reminder cron entry
   cron:
@@ -27,7 +27,7 @@
     user: "{{ project_name }}"
     minute: "0"
     hour: "7"
-    job: "cd {{ django_root }} && source {{ activate_bin }} && {{ pipenv_bin }} run ./manage.py send_review_reminders --settings={{ django_settings }} &>> {{ cron_log_root }}"
+    job: "cd {{ django_root }} && source {{ activate_bin }} && python ./manage.py send_review_reminders --settings={{ django_settings }} &>> {{ cron_log_root }}"
 
 - name: Add transmittals waiting acknowlegment of receiept reminder cron entry
   cron:
@@ -35,5 +35,4 @@
     user: "{{ project_name }}"
     minute: "0"
     hour: "8"
-    job: "cd {{ django_root }}&& source {{ activate_bin }} && {{ pipenv_bin }} run ./manage.py send_trs_reminders --settings={{ django_settings }} &>> {{ cron_log_root }}"
-
+    job: "cd {{ django_root }}&& source {{ activate_bin }} && python ./manage.py send_trs_reminders --settings={{ django_settings }} &>> {{ cron_log_root }}"
