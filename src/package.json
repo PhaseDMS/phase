@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "casperjs": "^1.1.4",
-    "phantomjs": "^2.1.7"
+    "cssmin": "^0.4.3",
+    "phantomjs": "^2.1.7",
+    "uglify-js": "^3.14.1"
   }
 }

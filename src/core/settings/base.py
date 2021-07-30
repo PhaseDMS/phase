@@ -312,6 +312,8 @@ STATICFILES_STORAGE = "pipeline.storage.PipelineManifestStorage"
 PIPELINE = {
     "JS_COMPRESSOR": "pipeline.compressors.uglifyjs.UglifyJSCompressor",
     "CSS_COMPRESSOR": "pipeline.compressors.cssmin.CSSMinCompressor",
+    "CSSMIN_BINARY": join(DJANGO_ROOT, "node_modules", "cssmin", "bin", "cssmin"),
+    "UGLIFYJS_BINARY": join(DJANGO_ROOT, "node_modules", "uglify-js", "bin", "uglifyjs"),
     "DISABLE_WRAPPER": True,
     "STYLESHEETS": {
         "base": {
