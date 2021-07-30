@@ -1,5 +1,5 @@
 project_domain: phase.local
-project_version: master
+project_version: main
 django_settings: core.settings.production
 project_env: production
 gunicorn_options: "--reload"
