@@ -1,12 +1,10 @@
 [program:celery]
-environment=DJANGO_SETTINGS_MODULE='core.settings.production'
-directory=/home/aides/aides/src
-command=/home/aides/.virtualenvs/aides/bin/celery -A core worker -l INFO
-
-user=aides
+environment=DJANGO_SETTINGS_MODULE='{{ django_settings }}'
+directory={{ django_root }}
+command={{ python_bin }} -m celery -A core worker -l INFO
+user={{ user_name }}
 autostart=true
-
-stdout_logfile=/var/log/supervisor/celery.log
+stdout_logfile=/var/log/supervisor/{{ project_name }}_celery.log
 redirect_stderr=true
 autostart=true
 autorestart=true
