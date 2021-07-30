@@ -874,6 +874,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pylibmc"
+version = "1.6.1"
+description = "Quick and small memcached client for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pynacl"
 version = "1.4.0"
 description = "Python binding to the Networking and Cryptography (NaCl) library"
@@ -1245,7 +1253,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "de35750d29ed6e86a4f0fc1c8502a3412343426d66cf1a4294b332cd48240c98"
+content-hash = "1154dec797c8fb022f8bf6b9bdb9dd4333617302ca4c6fab03de5033eae7b76b"
 
 [metadata.files]
 alabaster = [
@@ -1719,6 +1727,13 @@ pyflakes = [
 pygments = [
     {file = "Pygments-2.9.0-py3-none-any.whl", hash = "sha256:d66e804411278594d764fc69ec36ec13d9ae9147193a1740cd34d272ca383b8e"},
     {file = "Pygments-2.9.0.tar.gz", hash = "sha256:a18f47b506a429f6f4b9df81bb02beab9ca21d0a5fee38ed15aef65f0545519f"},
+]
+pylibmc = [
+    {file = "pylibmc-1.6.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:01a7e2e3fa9fcd7a791c7818a80a07e7a381aee988a5d810a1c1e6f7a9a288fd"},
+    {file = "pylibmc-1.6.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:6fff384e3c30af029bbac87f88b3fab14ae87b50103d389341d9b3e633349a3f"},
+    {file = "pylibmc-1.6.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:c749b4251c1137837d00542b62992b96cd2aed639877407f66291120dd6de2ff"},
+    {file = "pylibmc-1.6.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:e6c0c452336db0868d0de521d48872c2a359b1233b974c6b32c36ce68abc4820"},
+    {file = "pylibmc-1.6.1.tar.gz", hash = "sha256:8a8dd406487d419d58c6d944efd91e8189b360a0c4d9e8c6ebe3990d646ae7e9"},
 ]
 pynacl = [
     {file = "PyNaCl-1.4.0-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:ea6841bc3a76fa4942ce00f3bda7d436fda21e2d91602b9e21b7ca9ecab8f3ff"},
