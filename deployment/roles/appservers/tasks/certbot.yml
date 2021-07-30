@@ -6,7 +6,7 @@
   tags: certbot
 
 - name: Generate certificate using Let's Encrypt (for production)
-  when: project_env == "production"
+  when: use_certbot == true
   command:
   args:
     argv:
@@ -25,7 +25,7 @@
   tags: certbot
 
 - name: Generate partners certificates using Let's Encrypt (for production)
-  when: project_env == "production" and partners is defined
+  when: use_certbot == true and partners is defined
   command:
   args:
     argv:
@@ -43,7 +43,7 @@
   tags: certbot
 
 - name: Install the certificate renewal cronjob
-  when: project_env == "production"
+  when: use_certbot == true
   cron:
     name: Daily certificate renewal
     special_time: daily
@@ -52,14 +52,14 @@
   tags: certbot
 
 - name: Make sure certificate directory exists for OpenSSL
-  when: project_env == "local"
+  when: use_certbot == false
   file:
     path: /etc/letsencrypt/live/{{ project_domain }}
     state: directory
   tags: certbot
 
 - name: Generate a self-signed OpenSSL certificate (dev only)
-  when: project_env == "local"
+  when: use_certbot == false
   command:
   args:
     creates: /etc/letsencrypt/live/{{ project_domain }}/fullchain.pem

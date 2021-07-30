@@ -4,6 +4,7 @@ project_repo: https://github.com/PhaseDMS/phase.git
 install_root: /home/phase
 project_root: "{{ install_root }}/{{ project_name }}"
 django_root: "{{ project_root }}/src"
+settings_root: "{{ django_root }}/core/settings"
 requirements_root: "{{ project_root }}/requirements"
 cron_log_root: "{{ install_root }}/cron.log"
 venv_root: "{{ install_root }}/.virtualenvs"
@@ -14,3 +15,4 @@ poetry_bin: "{{ install_root }}/.local/bin/poetry"
 activate_bin: "{{ bin_dir }}/activate"
 gunicorn_bin: "{{ bin_dir }}/gunicorn"
 shell_prompt: PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+use_certbot: false

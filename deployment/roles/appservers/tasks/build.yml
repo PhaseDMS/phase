@@ -25,7 +25,6 @@
 - name: Run application building steps
   become: yes
   become_user: "{{ user_name }}"
-  become_flags: "-HE"
   block:
 
     - name: Pull / clone main project repo
@@ -48,18 +47,17 @@
     #     bin_dir: "{{ poetry_output.stdout }}/bin"
     #     activate_bin: "{{ poetry_output.stdout }}/bin/activate"
 
-    - name: Copy private production settings to the remote
+    - name: Copy private settings file to the remote
       when: project_env == "production"
       copy:
-        src: ../../../src/{{ env_file }}
-        dest: "{{ django_root }}/{{ env_target }}"
+        src: ../../../src/core/settings/{{ settings_file }}
+        dest: "{{ settings_root }}/prod_private.py"
 
     - name: Install python packages
       shell: |
         {{ poetry_bin }} install
       args:
         chdir: "{{ project_root }}"
-        virtualenv: "{{ venv_dir }}"
 
     # - name: Install js packages assets
     #   shell: npm ci
