@@ -1,13 +1,32 @@
 ---
+- name: Build
+  debug:
+    msg: "Starting building tasks"
+    verbosity: 3
+
+- name: Install additional document apps
+  when: project_env == "production"
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ install_root }}/{{ item.name }}"
+    accept_hostkey: yes
+    version: "{{ project_version }}"
+  with_items: "{{ document_apps }}"
+
+- name: Updating repository permissions
+  when: project_env == "production"
+  file:
+    dest: "{{ install_root }}/{{ item.name }}"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    recurse: true
+  with_items: "{{ document_apps }}"
+
 - name: Run application building steps
   become: yes
   become_user: "{{ user_name }}"
+  become_flags: "-HE"
   block:
-
-    - name: Build
-      debug:
-        msg: "Starting building tasks"
-        verbosity: 3
 
     - name: Pull / clone main project repo
       when: project_env == "production"
@@ -17,26 +36,17 @@
         version: "{{ project_version }}"
         accept_hostkey: yes
 
-    - name: Get the virtualenv path
-      shell: "{{ poetry_bin }} env info --path"
-      register: poetry_output
-      args:
-        chdir: "{{ django_root }}"
+    # - name: Get the virtualenv path
+    #   shell: "{{ poetry_bin }} env info --path"
+    #   register: poetry_output
+    #   args:
+    #     chdir: "{{ project_root }}"
 
-    - name: Stores the virtualenv path for further usage
-      set_fact:
-        venv_dir: "{{ poetry_output.stdout }}"
-        bin_dir: "{{ poetry_output.stdout }}/bin"
-        activate_bin: "{{ poetry_output.stdout }}/bin/activate"
-
-    - name: Install additional document apps
-      when: project_env == "production"
-      git:
-        repo: "{{ item.repo }}"
-        dest: "{{ install_root }}/{{ item.name }}"
-        accept_hostkey: yes
-        version: "{{ project_version }}"
-      with_items: "{{ document_apps }}"
+    # - name: Stores the virtualenv path for further usage
+    #   set_fact:
+    #     venv_dir: "{{ poetry_output.stdout }}"
+    #     bin_dir: "{{ poetry_output.stdout }}/bin"
+    #     activate_bin: "{{ poetry_output.stdout }}/bin/activate"
 
     - name: Copy private production settings to the remote
       when: project_env == "production"
@@ -48,7 +58,8 @@
       shell: |
         {{ poetry_bin }} install
       args:
-        chdir: "{{ django_root }}"
+        chdir: "{{ project_root }}"
+        virtualenv: "{{ venv_dir }}"
 
     # - name: Install js packages assets
     #   shell: npm ci
