@@ -59,10 +59,10 @@
       args:
         chdir: "{{ project_root }}"
 
-    # - name: Install js packages assets
-    #   shell: npm ci
-    #   args:
-    #     chdir: "{{ django_root }}"
+    - name: Install js packages assets
+      shell: npm ci
+      args:
+        chdir: "{{ django_root }}"
 
     - name: Run Django database migrations
       django_manage:
@@ -78,17 +78,17 @@
         virtualenv: "{{ venv_dir }}"
         settings: "{{ django_settings }}"
 
-    - name: Compile locale files
-      django_manage:
-        command: compilemessages
-        app_path: "{{ django_root }}"
-        virtualenv: "{{ venv_dir }}"
-        settings: "{{ django_settings }}"
+    # - name: Compile locale files
+    #   django_manage:
+    #     command: compilemessages
+    #     app_path: "{{ django_root }}"
+    #     virtualenv: "{{ venv_dir }}"
+    #     settings: "{{ django_settings }}"
 
-    - name: Compress assets
-      when: project_env == "production"
-      django_manage:
-        command: compress
-        app_path: "{{ django_root }}"
-        virtualenv: "{{ venv_dir }}"
-        settings: "{{ django_settings }}"
+    # - name: Compress assets
+    #   when: project_env == "production"
+    #   django_manage:
+    #     command: compress
+    #     app_path: "{{ django_root }}"
+    #     virtualenv: "{{ venv_dir }}"
+    #     settings: "{{ django_settings }}"
