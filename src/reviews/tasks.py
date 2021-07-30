@@ -8,7 +8,7 @@ from celery import current_task
 from accounts.models import User
 from audit_trail.models import Activity
 from audit_trail.signals import activity_log
-from core.celeryapp import app
+from core.celery import app
 from reviews.signals import pre_batch_review, post_batch_review, batch_item_indexed
 from reviews.models import Review
 from notifications.models import notify

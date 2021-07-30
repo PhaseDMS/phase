@@ -1,4 +1,4 @@
-from core.celeryapp import app
+from core.celery import app
 from imports.models import ImportBatch
 
 
