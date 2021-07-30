@@ -55,7 +55,7 @@
 
     - name: Install python packages
       shell: |
-        {{ poetry_bin }} install
+        . {{ activate_bin }} && {{ poetry_bin }} install
       args:
         chdir: "{{ project_root }}"
 
