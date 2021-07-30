@@ -1,0 +1,12 @@
+---
+- name: Install memcached
+  apt:
+    name: memcached
+    state: latest
+    update_cache: yes
+
+- name: Start memcached on boot
+  service:
+    name: memcached
+    enabled: yes
+    state: started
