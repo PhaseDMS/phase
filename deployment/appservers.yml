@@ -1,6 +1,7 @@
 ---
 - name: Configure all application servers
   hosts: phase
+  become: true
   roles:
     - { role: common }
     - { role: appservers }

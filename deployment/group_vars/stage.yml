@@ -1,4 +1,4 @@
-project_domain: phase.local
+project_domain: phase.stage
 project_version: main
 django_settings: core.settings.production
 project_env: production

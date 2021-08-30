@@ -59,6 +59,13 @@
       args:
         chdir: "{{ project_root }}"
 
+    - name: Install packages for additional document apps
+      pip:
+        name: "{{ install_root }}/{{ item.name }}"
+        virtualenv: "{{ venv_dir }}"
+        editable: yes
+      with_items: "{{ document_apps }}"
+
     - name: Install js packages assets
       shell: npm ci
       args:
