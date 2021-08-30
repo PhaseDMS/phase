@@ -11,8 +11,8 @@
 
 - name: Install elasticsearch
   apt:
-    name: elasticsearch
-    state: latest
+    name: elasticsearch=7.13.0
+    state: present
     update_cache: yes
 
 - name: Start elasticsearch on boot
