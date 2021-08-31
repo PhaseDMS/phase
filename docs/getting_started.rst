@@ -34,24 +34,3 @@ LXC.
     git clone https://github.com/PhaseDMS/phase.git
     cd phase/deployment
     ./local_vm_creation.sh
-
-Contributing
-------------
-
-To make Phase work on a local environment, you must have the following
-processes running:
-
- * Phase (django runserver)
- * Celery (run locally with *DJANGO_SETTINGS_MODULE=core.settings.local celery -A
-   core.celery worker -l info*)
- * RabbitMQ
- * Postgres
- * Elasticsearch
- * Memcached
-
-
-Available fabric commands
--------------------------
-
-A fabric script is available to run custom commands. Check `fabfile.py` to have
-an up to date list.

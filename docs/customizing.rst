@@ -3,7 +3,7 @@ Customizing document models
 
 Phase comes with predefined document models. However, it is designed so you can create your own.
 
-All you need to do is to create a new application with a name ending by *"_documents"*::
+All you need to do is to create a python package for a working django application with a name ending by *"_documents"*::
 
     mkdir myproject_app
     cd myproject_app
@@ -13,17 +13,18 @@ You need to make sure that this application is accessible in the **PYTHONPATH**.
 
     add2virtualenv myproject_app
 
+You can also install locally using **pip**::
+
+    pip install -e /path/to/myproject_app
+
 Once this is done, add your application in the `core/settings/doc_apps.py` file
 and run **migrate**.
 
 Sample `doc_apps.py`::
 
-    # -*- coding: utf-8 -*-
-    from __future__ import unicode_literals
-
     DOC_APPS = (
-        'epc2_documents',
-        'sileo_documents',
+        'client1_documents',
+        'client2_documents',
     )
 
 This file is listed in .gitignore and must not be commited.
