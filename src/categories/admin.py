@@ -67,6 +67,13 @@ class UserCategoryInline(admin.StackedInline):
     extra = 0
     formset = RequiredInlineFormSet
 
+    def get_field_queryset(self, db, db_field, request):
+        qs = super().get_field_queryset(db, db_field, request)
+        if db_field.name == 'category':
+            qs = qs.select_related('organisation', 'category_template')
+
+        return qs
+
 
 class ContractAdmin(admin.ModelAdmin):
     list_display = ("number", "name", "get_associated_categories")
