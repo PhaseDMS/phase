@@ -63,6 +63,16 @@ server {
         access_log off;
     }
 
+    location /xprotected/ {
+        internal;
+        alias {{ project_root }}/protected/;
+    }
+
+    location /xprivate/ {
+        internal;
+        alias {{ project_root }}/private/;
+    }
+
     location / {
         error_page 418 = @django;
         return 418;
