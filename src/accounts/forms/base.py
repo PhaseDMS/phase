@@ -62,6 +62,12 @@ class UserChangeForm(forms.ModelForm):
         # field does not have access to the initial value
         return self.initial["password"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user_permissions = self.fields.get('user_permissions')
+        if user_permissions:
+            user_permissions.queryset = user_permissions.queryset.select_related('content_type')
+
 
 class EmailAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label=_("Email"), max_length=253)
