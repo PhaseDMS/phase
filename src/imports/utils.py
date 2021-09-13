@@ -12,7 +12,7 @@ def make_csv_template(import_fields, filename):
     cd = 'attachment; filename="{}_template.csv"'.format(filename)
     response["Content-Disposition"] = cd
     fields = list(import_fields.keys())
-    writer = csv.writer(response, delimiter=b";")
+    writer = csv.writer(response, delimiter=";")
     writer.writerow(fields)
     return response
 
