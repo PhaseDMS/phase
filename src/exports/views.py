@@ -7,8 +7,7 @@ from django.http import HttpResponse, Http404
 from django.views.static import serve
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-
-from braces.views import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from documents.views import DocumentListMixin
 from notifications.models import notify
