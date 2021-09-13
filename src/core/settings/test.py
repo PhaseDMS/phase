@@ -54,8 +54,8 @@ ELASTIC_INDEX = "test_documents"
 ELASTIC_AUTOINDEX = False
 
 # Makes Celery working synchronously and in memory
-CELERY_ALWAYS_EAGER = True
-BROKER_URL = "memory://"
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_BROKER_URL = "memory://"
 CELERY_CACHE_BACKEND = "memory"
 CELERY_RESULT_BACKEND = "cache"
 

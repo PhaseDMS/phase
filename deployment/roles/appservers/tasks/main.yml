@@ -1,12 +1,12 @@
 ---
 - import_tasks: packages.yml
 - import_tasks: celery.yml
-  when: project_env == "production"
 - import_tasks: user.yml
 - import_tasks: database.yml
 - import_tasks: webserver.yml
 - import_tasks: elasticsearch.yml
 - import_tasks: memcached.yml
+- import_tasks: broker.yml
 - import_tasks: certbot.yml
 - import_tasks: virtualenv.yml
 - import_tasks: cron.yml

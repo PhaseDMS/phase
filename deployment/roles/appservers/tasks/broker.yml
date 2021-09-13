@@ -1,0 +1,12 @@
+---
+- name: Install rabbitmq
+  apt:
+    name: rabbitmq-server
+    state: latest
+    update_cache: yes
+
+- name: Start rabbitmq on boot
+  service:
+    name: rabbitmq-server
+    enabled: yes
+    state: started
