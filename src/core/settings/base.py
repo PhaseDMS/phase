@@ -523,3 +523,5 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # Some users may want to create *huge* values lists, hence will send
 # forms with a *lot* of fields
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
+# CELERY_TASK_ALWAYS_EAGER = True

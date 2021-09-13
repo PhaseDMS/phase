@@ -57,7 +57,7 @@ class ExportGenerator(object):
         result = builder.scan_results(
             ["pk"], only_latest_revisions=not self.export_all_revisions
         )
-        pks = [doc["pk"][0] for doc in result]
+        pks = [doc["pk"] for doc in result]
         total = len(pks)
         return pks, total
 
