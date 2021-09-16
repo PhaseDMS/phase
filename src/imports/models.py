@@ -168,6 +168,7 @@ class Import(models.Model):
         ImportBatch,
         on_delete=models.PROTECT,
         verbose_name=_("Batch"),
+        related_name='import_set',
     )
     document = models.ForeignKey(
         Document, on_delete=models.PROTECT, null=True, blank=True
