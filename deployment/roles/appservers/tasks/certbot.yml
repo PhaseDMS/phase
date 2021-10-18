@@ -24,24 +24,6 @@
       - "{{ certbot_domains | join(',') }}"
   tags: certbot
 
-- name: Generate partners certificates using Let's Encrypt (for production)
-  when: use_certbot == true and partners is defined
-  command:
-  args:
-    argv:
-      - certbot
-      - certonly
-      - --noninteractive
-      - --agree-tos
-      - --standalone
-      - --expand
-      - --email
-      - "{{ certbot_admin_email }}"
-      - -d
-      - "{{ item.domain }}"
-  loop: "{{ partners }}"
-  tags: certbot
-
 - name: Install the certificate renewal cronjob
   when: use_certbot == true
   cron:
