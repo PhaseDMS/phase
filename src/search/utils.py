@@ -163,8 +163,8 @@ def get_mapping(doc_class):
         "properties": {
             "_all": {
                 "type": "text",
-                "analyzer": "autocomplete",
-                "search_analyzer": "autocomplete_search",
+                "analyzer": "ngram_analyzer",
+                "search_analyzer": "whitespace_analyzer",
             }
         }
     }

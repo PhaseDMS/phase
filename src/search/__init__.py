@@ -19,22 +19,25 @@ elastic = Elasticsearch(settings.ELASTIC_HOSTS, connection_class=RequestsHttpCon
 
 INDEX_SETTINGS = {
     "settings": {
+        "index": {
+            "max_ngram_diff": 128,
+        },
         "analysis": {
             "analyzer": {
-                "autocomplete": {
-                    "tokenizer": "standard",
+                "ngram_analyzer": {
+                    "tokenizer": "keyword",
                     "filter": ["lowercase", "asciifolding", "ngram_filter"],
                 },
-                "autocomplete_search": {
-                    "tokenizer": "standard",
+                "whitespace_analyzer": {
+                    "tokenizer": "whitespace",
                     "filter": ["lowercase", "asciifolding"],
                 },
             },
             "filter": {
                 "ngram_filter": {
-                    "type": "edge_ngram",
-                    "min_gram": 2,
-                    "max_gram": 20
+                    "type": "ngram",
+                    "min_gram": 3,
+                    "max_gram": 128
                 }
             },
         }
