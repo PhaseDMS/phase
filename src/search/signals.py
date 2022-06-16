@@ -1,3 +1,4 @@
+from tkinter import W
 from django.db.models.signals import post_save, pre_delete
 from django.conf import settings
 
@@ -8,6 +9,7 @@ from search.utils import (
     unindex_document,
     put_category_mapping,
     refresh_index,
+    create_index,
 )
 from documents.models import Document
 from documents.signals import document_form_saved
@@ -38,6 +40,8 @@ def remove_from_index(sender, instance, **kwargs):
 def save_mapping(sender, instance, **kwargs):
     created = kwargs.pop("created")
     if created:
+        index_name = instance.get_index_name()
+        create_index(index_name)
         put_category_mapping.delay(instance.pk)
 
 
