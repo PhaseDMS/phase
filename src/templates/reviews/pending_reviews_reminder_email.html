@@ -28,7 +28,7 @@ Please note that the following documents are pending your review in Phase.
         style="font-weight: bold;"
     {% endif %}>
     <td style="border: solid 1px black;">
-        <a href="http://{{ site.domain }}{% url 'review_document' review.document.document_key %}">
+        <a href="https://{{ site.domain }}{% url 'review_document' review.document.document_key %}">
         {{ review.document.document_key }}
         </a>
     </td>
@@ -53,7 +53,7 @@ Please note that the following documents are pending your review in Phase.
 <br />
 <br />
 
-<a href="http://{{ site.domain }}{% url 'review_home' %}">
+<a href="https://{{ site.domain }}{% url 'review_home' %}">
 You can see the whole list here.
 </a>
 

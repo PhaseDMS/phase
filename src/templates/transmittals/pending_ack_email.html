@@ -18,7 +18,7 @@ Please note that the following transmittals are pending your acknowledgment of r
         {% for transmittal in transmittals %}
 <tr>
     <td style="border: solid 1px black;">
-        <a href="http://{{ site.domain }}{{ transmittal.document.get_absolute_url }}">
+        <a href="https://{{ site.domain }}{{ transmittal.document.get_absolute_url }}">
         {{ transmittal.document.document_key }}
         </a>
     </td>
@@ -31,7 +31,7 @@ Please note that the following transmittals are pending your acknowledgment of r
 <br />
 <br />
 
-<a href="http://{{ site.domain }}{% url 'category_list' %}">
+<a href="https://{{ site.domain }}{% url 'category_list' %}">
     You can download the documents on Phase.
 </a>
 
@@ -39,4 +39,3 @@ Please note that the following transmittals are pending your acknowledgment of r
 <br />
 
 The Phase team.
-

@@ -12,6 +12,6 @@ following documents:
 
 Please click on the following link to download the documents:
 
-http://{{ site.domain }}{{ document.get_absolute_url }}
+https://{{ site.domain }}{{ document.get_absolute_url }}
 
 The Phase team.

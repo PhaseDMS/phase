@@ -8,7 +8,6 @@ Please not that the following transmittals are pending your aknowledgement of re
 
 You can download the documents on Phase:
 
-http://{{ site.domain }}{% url 'category_list' %}
+https://{{ site.domain }}{% url 'category_list' %}
 
 The Phase team.
-
